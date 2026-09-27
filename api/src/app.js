@@ -47,7 +47,7 @@ function limiter(max, windowMs) {
 export async function ensureTeacher(store, { email, password, name }) {
   email = String(email || '').trim().toLowerCase();
   if (!email || !password) return null;
-  if (password.length < 8) throw new Error('ADMIN_PASSWORD debe tener al menos 8 caracteres');
+  if (password.length < 8) console.warn('AVISO: ADMIN_PASSWORD tiene menos de 8 caracteres; usa una más larga.');
   const t = await store.findTeacherByEmail(email);
   if (!t) return store.createTeacher({ name: name || 'Docente', email, passHash: await bcrypt.hash(password, 10) });
   if (!(await bcrypt.compare(password, t.passHash))) await store.setTeacherPass(t.id, await bcrypt.hash(password, 10));
