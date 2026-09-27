@@ -7,7 +7,7 @@ import { applyResult, BADGES, earnedBadges, levelOf, todayBogota, type Lessons, 
 export type User =
   | { role: 'teacher'; id: string; name: string }
   | { role: 'student'; id: string; name: string; username?: string | null; className?: string; grade?: number; units?: string[]; limits?: Limits };
-export type Limits = { quiz: number; game: number; reto: number };
+export type Limits = { quiz: number; game: number; reto: number; gameMin?: number };
 
 type Local = { name: string; xp: number; lessons: Lessons; days: string[]; grades: string[]; last: string | null };
 const EMPTY: Local = { name: '', xp: 0, lessons: {}, days: [], grades: [], last: null };
@@ -138,7 +138,7 @@ export function Providers({ children }: { children: ReactNode }) {
 
   const triesLeft = useCallback((id: string) => {
     const kind = /r$/.test(id) ? 'reto' : /j\d+$/.test(id) ? 'game' : 'quiz';
-    const limit = user?.role === 'student' ? user.limits?.[kind] || 0 : 0;
+    const limit = user?.role === 'student' ? user.limits?.[kind as 'quiz' | 'game' | 'reto'] || 0 : 0;
     const used = state.lessons[id]?.attempts || 0;
     return { limit, used, left: limit ? Math.max(0, limit - used) : Infinity };
   }, [user, state.lessons]);

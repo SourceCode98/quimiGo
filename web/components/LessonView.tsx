@@ -12,7 +12,7 @@ import { NoTries, useTriesLabel } from './Tries';
 import { GameHost } from './GameHost';
 import { lessonGames } from '@/content/lesson-games';
 import { GAME_NAME } from '@/content/game-names';
-import { prevInUnit, stageOf } from '@/lib/order';
+import { passed, prevInUnit, stageOf } from '@/lib/order';
 import { isDone } from '@/lib/game';
 
 const html = (s: string) => ({ __html: s });
@@ -35,11 +35,14 @@ export function LessonView({ id }: { id: string }) {
   const nextSameUnit = next && next.unit.id === l.unit.id;
   // Secciones en orden para el estudiante: 1 Aprende, 2 Practica, 3 Juega, 4 Demuestra. El docente ve todo.
   const student = user?.role === 'student';
-  const stage = student ? stageOf(state.lessons, id) : 4;
+  // Estrellas mínimas que el docente pide en cada minijuego de "Juega" (2 por defecto).
+  const gameMin = user?.role === 'student' ? user.limits?.gameMin ?? 2 : 2;
+  const stage = student ? stageOf(state.lessons, id, gameMin) : 4;
   const quizDone = isDone(state.lessons, id);
   const learnDone = !!r.learn;
   const onSeenAll = () => { if (!r.learn) record(id, { learn: true }); };
-  const played = games.filter((x) => state.lessons[x.id]?.stars != null).length;
+  const played = games.filter((x) => passed(state.lessons, x.id, gameMin)).length;
+  const stars = (k: number) => '★'.repeat(k) + '☆'.repeat(3 - k);
   // Avisa al estudiante cada vez que desbloquea una sección o la lección siguiente.
   const seen = useRef({ id, stage, quizDone });
   useEffect(() => {
@@ -103,12 +106,12 @@ export function LessonView({ id }: { id: string }) {
 
       {games.length > 0 && (
         <section className={'block' + (played === games.length ? ' ok' : '')} id="juega">
-          <div className="bhead"><span className="i">3</span><div><h2>Juega</h2><span className="mono">{games.length} minijuegos · +20 XP y hasta 3 estrellas cada uno</span></div></div>
+          <div className="bhead"><span className="i">3</span><div><h2>Juega</h2><span className="mono">{games.length} minijuegos · +20 XP y hasta 3 estrellas cada uno{gameMin > 0 ? ` · mínimo ${gameMin}★ para superar cada uno` : ''}</span></div></div>
           {stage < 3 ? lockedMsg('Practica') : <>
           <div className="juega-tabs" role="group" aria-label="Minijuegos de la lección">
               {games.map((x, i) => (
                 <button key={x.id} aria-pressed={gi === i} onClick={() => setGi(i)}>
-                  <b>{x.title}</b><small>{GAME_NAME[x.game] || 'Minijuego'} · {state.lessons[x.id]?.stars != null ? '★'.repeat(state.lessons[x.id]!.stars!) + '☆'.repeat(3 - state.lessons[x.id]!.stars!) : 'Sin jugar'}</small>
+                  <b>{x.title}</b><small>{GAME_NAME[x.game] || 'Minijuego'} · {state.lessons[x.id]?.stars != null ? `${stars(state.lessons[x.id]!.stars!)} · ${passed(state.lessons, x.id, gameMin) ? 'Superado' : `Necesitas ${gameMin}★`}` : 'Sin jugar'}</small>
                 </button>
               ))}
             </div>
@@ -122,7 +125,7 @@ export function LessonView({ id }: { id: string }) {
 
       <section className={'block' + (r.stars !== null && r.stars !== undefined ? ' ok' : '')} id="demuestra">
         <div className="bhead"><span className="i">{games.length > 0 ? 4 : 3}</span><div><h2>Demuestra</h2><span className="mono">3 preguntas · 10 XP por acierto{quizLabel ? ` · ${quizLabel}` : ''}</span></div></div>
-        {stage < 4 ? lockedMsg(games.length ? 'Juega: los dos minijuegos' : 'Practica')
+        {stage < 4 ? lockedMsg(games.length ? (gameMin > 0 ? `Juega: los dos minijuegos con al menos ${gameMin} ${gameMin === 1 ? 'estrella' : 'estrellas'}` : 'Juega: los dos minijuegos') : 'Practica')
           : triesLeft(id).left <= 0 && !quizPlayed
           ? <NoTries id={id} what="este quiz" />
           : <Quiz key={id} items={l.quiz} canRetry={triesLeft(id).left > 0} onFinish={(n) => { setQuizPlayed(true); record(id, { stars: n }); }} />}

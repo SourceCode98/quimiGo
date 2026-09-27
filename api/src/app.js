@@ -16,7 +16,7 @@ for (const l of LESSON_LIST) {
   if (!UNITS_BY_GRADE.has(l.grade)) UNITS_BY_GRADE.set(l.grade, []);
   if (!UNITS_BY_GRADE.get(l.grade).includes(u)) UNITS_BY_GRADE.get(l.grade).push(u);
 }
-// Orden dentro de cada lección: Aprende → Practica → Juega (todos sus minijuegos) → Demuestra (quiz).
+// Orden dentro de cada lección: Aprende → Practica → Juega (todos sus minijuegos con el mínimo de estrellas) → Demuestra (quiz).
 // La lección siguiente del módulo se abre al terminar Demuestra de la anterior (g8u1l3 pide g8u1l2),
 // y el reto del módulo cuando se terminó Demuestra en todas sus lecciones.
 const lessonOfId = (id) => id.replace(/j\d+$/, '');
@@ -25,7 +25,7 @@ const LESSONS_OF_UNIT = new Map();
 for (const l of LESSON_LIST.filter((x) => /l\d+$/.test(x.id))) { const u = `g${l.grade}u${l.unit}`; if (!LESSONS_OF_UNIT.has(u)) LESSONS_OF_UNIT.set(u, []); LESSONS_OF_UNIT.get(u).push(l.id); }
 const GAMES_OF = new Map();
 for (const l of LESSON_LIST.filter((x) => /j\d+$/.test(x.id))) { const k = lessonOfId(l.id); if (!GAMES_OF.has(k)) GAMES_OF.set(k, []); GAMES_OF.get(k).push(l.id); }
-function orderBlock(id, { act, stars }, rows) {
+function orderBlock(id, { act, stars }, rows, gameMin) {
   const row = (x) => rows.find((r) => r.lessonId === x);
   const done = (x) => row(x)?.stars != null;
   if (/r$/.test(id)) return (LESSONS_OF_UNIT.get(id.slice(0, -1)) || []).every(done) ? null : 'Completa todas las lecciones del módulo, hasta "Demuestra", para abrir el reto.';
@@ -36,7 +36,7 @@ function orderBlock(id, { act, stars }, rows) {
   if (stars !== undefined) {
     const games = GAMES_OF.get(L) || [];
     if (!(row(L)?.act || act)) return 'Primero completa "Practica".';
-    if (!games.every(done)) return 'Primero termina los minijuegos de "Juega".';
+    if (!games.every((g) => (row(g)?.stars ?? -1) >= gameMin)) return `Primero supera los minijuegos de "Juega" con al menos ${gameMin} ${gameMin === 1 ? 'estrella' : 'estrellas'}.`;
   }
   return null;
 }
@@ -50,7 +50,11 @@ const nameKey = (n) => n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().
 // Secciones con intentos limitables por el docente: quiz de la lección, minijuegos de "Juega" y reto de la unidad.
 const LIMIT_KINDS = ['quiz', 'game', 'reto'];
 const kindOf = (id) => (/r$/.test(id) ? 'reto' : /j\d+$/.test(id) ? 'game' : 'quiz');
-const cleanLimits = (l) => Object.fromEntries(LIMIT_KINDS.map((k) => [k, Number.isInteger(l?.[k]) && l[k] >= 0 && l[k] <= 20 ? l[k] : 0]));
+// gameMin: estrellas mínimas (0 a 3) para dar por superado un minijuego de "Juega"; por defecto 2.
+const cleanLimits = (l) => ({
+  ...Object.fromEntries(LIMIT_KINDS.map((k) => [k, Number.isInteger(l?.[k]) && l[k] >= 0 && l[k] <= 20 ? l[k] : 0])),
+  gameMin: Number.isInteger(l?.gameMin) && l.gameMin >= 0 && l.gameMin <= 3 ? l.gameMin : 2,
+});
 // Usuario del estudiante: minúsculas sin tildes; letras, números, punto y guion bajo. Debe ser distinto al nombre.
 const cleanUsername = (v) => (typeof v === 'string' ? v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().slice(0, 30) : '');
 const USERNAME_RE = /^[a-z0-9][a-z0-9._]{2,19}$/;
@@ -216,7 +220,7 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
     const c = await store.getClass(st.classId);
     if (!c?.units?.includes(UNIT_OF.get(lessonId))) return bad(res, 403, 'Tu profe aún no habilita este módulo.');
     const rows = await store.getProgress(st.id);
-    const blocked = orderBlock(lessonId, { act, stars }, rows);
+    const blocked = orderBlock(lessonId, { act, stars }, rows, cleanLimits(c.limits).gameMin);
     if (blocked) return bad(res, 403, blocked);
     const prev = rows.find((r) => r.lessonId === lessonId);
     // Cada envío con estrellas es un intento; 0 = sin límite.

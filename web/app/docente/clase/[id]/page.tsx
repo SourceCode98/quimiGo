@@ -11,10 +11,10 @@ import { levelOf } from '@/lib/game';
 
 type Row = { lessonId: string; stars: number | null; act: boolean };
 type Student = { id: string; name: string; username?: string | null; xp: number; lastActive: string; progress: Row[] };
-type Limits = { quiz: number; game: number; reto: number };
+type Limits = { quiz: number; game: number; reto: number; gameMin: number };
 type Klass = { id: string; name: string; grade: number; code: string; units?: string[]; limits?: Limits };
 const TRIES = [0, 1, 2, 3, 5];
-const SECTIONS: [keyof Limits, string, string][] = [['quiz', 'Demuestra', 'Quiz de cada lección'], ['game', 'Juega', 'Cada minijuego de la lección'], ['reto', 'Reto', 'Reto al final de cada módulo']];
+const SECTIONS: ['quiz' | 'game' | 'reto', string, string][] = [['quiz', 'Demuestra', 'Quiz de cada lección'], ['game', 'Juega', 'Cada minijuego de la lección'], ['reto', 'Reto', 'Reto al final de cada módulo']];
 
 const when = (iso: string) => {
   if (!iso) return '—';
@@ -65,7 +65,7 @@ export default function Clase() {
     } catch (e) { toast((e as Error).message); }
     setSaving(false);
   };
-  const limits: Limits = c.limits || { quiz: 0, game: 0, reto: 0 };
+  const limits: Limits = { quiz: 0, game: 0, reto: 0, gameMin: 2, ...c.limits };
   const saveLimit = async (k: keyof Limits, v: number) => {
     setSaving(true);
     try {
@@ -130,8 +130,14 @@ export default function Clase() {
               </select>
             </label>
           ))}
+          <label className="tries-row">
+            <span><b>Mínimo en Juega</b><small>Estrellas para superar cada minijuego y abrir Demuestra</small></span>
+            <select value={limits.gameMin} disabled={saving} onChange={(e) => saveLimit('gameMin', Number(e.target.value))}>
+              {[0, 1, 2, 3].map((t) => <option key={t} value={t}>{t === 0 ? 'Sin mínimo' : `${'★'.repeat(t)} ${t} ${t === 1 ? 'estrella' : 'estrellas'}`}</option>)}
+            </select>
+          </label>
         </div>
-        <p className="muted" style={{ fontSize: '.85rem' }}>Se cuenta un intento cada vez que el estudiante termina el quiz, un minijuego o el reto. Se guarda su mejor resultado.</p>
+        <p className="muted" style={{ fontSize: '.85rem' }}>Se cuenta un intento cada vez que el estudiante termina el quiz, un minijuego o el reto. Se guarda su mejor resultado. Si alguien agota sus intentos sin llegar al mínimo de estrellas, súbele los intentos para que pueda seguir.</p>
       </section>
 
       <section className="stats">

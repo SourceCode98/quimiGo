@@ -58,8 +58,8 @@ test('flujo completo docente y estudiante', async () => {
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u2l1', act: true })).status, 403);
 
     // Intentos: el docente limita el quiz a 2; la actividad (Practica) no cuenta.
-    assert.deepEqual((await t('PUT', `/api/classes/${cls.id}/limits`, { limits: { quiz: 2, game: 'x', reto: 50 } })).body.limits, { quiz: 2, game: 0, reto: 0 });
-    assert.deepEqual((await s('GET', '/api/me')).body.user.limits, { quiz: 2, game: 0, reto: 0 });
+    assert.deepEqual((await t('PUT', `/api/classes/${cls.id}/limits`, { limits: { quiz: 2, game: 'x', reto: 50, gameMin: 9 } })).body.limits, { quiz: 2, game: 0, reto: 0, gameMin: 2 });
+    assert.deepEqual((await s('GET', '/api/me')).body.user.limits, { quiz: 2, game: 0, reto: 0, gameMin: 2 });
     // Orden dentro de la lección: Aprende → Practica → Juega → Demuestra.
     let r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', act: true });
     assert.equal(r.status, 403);
@@ -75,7 +75,10 @@ test('flujo completo docente y estudiante', async () => {
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l2', learn: true })).status, 403);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1r', stars: 1 })).status, 403);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 2 })).status, 403);
-    assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1j2', stars: 0 })).body.gained, 0);
+    // Cada minijuego pide un mínimo de estrellas (2 por defecto) para abrir Demuestra.
+    assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1j2', stars: 1 })).body.gained, 10);
+    assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 2 })).status, 403);
+    assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1j2', stars: 2 })).body.gained, 10);
     r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 2 });
     assert.equal(r.body.gained, 20);
     r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 1, act: true });
@@ -83,13 +86,13 @@ test('flujo completo docente y estudiante', async () => {
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 3 })).status, 403);
     assert.equal((await t('PUT', `/api/classes/${cls.id}/limits`, { limits: { quiz: 0 } })).status, 200);
     r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 3 });
-    assert.deepEqual([r.body.gained, r.body.xp, r.body.record.attempts], [10, 70, 3]);
+    assert.deepEqual([r.body.gained, r.body.xp, r.body.record.attempts], [10, 90, 3]);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l2', learn: true })).status, 200);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1r', stars: 1 })).status, 403);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'falsa', stars: 3 })).status, 400);
 
     const me = (await s('GET', '/api/me')).body;
-    assert.equal(me.xp, 70);
+    assert.equal(me.xp, 90);
     assert.deepEqual(me.progress.g10u1l1, { stars: 3, act: true, learn: true, attempts: 3 });
     assert.equal(me.days.length, 1);
 
@@ -110,7 +113,7 @@ test('flujo completo docente y estudiante', async () => {
 
     const detail = (await t('GET', `/api/classes/${cls.id}`)).body;
     assert.equal(detail.students.length, 1);
-    assert.equal(detail.students[0].xp, 70);
+    assert.equal(detail.students[0].xp, 90);
     assert.deepEqual(detail.class.units, ['g10u1']);
     const sid = detail.students[0].id;
     assert.equal((await t('POST', `/api/classes/${cls.id}/students/${sid}/pin`, { pin: '5555' })).status, 200);
