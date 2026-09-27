@@ -1,0 +1,31 @@
+# Abre la web de Vercel en un navegador e intenta entrar como docente. La contraseña no se muestra en los logs.
+name: Probar la web
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL de la web en Vercel (sin / al final)'
+        required: true
+      email:
+        description: 'Correo del docente (opcional)'
+        default: ''
+      password:
+        description: 'Contraseña (opcional, no se muestra)'
+        default: ''
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ocultar la contraseña
+        run: |
+          pw=$(jq -r '.inputs.password' "$GITHUB_EVENT_PATH")
+          [ -n "$pw" ] && echo "::add-mask::$pw" || true
+      - name: API a través de la web
+        run: |
+          url=$(jq -r '.inputs.url' "$GITHUB_EVENT_PATH")
+          curl -sS --max-time 90 -w '\nHTTP %{http_code}\n' "$url/api/health" | head -c 600
+      - name: Instalar navegador
+        run: cd .github/scripts && npm init -y >/dev/null && npm i playwright@1 >/dev/null && npx playwright install --with-deps chromium >/dev/null
+      - name: Login en el navegador
+        run: node .github/scripts/probar-web.mjs
