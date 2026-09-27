@@ -21,7 +21,7 @@ export function RetoView({ unitId }: { unitId: string }) {
     <section className="locked-card">
       <span className="lock-ic" aria-hidden>🔒</span>
       <h1>Primero termina las lecciones del módulo</h1>
-      <p>El reto se abre cuando revisas todos los pasos de “Aprende” en cada lección de “{u.title}”.</p>
+      <p>El reto se abre cuando completas cada lección de “{u.title}” hasta “Demuestra”.</p>
       <Link className="btn" href={`/grado/${u.grade.n}`}>Ver las lecciones</Link>
     </section>
   );

@@ -16,17 +16,29 @@ for (const l of LESSON_LIST) {
   if (!UNITS_BY_GRADE.has(l.grade)) UNITS_BY_GRADE.set(l.grade, []);
   if (!UNITS_BY_GRADE.get(l.grade).includes(u)) UNITS_BY_GRADE.get(l.grade).push(u);
 }
-// Orden dentro de cada módulo: una lección se abre cuando el estudiante terminó "Aprende" de la anterior
-// (g8u1l3 pide g8u1l2); el reto de la unidad pide "Aprende" de todas sus lecciones.
+// Orden dentro de cada lección: Aprende → Practica → Juega (todos sus minijuegos) → Demuestra (quiz).
+// La lección siguiente del módulo se abre al terminar Demuestra de la anterior (g8u1l3 pide g8u1l2),
+// y el reto del módulo cuando se terminó Demuestra en todas sus lecciones.
 const lessonOfId = (id) => id.replace(/j\d+$/, '');
 const prevLesson = (id) => { const m = id.match(/^(g\d+u\d+l)(\d+)$/); return m && Number(m[2]) > 1 ? m[1] + (Number(m[2]) - 1) : null; };
 const LESSONS_OF_UNIT = new Map();
 for (const l of LESSON_LIST.filter((x) => /l\d+$/.test(x.id))) { const u = `g${l.grade}u${l.unit}`; if (!LESSONS_OF_UNIT.has(u)) LESSONS_OF_UNIT.set(u, []); LESSONS_OF_UNIT.get(u).push(l.id); }
-function orderBlock(id, rows) {
-  const learned = (x) => rows.some((r) => r.lessonId === x && r.learn);
-  if (/r$/.test(id)) return (LESSONS_OF_UNIT.get(id.slice(0, -1)) || []).every(learned) ? null : 'Termina "Aprende" de todas las lecciones del módulo para abrir el reto.';
-  const p = prevLesson(lessonOfId(id));
-  return p && !learned(p) ? 'Primero termina "Aprende" de la lección anterior.' : null;
+const GAMES_OF = new Map();
+for (const l of LESSON_LIST.filter((x) => /j\d+$/.test(x.id))) { const k = lessonOfId(l.id); if (!GAMES_OF.has(k)) GAMES_OF.set(k, []); GAMES_OF.get(k).push(l.id); }
+function orderBlock(id, { act, stars }, rows) {
+  const row = (x) => rows.find((r) => r.lessonId === x);
+  const done = (x) => row(x)?.stars != null;
+  if (/r$/.test(id)) return (LESSONS_OF_UNIT.get(id.slice(0, -1)) || []).every(done) ? null : 'Completa todas las lecciones del módulo, hasta "Demuestra", para abrir el reto.';
+  const L = lessonOfId(id), p = prevLesson(L);
+  if (p && !done(p)) return 'Primero completa la lección anterior, hasta "Demuestra".';
+  if (id !== L) return row(L)?.act ? null : 'Primero completa "Practica".';
+  if (act && !row(L)?.learn) return 'Primero revisa todos los pasos de "Aprende".';
+  if (stars !== undefined) {
+    const games = GAMES_OF.get(L) || [];
+    if (!(row(L)?.act || act)) return 'Primero completa "Practica".';
+    if (!games.every(done)) return 'Primero termina los minijuegos de "Juega".';
+  }
+  return null;
 }
 const COOKIE = 'ql_session';
 const MAX_AGE = 30 * 24 * 3600;
@@ -204,7 +216,7 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
     const c = await store.getClass(st.classId);
     if (!c?.units?.includes(UNIT_OF.get(lessonId))) return bad(res, 403, 'Tu profe aún no habilita este módulo.');
     const rows = await store.getProgress(st.id);
-    const blocked = orderBlock(lessonId, rows);
+    const blocked = orderBlock(lessonId, { act, stars }, rows);
     if (blocked) return bad(res, 403, blocked);
     const prev = rows.find((r) => r.lessonId === lessonId);
     // Cada envío con estrellas es un intento; 0 = sin límite.

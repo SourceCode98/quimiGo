@@ -43,13 +43,13 @@ export function CourseView({ n }: { n: number }) {
               ) : (
                 <div key={l.id} className="lrow is-locked" aria-disabled>
                   <span className="n" aria-hidden>🔒</span>
-                  <span><b>{l.title}</b><small>Se abre al terminar “Aprende” de la lección {li}</small></span>
+                  <span><b>{l.title}</b><small>Se abre al completar la lección {li}</small></span>
                 </div>
               ))}
               {UNIT_GAMES[u.id] && !retoOpen(u.id) && (
                 <div className="reto-row is-locked" aria-disabled>
                   <span className="gi">🔒</span>
-                  <span><b>Reto de la unidad: {UNIT_GAMES[u.id].title}</b><small>Se abre al terminar “Aprende” de todas las lecciones</small></span>
+                  <span><b>Reto de la unidad: {UNIT_GAMES[u.id].title}</b><small>Se abre al completar todas las lecciones del módulo</small></span>
                 </div>
               )}
               {UNIT_GAMES[u.id] && retoOpen(u.id) && (

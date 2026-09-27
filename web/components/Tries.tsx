@@ -3,12 +3,13 @@ import { useQL } from './Providers';
 
 const n = (k: number) => `${k} ${k === 1 ? 'intento' : 'intentos'}`;
 
-/** Texto corto para el encabezado de la sección: "Intento 2 de 3". Vacío si no hay límite. */
+/** Intentos que le quedan al estudiante, siempre visibles para él: "Te quedan 2 de 3 intentos". Vacío para el docente. */
 export function useTriesLabel(id: string) {
-  const { triesLeft } = useQL();
+  const { triesLeft, user } = useQL();
+  if (user?.role !== 'student') return '';
   const t = triesLeft(id);
-  if (!t.limit) return '';
-  return t.left > 0 ? `Intento ${t.used + 1} de ${t.limit}` : `Sin intentos (${t.limit})`;
+  if (!t.limit) return 'Intentos ilimitados';
+  return t.left > 0 ? `Te ${t.left === 1 ? 'queda' : 'quedan'} ${t.left} de ${n(t.limit)}` : `Sin intentos (usaste ${n(t.limit)})`;
 }
 
 /** Aviso cuando el estudiante ya usó todos los intentos que fijó su docente. */
