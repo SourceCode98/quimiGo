@@ -29,8 +29,12 @@ export function Learn({ l, onSeenAll }: { l: LessonRef; onSeenAll: () => void })
     const k = Math.max(0, Math.min(n - 1, i));
     setCur(k);
     scene.current?.step(k);
-    setSeen((s) => { const x = new Set(s); x.add(k); if (x.size === n) done.current(); return x; });
+    setSeen((s) => { if (s.has(k)) return s; const x = new Set(s); x.add(k); return x; });
   };
+
+  // Avisa una sola vez cuando se vieron todos los pasos (también si la lección tiene un solo paso).
+  const fired = useRef(false);
+  useEffect(() => { if (!fired.current && seen.size >= n) { fired.current = true; done.current(); } }, [seen, n]);
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {

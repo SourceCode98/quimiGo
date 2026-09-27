@@ -10,13 +10,21 @@ import { NoTries, useTriesLabel } from './Tries';
 import { GAME_NAME as INFO } from '@/content/game-names';
 
 export function RetoView({ unitId }: { unitId: string }) {
-  const { record, canOpen, ready, triesLeft } = useQL();
+  const { record, canOpen, retoOpen, ready, triesLeft } = useQL();
   const u = UNIT_BY_ID[unitId];
   const spec = useMemo(() => unitGame(u)!, [u]);
   const next = u.grade.units[u.index + 1];
   const label = useTriesLabel(spec.id);
   if (!ready) return <p className="muted">Cargando…</p>;
   if (!canOpen(u.id)) return <Locked what={`El reto de “${u.title}”`} gradeN={u.grade.n} />;
+  if (!retoOpen(u.id)) return (
+    <section className="locked-card">
+      <span className="lock-ic" aria-hidden>🔒</span>
+      <h1>Primero termina las lecciones del módulo</h1>
+      <p>El reto se abre cuando revisas todos los pasos de “Aprende” en cada lección de “{u.title}”.</p>
+      <Link className="btn" href={`/grado/${u.grade.n}`}>Ver las lecciones</Link>
+    </section>
+  );
   return (
     <>
       <section className="reto-head" style={gc(u.grade.id)}>

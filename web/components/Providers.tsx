@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { api } from '@/lib/api';
+import { lessonReady, retoReady } from '@/lib/order';
 import { applyResult, BADGES, earnedBadges, levelOf, todayBogota, type Lessons, type Rec } from '@/lib/game';
 
 export type User =
@@ -25,10 +26,13 @@ type Ctx = {
   logout: () => Promise<void>;
   setGuestName: (n: string) => void;
   visit: (lessonId: string, gradeId: string) => void;
-  record: (lessonId: string, input: { act?: boolean; stars?: number }) => Promise<void>;
+  record: (lessonId: string, input: { act?: boolean; stars?: number; learn?: boolean }) => Promise<void>;
   toast: (msg: string) => void;
   /** Un estudiante solo abre los módulos (unidades) que su docente habilitó; docentes e invitados, todos. */
   canOpen: (unitId: string) => boolean;
+  /** Un estudiante abre una lección cuando terminó "Aprende" de la anterior del módulo, y el reto cuando terminó todas. */
+  lessonOpen: (lessonId: string) => boolean;
+  retoOpen: (unitId: string) => boolean;
   /** Intentos que le quedan al estudiante en un quiz, juego o reto (Infinity si no hay límite). */
   triesLeft: (id: string) => { left: number; limit: number; used: number };
 };
@@ -97,7 +101,7 @@ export function Providers({ children }: { children: ReactNode }) {
     });
   }, [persist, announce, synced]);
 
-  const record = useCallback(async (lessonId: string, input: { act?: boolean; stars?: number }) => {
+  const record = useCallback(async (lessonId: string, input: { act?: boolean; stars?: number; learn?: boolean }) => {
     const why = input.act ? 'Actividad completada' : `${input.stars} de 3 correctas`;
     if (synced) {
       try {
@@ -139,9 +143,11 @@ export function Providers({ children }: { children: ReactNode }) {
     return { limit, used, left: limit ? Math.max(0, limit - used) : Infinity };
   }, [user, state.lessons]);
   const canOpen = useCallback((unitId: string) => user?.role !== 'student' || !!user.units?.includes(unitId), [user]);
+  const lessonOpen = useCallback((id: string) => user?.role !== 'student' || lessonReady(state.lessons, id), [user, state.lessons]);
+  const retoOpen = useCallback((unitId: string) => user?.role !== 'student' || retoReady(state.lessons, unitId), [user, state.lessons]);
 
-  const value = useMemo<Ctx>(() => ({ ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen, triesLeft }),
-    [ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen, triesLeft]);
+  const value = useMemo<Ctx>(() => ({ ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen, lessonOpen, retoOpen, triesLeft }),
+    [ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen, lessonOpen, retoOpen, triesLeft]);
 
   return (
     <C.Provider value={value}>

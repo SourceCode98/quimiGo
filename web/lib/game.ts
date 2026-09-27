@@ -1,6 +1,6 @@
 import { ALL_LESSONS, type LessonRef } from '@/content';
 
-export type Rec = { stars: number | null; act: boolean; attempts?: number };
+export type Rec = { stars: number | null; act: boolean; learn?: boolean; attempts?: number };
 export type Lessons = Record<string, Rec>;
 
 export const LEVELS = ['Aprendiz', 'Curioso', 'Observador', 'Experimentador', 'Laboratorista', 'Analista', 'Investigador', 'Científico', 'Premio Nobel'];
@@ -60,10 +60,11 @@ export function earnedBadges(s: { xp: number; lessons: Lessons; days: string[]; 
 }
 
 // Mismas reglas que el servidor (api/src/game.js): +20 por la actividad y +10 por cada estrella nueva.
-export function applyResult(prev: Rec | undefined, input: { act?: boolean; stars?: number }) {
+export function applyResult(prev: Rec | undefined, input: { act?: boolean; stars?: number; learn?: boolean }) {
   const before: Rec = prev || { stars: null, act: false };
   const next: Rec = { ...before };
   let gained = 0;
+  if (input.learn) next.learn = true;
   if (input.act && !before.act) { next.act = true; gained += 20; }
   if (input.stars !== undefined) {
     const best = before.stars ?? 0;

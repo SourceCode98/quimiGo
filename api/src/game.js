@@ -2,10 +2,11 @@
 export const XP_ACTIVITY = 20;
 export const XP_PER_STAR = 10;
 
-export function applyResult(prev, { act, stars }) {
+export function applyResult(prev, { act, stars, learn }) {
   const before = prev || { stars: null, act: false, attempts: 0 };
   const next = { ...before };
   let gained = 0;
+  if (learn) next.learn = true;
   if (act && !before.act) { next.act = true; gained += XP_ACTIVITY; }
   if (stars !== undefined && stars !== null) {
     const best = before.stars ?? 0;

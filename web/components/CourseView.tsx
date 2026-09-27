@@ -7,7 +7,7 @@ import { useQL } from './Providers';
 import { gc, Stars } from './ui';
 
 export function CourseView({ n }: { n: number }) {
-  const { state, canOpen, user } = useQL();
+  const { state, canOpen, lessonOpen, retoOpen, user } = useQL();
   const g = GRADES.find((x) => x.n === n)!;
   const ls = g.units.flatMap((u) => u.lessons);
   const d = ls.filter((l) => isDone(state.lessons, l.id)).length;
@@ -34,14 +34,25 @@ export function CourseView({ n }: { n: number }) {
             <div className="unit-h"><h2>{ui + 1}. {u.title}</h2><span className="mono">{u.lessons.filter((l) => isDone(state.lessons, l.id)).length}/{u.lessons.length}</span></div>
             <p style={{ color: 'var(--muted)', fontSize: '.92rem' }}>{u.desc}</p>
             <div className="lessons">
-              {u.lessons.map((l, li) => (
+              {u.lessons.map((l, li) => lessonOpen(l.id) ? (
                 <Link key={l.id} href={`/leccion/${l.id}`} className={'lrow' + (isDone(state.lessons, l.id) ? ' done' : '')}>
                   <span className="n">{li + 1}</span>
                   <span><b>{l.title}</b><small>{ACT_NAME[l.act.type]} · {l.time} min</small></span>
                   <Stars n={state.lessons[l.id]?.stars} />
                 </Link>
+              ) : (
+                <div key={l.id} className="lrow is-locked" aria-disabled>
+                  <span className="n" aria-hidden>🔒</span>
+                  <span><b>{l.title}</b><small>Se abre al terminar “Aprende” de la lección {li}</small></span>
+                </div>
               ))}
-              {UNIT_GAMES[u.id] && (
+              {UNIT_GAMES[u.id] && !retoOpen(u.id) && (
+                <div className="reto-row is-locked" aria-disabled>
+                  <span className="gi">🔒</span>
+                  <span><b>Reto de la unidad: {UNIT_GAMES[u.id].title}</b><small>Se abre al terminar “Aprende” de todas las lecciones</small></span>
+                </div>
+              )}
+              {UNIT_GAMES[u.id] && retoOpen(u.id) && (
                 <Link href={`/reto/${u.id}`} className="reto-row">
                   <span className="gi">★</span>
                   <span><b>Reto de la unidad: {UNIT_GAMES[u.id].title}</b><small>Minijuego · +20 XP y hasta 3 estrellas</small></span>

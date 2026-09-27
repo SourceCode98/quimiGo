@@ -19,7 +19,7 @@ const FREE: Free[] = [
 ];
 
 export default function Juegos() {
-  const { state, canOpen, user } = useQL();
+  const { state, canOpen, retoOpen, user } = useQL();
   const shown = user?.role === 'student' && user.grade ? GRADES.filter((g) => g.n === user.grade) : GRADES;
   const [free, setFree] = useState<Free | null>(null);
   if (free) return (
@@ -45,9 +45,10 @@ export default function Juegos() {
           <section className="arcade-grade" key={g.id}><h2>Retos de {g.n}° · {g.title}</h2><div className="gamecards">
             {g.units.filter((u) => UNIT_GAMES[u.id]).map((u) => {
               const sp = UNIT_GAMES[u.id];
+              const ok = canOpen(u.id) && retoOpen(u.id);
               return (
-                <Link key={u.id} href={`/reto/${u.id}`} className={'gamecard' + (canOpen(u.id) ? '' : ' is-locked')} aria-disabled={!canOpen(u.id)} tabIndex={canOpen(u.id) ? undefined : -1} style={{ ['--gc' as string]: `var(--${g.id})` }}>
-                  <span className="gi">{canOpen(u.id) ? IC[sp.game] : '🔒'}</span><b>{sp.title}</b><small>{NAME[sp.game]} · {u.title}</small><Stars n={state.lessons[u.id + 'r']?.stars} />
+                <Link key={u.id} href={`/reto/${u.id}`} className={'gamecard' + (ok ? '' : ' is-locked')} aria-disabled={!ok} tabIndex={ok ? undefined : -1} style={{ ['--gc' as string]: `var(--${g.id})` }}>
+                  <span className="gi">{ok ? IC[sp.game] : '🔒'}</span><b>{sp.title}</b><small>{NAME[sp.game]} · {u.title}</small><Stars n={state.lessons[u.id + 'r']?.stars} />
                 </Link>
               );
             })}

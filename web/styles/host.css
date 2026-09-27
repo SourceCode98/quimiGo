@@ -77,3 +77,6 @@
 .entry{display:flex;flex-direction:column;align-items:flex-start;gap:8px;border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface);text-decoration:none;color:inherit}
 .entry:hover{border-color:var(--accent)}
 .entry p{color:var(--muted)}
+.btn.is-locked{opacity:.65;background:var(--muted)}
+.lrow.is-locked,.reto-row.is-locked{opacity:.55;cursor:not-allowed}
+.lrow.is-locked .n{font-size:.9rem}

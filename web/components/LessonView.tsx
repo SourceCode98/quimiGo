@@ -12,11 +12,12 @@ import { NoTries, useTriesLabel } from './Tries';
 import { GameHost } from './GameHost';
 import { lessonGames } from '@/content/lesson-games';
 import { GAME_NAME } from '@/content/game-names';
+import { prevInUnit } from '@/lib/order';
 
 const html = (s: string) => ({ __html: s });
 
 export function LessonView({ id }: { id: string }) {
-  const { state, visit, record, canOpen, ready, triesLeft } = useQL();
+  const { state, visit, record, canOpen, lessonOpen, ready, triesLeft, toast } = useQL();
   const l = LESSON_BY_ID[id];
   const g = l.grade;
   const idx = ALL_LESSONS.indexOf(l);
@@ -29,14 +30,32 @@ export function LessonView({ id }: { id: string }) {
   const [quizPlayed, setQuizPlayed] = useState(false);
   const quizLabel = useTriesLabel(id);
   const gameLabel = useTriesLabel(games[gi]?.id || id + 'j1');
-  const open = canOpen(l.unit.id);
+  const open = canOpen(l.unit.id) && lessonOpen(id);
+  const before = prevInUnit(id);
+  const learnDone = learned || !!r.learn;
+  const nextSameUnit = next && next.unit.id === l.unit.id;
+  const onSeenAll = () => {
+    setLearned(true);
+    if (r.learn) return;
+    record(id, { learn: true });
+    if (nextSameUnit) toast(`Desbloqueaste la siguiente lección: ${next.title}`);
+    else toast('Terminaste “Aprende”. ¡Bien hecho!');
+  };
   const played = games.filter((x) => state.lessons[x.id]?.stars != null).length;
 
   useEffect(() => { if (open) visit(id, g.id); }, [id, g.id, visit, open]);
   useEffect(() => { setGi(0); setQuizPlayed(false); }, [id]);
 
   if (!ready) return <p className="muted">Cargando…</p>;
-  if (!open) return <Locked what={`El módulo “${l.unit.title}”`} gradeN={g.n} />;
+  if (!canOpen(l.unit.id)) return <Locked what={`El módulo “${l.unit.title}”`} gradeN={g.n} />;
+  if (!open && before) return (
+    <section className="locked-card">
+      <span className="lock-ic" aria-hidden>🔒</span>
+      <h1>Primero termina la lección anterior</h1>
+      <p>Las lecciones van en orden. Revisa todos los pasos de “Aprende” en <b>{before.title}</b> y esta lección se abrirá.</p>
+      <Link className="btn" href={`/leccion/${before.id}`}>Ir a {before.title}</Link>
+    </section>
+  );
 
   return (
     <>
@@ -44,7 +63,7 @@ export function LessonView({ id }: { id: string }) {
         <span className="mono">Grado {g.n}° · Unidad {l.unitIndex + 1}: {l.unit.title} · Lección {l.lessonIndex + 1}</span>
         <h1>{l.title}</h1>
         <nav className="phases" aria-label="Momentos">
-          <a href="#aprende" className={learned ? 'ok' : ''}>1 Aprende</a>
+          <a href="#aprende" className={learnDone ? 'ok' : ''}>1 Aprende</a>
           <a href="#practica" className={r.act ? 'ok' : ''}>2 Practica</a>
           {games.length > 0 && <a href="#juega" className={played === games.length ? 'ok' : ''}>3 Juega</a>}
           <a href="#demuestra" className={r.stars !== null && r.stars !== undefined ? 'ok' : ''}>{games.length > 0 ? 4 : 3} Demuestra</a>
@@ -65,8 +84,8 @@ export function LessonView({ id }: { id: string }) {
       </section>
 
       <section className="block" id="aprende">
-        <div className="bhead"><span className="i">1</span><div><h2>Aprende</h2><span className="mono">Explora paso a paso · usa las flechas o toca Siguiente</span></div></div>
-        <Learn key={id} l={l} onSeenAll={() => setLearned(true)} />
+        <div className="bhead"><span className="i">1</span><div><h2>Aprende</h2><span className="mono">{learnDone ? 'Completado · puedes repasar cuando quieras' : 'Revisa todos los pasos para abrir la siguiente lección'}</span></div></div>
+        <Learn key={id} l={l} onSeenAll={onSeenAll} />
       </section>
 
       <section className={'block' + (r.act ? ' ok' : '')} id="practica">
@@ -100,7 +119,9 @@ export function LessonView({ id }: { id: string }) {
 
       <div className="nav">
         {prev ? <Link className="btn ghost" href={`/leccion/${prev.id}`}>← {prev.title}</Link> : <span />}
-        {next && <Link className="btn" href={`/leccion/${next.id}`}>Siguiente: {next.title} →</Link>}
+        {next && (lessonOpen(next.id) || !nextSameUnit
+          ? <Link className="btn" href={`/leccion/${next.id}`}>Siguiente: {next.title} →</Link>
+          : <a className="btn is-locked" href="#aprende" title="Revisa todos los pasos de Aprende">🔒 Termina “Aprende” para seguir</a>)}
       </div>
     </>
   );

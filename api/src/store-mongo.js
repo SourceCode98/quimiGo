@@ -27,7 +27,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
   const teacher = (r) => r && { id: r._id, name: r.name, email: r.email, passHash: r.passHash, createdAt: iso(r.createdAt) };
   const klass = (r) => r && { id: r._id, teacherId: r.teacherId, name: r.name, grade: r.grade, code: r.code, units: r.units || [], limits: r.limits || {}, createdAt: iso(r.createdAt) };
   const student = (r) => r && { id: r._id, classId: r.classId, name: r.name, nameKey: r.nameKey, pinHash: r.pinHash, xp: r.xp, days: r.days || [], lastActive: iso(r.lastActive) };
-  const prog = (r) => ({ lessonId: r.lessonId, stars: r.stars, act: r.act, attempts: r.attempts, updatedAt: iso(r.updatedAt) });
+  const prog = (r) => ({ lessonId: r.lessonId, stars: r.stars, act: r.act, learn: !!r.learn, attempts: r.attempts, updatedAt: iso(r.updatedAt) });
 
   return {
     kind: 'mongodb',
@@ -76,10 +76,10 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
     },
 
     async getProgress(studentId) { return (await progress.find({ studentId }).toArray()).map(prog); },
-    async saveProgress(studentId, { lessonId, stars, act, attempts }) {
+    async saveProgress(studentId, { lessonId, stars, act, learn, attempts }) {
       await progress.updateOne(
         { studentId, lessonId },
-        { $set: { stars, act: !!act, attempts, updatedAt: new Date() } },
+        { $set: { stars, act: !!act, learn: !!learn, attempts, updatedAt: new Date() } },
         { upsert: true },
       );
     },

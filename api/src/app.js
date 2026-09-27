@@ -16,6 +16,18 @@ for (const l of LESSON_LIST) {
   if (!UNITS_BY_GRADE.has(l.grade)) UNITS_BY_GRADE.set(l.grade, []);
   if (!UNITS_BY_GRADE.get(l.grade).includes(u)) UNITS_BY_GRADE.get(l.grade).push(u);
 }
+// Orden dentro de cada módulo: una lección se abre cuando el estudiante terminó "Aprende" de la anterior
+// (g8u1l3 pide g8u1l2); el reto de la unidad pide "Aprende" de todas sus lecciones.
+const lessonOfId = (id) => id.replace(/j\d+$/, '');
+const prevLesson = (id) => { const m = id.match(/^(g\d+u\d+l)(\d+)$/); return m && Number(m[2]) > 1 ? m[1] + (Number(m[2]) - 1) : null; };
+const LESSONS_OF_UNIT = new Map();
+for (const l of LESSON_LIST.filter((x) => /l\d+$/.test(x.id))) { const u = `g${l.grade}u${l.unit}`; if (!LESSONS_OF_UNIT.has(u)) LESSONS_OF_UNIT.set(u, []); LESSONS_OF_UNIT.get(u).push(l.id); }
+function orderBlock(id, rows) {
+  const learned = (x) => rows.some((r) => r.lessonId === x && r.learn);
+  if (/r$/.test(id)) return (LESSONS_OF_UNIT.get(id.slice(0, -1)) || []).every(learned) ? null : 'Termina "Aprende" de todas las lecciones del módulo para abrir el reto.';
+  const p = prevLesson(lessonOfId(id));
+  return p && !learned(p) ? 'Primero termina "Aprende" de la lección anterior.' : null;
+}
 const COOKIE = 'ql_session';
 const MAX_AGE = 30 * 24 * 3600;
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -140,7 +152,7 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
     res.json({
       user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade, units: c?.units || [], limits: cleanLimits(c?.limits) },
       xp: st.xp, days: st.days,
-      progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act, attempts: r.attempts || 0 }])),
+      progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act, learn: !!r.learn, attempts: r.attempts || 0 }])),
     });
   }));
 
@@ -148,21 +160,26 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
     const lessonId = str(req.body?.lessonId, 20);
     if (!LESSONS.has(lessonId)) return bad(res, 400, 'Lección desconocida.');
     const act = req.body?.act === true;
+    // "learn" marca que terminó todos los pasos de Aprende (solo lecciones, no da XP).
+    const learn = req.body?.learn === true && /l\d+$/.test(lessonId);
     const stars = Number.isInteger(req.body?.stars) && req.body.stars >= 0 && req.body.stars <= 3 ? req.body.stars : undefined;
-    if (!act && stars === undefined) return bad(res, 400, 'Nada que guardar.');
+    if (!act && !learn && stars === undefined) return bad(res, 400, 'Nada que guardar.');
     const st = await store.getStudent(req.session.sub);
     if (!st) return bad(res, 401, 'Tu cuenta ya no existe.');
     // El docente decide qué módulos (unidades) están abiertos para su curso.
     const c = await store.getClass(st.classId);
     if (!c?.units?.includes(UNIT_OF.get(lessonId))) return bad(res, 403, 'Tu profe aún no habilita este módulo.');
-    const prev = (await store.getProgress(st.id)).find((r) => r.lessonId === lessonId);
+    const rows = await store.getProgress(st.id);
+    const blocked = orderBlock(lessonId, rows);
+    if (blocked) return bad(res, 403, blocked);
+    const prev = rows.find((r) => r.lessonId === lessonId);
     // Cada envío con estrellas es un intento; 0 = sin límite.
     const limit = cleanLimits(c.limits)[kindOf(lessonId)];
     if (stars !== undefined && limit && (prev?.attempts || 0) >= limit) return bad(res, 403, `Ya usaste tus ${limit} ${limit === 1 ? 'intento' : 'intentos'}.`);
-    const { next, gained } = applyResult(prev, { act, stars });
-    await store.saveProgress(st.id, { lessonId, stars: next.stars ?? null, act: next.act, attempts: next.attempts || 0 });
+    const { next, gained } = applyResult(prev, { act, stars, learn });
+    await store.saveProgress(st.id, { lessonId, stars: next.stars ?? null, act: next.act, learn: !!next.learn, attempts: next.attempts || 0 });
     const xp = await store.addXp(st.id, gained, addDay(st.days, today()));
-    res.json({ xp, gained, record: { stars: next.stars ?? null, act: next.act, attempts: next.attempts || 0 } });
+    res.json({ xp, gained, record: { stars: next.stars ?? null, act: next.act, learn: !!next.learn, attempts: next.attempts || 0 } });
   }));
 
   /* ---------- cursos del docente ---------- */
