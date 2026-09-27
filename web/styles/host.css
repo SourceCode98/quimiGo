@@ -1,0 +1,37 @@
+/* ---- host.css: Aprende paso a paso, retos de unidad y arcade ---- */
+.learn{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.learn{grid-template-columns:1fr}}
+.learn-scene{position:sticky;top:92px;min-width:0}
+@media (max-width:820px){.learn-scene{position:static}}
+.learn-scene .sc-box{display:flex;flex-direction:column;gap:10px}
+.learn-card{display:flex;flex-direction:column;gap:12px;min-width:0}
+.step-count{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font:700 .8rem "Bricolage Grotesque",sans-serif;color:var(--muted);padding:0}
+.dots button.seen{border-color:var(--accent);color:var(--accent)}
+.dots button[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step-text{background:var(--surface2);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-height:150px}
+.step-text h3{font-size:1.25rem}
+.step-text p{font-size:1.02rem}
+.step-text.enter{animation:stepIn .35s ease}
+@keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step-nav{display:flex;justify-content:space-between;gap:8px}
+.learn-extra{display:flex;flex-direction:column;gap:10px}
+.learn-extra.locked{opacity:.45}
+@media (prefers-reduced-motion: reduce){.step-text.enter{animation:none}}
+
+/* reto al final de cada unidad */
+.reto-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;border:1px dashed var(--gold);border-radius:10px;padding:10px 12px;background:var(--gold-soft);text-align:left;text-decoration:none;color:inherit;width:100%}
+.reto-row:hover{border-style:solid}
+.reto-row .gi{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--gold);color:#1B1408;font:800 1.2rem "Bricolage Grotesque",sans-serif}
+.reto-row small{display:block;color:var(--muted);font-size:.8rem}
+.reto-head{display:flex;flex-direction:column;gap:8px;border-left:4px solid var(--gold);padding-left:16px}
+
+/* arcade */
+.arcade{display:flex;flex-direction:column;gap:22px}
+.arcade-grade h2{margin-bottom:10px}
+.gamecards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.gamecard{border:1px solid var(--line);border-top:4px solid var(--gc,var(--gold));background:var(--surface);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left;text-decoration:none;color:inherit}
+.gamecard:hover{border-color:var(--gc,var(--gold))}
+.gamecard .gi{font:800 1.5rem "Bricolage Grotesque",sans-serif;color:var(--gc,var(--gold))}
+.gamecard small{color:var(--muted);font-size:.8rem}

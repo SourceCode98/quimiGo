@@ -1,0 +1,21 @@
+{
+  "name": "quimicalearn-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "API de QuimicaLearn: cuentas, cursos y progreso. Corre en Render o en una máquina virtual de Oracle Cloud.",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/*.test.js",
+    "sync-lessons": "node scripts/sync-lessons.mjs"
+  },
+  "engines": { "node": "22.x" },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "jose": "^6.1.0",
+    "oracledb": "^7.0.1"
+  }
+}

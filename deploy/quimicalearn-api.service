@@ -1,0 +1,17 @@
+[Unit]
+Description=QuimicaLearn API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=quimicalearn
+WorkingDirectory=/opt/quimicalearn/api
+EnvironmentFile=/opt/quimicalearn/api/.env
+ExecStart=/usr/bin/node src/server.js
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,67 @@
+/* Escenas 3D grupo B: mol, lattice, reaction, chain */
+.sc-stage{height:340px}
+@media (max-width:559px){.sc-stage{height:280px}}
+.scb-3d canvas{position:absolute;inset:0}
+
+/* título corto arriba a la izquierda */
+.scb-cap{position:absolute;left:12px;top:10px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;max-width:calc(100% - 24px);pointer-events:none;color:#E6ECF0;font-size:.82rem;line-height:1.3;z-index:2}
+.scb-cap b{font:700 .95rem "Bricolage Grotesque","IBM Plex Sans",sans-serif;color:#fff}
+.scb-cap span{color:#9FB4C4;font-size:.85rem}
+.scb-cap span.f{font-weight:600;color:#B9CAD6}
+.scb-cap sub,.stage .lab sub,.scb-eq sub{font-size:.72em;vertical-align:-.25em;line-height:0}
+.scb-cap:empty{display:none}
+
+/* etiquetas especiales */
+.stage .lab.scb-name{background:transparent;color:#C9D6E0;font-weight:600;font-size:.8rem;white-space:nowrap}
+.stage .lab.scb-grp{background:rgba(231,180,96,.95);color:#1B1305;font-weight:700;white-space:nowrap;padding:1px 7px;border-radius:999px}
+.stage .lab.scb-dneg{background:transparent;color:#FF8F9C;font-size:.95rem;font-weight:700;text-shadow:0 1px 3px #000}
+.stage .lab.scb-dpos{background:transparent;color:#8CC6FF;font-size:.95rem;font-weight:700;text-shadow:0 1px 3px #000}
+.stage .lab.scb-mu{background:rgba(231,180,96,.16);color:#F3D29A;border:1px solid rgba(231,180,96,.5);white-space:nowrap}
+.stage .lab.scb-ion{font-size:.85rem;white-space:nowrap}
+.stage .lab.scb-soft{background:rgba(11,17,22,.55);color:#D8E2EA;font-weight:500;font-size:.75rem;white-space:nowrap}
+.stage .lab.scb-e{background:#2F7BEA;color:#fff;border-radius:999px;font-size:.72rem;padding:0 5px}
+.scb-3d .lab{transition:opacity .15s linear}
+
+/* esquinas y fases dentro del stage */
+.scb-corner{position:absolute;top:10px;font:500 .68rem "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#8FA3B3;pointer-events:none;z-index:2}
+.scb-corner.l{left:12px}.scb-corner.r{right:12px}
+.scb-corner.r.v{right:auto;left:12px;top:calc(50% + 6px)}
+.scb-phase{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);font:600 .8rem "IBM Plex Sans",sans-serif;color:#E6ECF0;background:rgba(11,17,22,.6);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:3px 12px;white-space:nowrap;pointer-events:none;transition:opacity .3s;z-index:2}
+.scb-phase:empty{opacity:0}
+.stage .lab.scb-arrowlab{background:none;font:300 2.3rem/1 "IBM Plex Sans",sans-serif;color:#E7B460;text-shadow:0 0 12px rgba(231,180,96,.35);transition:opacity .25s}
+.scb-hud{position:absolute;right:10px;bottom:10px;display:flex;gap:6px;pointer-events:none;z-index:2}
+.scb-hud span{font:600 .75rem "IBM Plex Sans",sans-serif;color:#D8E2EA;background:rgba(11,17,22,.62);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:3px 8px;white-space:nowrap}
+.scb-hud span b{font-variant-numeric:tabular-nums;color:#fff}
+.scb-hud span.ok b{color:#F3C470}
+.scb-err{position:absolute;inset:auto 12px 12px 12px;display:flex;justify-content:center;pointer-events:none;z-index:2}
+.scb-err span{background:rgba(179,38,30,.88);color:#fff;font:600 .82rem "IBM Plex Sans",sans-serif;border-radius:8px;padding:5px 12px;text-align:center}
+
+/* panel debajo del stage */
+.scb-below{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.scb-eq{font:600 1rem "IBM Plex Sans",sans-serif;color:var(--ink);display:flex;flex-wrap:wrap;gap:4px 6px;align-items:baseline;justify-content:center;text-align:center}
+.scb-eq i{font-style:normal;color:var(--muted);font-weight:400}
+.scb-eq .ar{color:var(--gold);font-weight:700;padding:0 4px}
+.scb-count{display:grid;grid-template-columns:max-content minmax(0,1fr) minmax(0,1fr) max-content;width:100%;max-width:560px;margin:0 auto;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);font-size:.86rem}
+.scb-count>div{padding:6px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;min-width:0}
+.scb-count>div:nth-last-child(-n+4){border-bottom:0}
+.scb-count .h{font:500 .68rem "IBM Plex Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--surface2)}
+.scb-count .el{font-weight:700;white-space:nowrap}
+.scb-count .n{font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.scb-count .n b{min-width:1.4em;font-size:1rem}
+.scb-count .dots{display:flex;flex-wrap:wrap;gap:2px;min-width:0}
+.scb-count .dots i{width:8px;height:8px;border-radius:50%;display:block;border:1px solid rgba(0,0,0,.25)}
+.scb-count .ck{color:var(--ok);font-weight:700;justify-content:center}
+.scb-count .bad{color:var(--bad)}
+.scb-count .rowbad{background:var(--bad-soft)}
+.scb-count .ck.bad{font-size:.78rem;white-space:nowrap}
+.scb-legend{justify-content:center}
+.scb-legend .dot{border-color:rgba(0,0,0,.25)}
+@media (max-width:420px){
+  .scb-count{font-size:.8rem}
+  .scb-count>div{padding:5px 7px}
+  .scb-count .dots i{width:7px;height:7px}
+  .stage .lab.scb-arrowlab{font-size:1.8rem}
+}
+.scb-lg{margin-top:10px}
+.scb-dash{display:inline-block;width:18px;height:0;border-top:2px dashed var(--gold);vertical-align:middle;margin-right:5px}
+.scb-err[hidden],.scb-hud[hidden]{display:none}

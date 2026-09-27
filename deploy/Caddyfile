@@ -1,0 +1,6 @@
+# Caddy obtiene y renueva el certificado HTTPS automáticamente.
+# Reemplaza TU_IP por la IP pública de la VM (ej. 129-151-10-20.sslip.io usa guiones o puntos).
+TU_IP.sslip.io {
+	encode gzip
+	reverse_proxy 127.0.0.1:4000
+}

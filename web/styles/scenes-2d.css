@@ -1,0 +1,99 @@
+/* Escenas 2D de "Aprende": ptable, lab, graph. Prefijo .sc- (ver web/lib/SPEC.md). */
+
+.sc-stage.sc-2d{height:340px;touch-action:pan-y;cursor:default;user-select:none;-webkit-user-select:none}
+@media (max-width:559px){.sc-stage.sc-2d{height:280px}}
+.sc-2d .sc-layer{position:absolute;inset:0;opacity:0;transition:opacity .55s ease}
+.sc-2d .sc-layer.sc-on{opacity:1}
+.sc-2d .sc-layer>svg{display:block;width:100%;height:100%;overflow:hidden}
+.sc-tag{position:absolute;left:10px;top:8px;z-index:3;font:500 .68rem/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#B8C6D1;background:rgba(11,17,22,.55);border:1px solid rgba(154,168,179,.22);border-radius:999px;padding:5px 9px;pointer-events:none;transition:opacity .3s;max-width:calc(100% - 20px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-note{margin-top:8px;min-height:1.4em;font-size:.9rem;color:var(--muted);transition:opacity .3s}
+.sc-note b{color:var(--ink)}
+.sc-note:empty{display:none}
+
+/* ---------- texto dentro de SVG ---------- */
+.sc-2d text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.sc-t{fill:#E8EEF3;font-weight:600;paint-order:stroke;stroke:#0D151B;stroke-width:4.5px;stroke-linejoin:round}
+.sc-t.sc-m{fill:#A9B7C2;font-weight:500}
+.sc-t.sc-h{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;font-weight:800}
+.sc-lead{stroke:#8E9DA9;stroke-width:1.4;fill:none;stroke-linecap:round}
+.sc-lead-dot{fill:#C9D4DC}
+
+/* ---------- animaciones reutilizables ---------- */
+.sc-a{transform-box:fill-box;transform-origin:50% 50%}
+.sc-ab{transform-box:fill-box;transform-origin:50% 100%}
+.sc-drop{animation:sc-drop var(--d,1.4s) var(--dl,0s) ease-in infinite}
+.sc-rise{animation:sc-rise var(--d,2.4s) var(--dl,0s) ease-out infinite}
+.sc-flick{animation:sc-flick var(--d,.35s) var(--dl,0s) ease-in-out infinite alternate}
+.sc-steam{animation:sc-steam var(--d,3s) var(--dl,0s) ease-out infinite}
+.sc-flow{animation:sc-flow var(--d,1s) linear infinite}
+.sc-flowr{animation:sc-flow var(--d,1s) linear infinite reverse}
+.sc-shake{animation:sc-shake var(--d,.5s) ease-in-out infinite}
+.sc-drive{animation:sc-drive var(--d,8s) var(--dl,0s) linear infinite}
+.sc-pulse{animation:sc-pulse var(--d,1.6s) var(--dl,0s) ease-in-out infinite}
+.sc-bob{animation:sc-bob var(--d,3s) var(--dl,0s) ease-in-out infinite alternate}
+.sc-spin{animation:sc-spin var(--d,6s) linear infinite}
+.sc-twinkle{animation:sc-twinkle var(--d,2.2s) var(--dl,0s) ease-in-out infinite}
+@keyframes sc-drop{0%{transform:translateY(0) scale(.5);opacity:0}12%{transform:translateY(0) scale(1);opacity:1}80%{opacity:1}100%{transform:translateY(var(--dy,50px));opacity:0}}
+@keyframes sc-rise{0%{transform:translate(0,0) scale(.5);opacity:0}15%{opacity:var(--o,.9)}100%{transform:translate(var(--dx,0px),var(--dy,-60px)) scale(1.1);opacity:0}}
+@keyframes sc-flick{0%{transform:scale(1,1)}100%{transform:scale(.9,1.1)}}
+@keyframes sc-steam{0%{transform:translate(0,0) scale(.6);opacity:0}25%{opacity:var(--o,.55)}100%{transform:translate(var(--dx,6px),var(--dy,-55px)) scale(1.7);opacity:0}}
+@keyframes sc-flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-40}}
+@keyframes sc-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes sc-drive{from{transform:translateX(var(--x0,0px))}to{transform:translateX(var(--x1,600px))}}
+@keyframes sc-pulse{0%,100%{opacity:var(--lo,.35)}50%{opacity:1}}
+@keyframes sc-bob{from{transform:translateY(0)}to{transform:translateY(var(--dy,-6px))}}
+@keyframes sc-spin{to{transform:rotate(360deg)}}
+@keyframes sc-twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.sc-reduce *{animation:none!important}
+
+/* ---------- lab: interacción y resaltado ---------- */
+.sc-dim{transition:opacity .45s ease,filter .45s ease}
+.sc-lab .sc-off{opacity:.32;filter:saturate(.4)}
+.sc-lab .sc-soft.sc-off{opacity:.5;filter:none}
+.sc-pick{cursor:pointer;outline:none}
+.sc-pick .sc-hit{fill:transparent}
+.sc-pick:focus-visible .sc-ring{stroke:#7FB2EA;stroke-width:4}
+.sc-ring{fill:none;stroke:transparent;stroke-width:3;transition:stroke .3s}
+.sc-pick.sc-sel .sc-ring{stroke:#E7B460}
+.sc-grow{transform-box:fill-box;transform-origin:50% 50%;transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+.sc-sel .sc-grow{transform:scale(1.08)}
+.sc-badge{transition:opacity .4s ease,transform .45s cubic-bezier(.3,1.5,.5,1);transform-box:fill-box;transform-origin:50% 50%}
+
+/* ---------- tabla periódica ---------- */
+.sc-pt .sc-ptw{position:absolute;inset:0}
+.sc-ptc{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;border:1px solid rgba(255,255,255,.07);background:#1C2934;color:#E6ECF1;padding:0;font:inherit;line-height:1;cursor:pointer;transition:background-color .55s ease,color .55s ease,opacity .55s ease,transform .3s ease,box-shadow .3s ease,border-color .3s ease;-webkit-tap-highlight-color:transparent}
+.sc-ptc:hover{border-color:rgba(255,255,255,.45)}
+.sc-ptc:focus-visible{outline:2px solid #7FB2EA;outline-offset:1px;z-index:2}
+.sc-ptc b{font:700 var(--fs,14px)/1 "Bricolage Grotesque","IBM Plex Sans",sans-serif;letter-spacing:-.01em}
+.sc-ptc small{position:absolute;left:3px;top:2px;font:500 var(--fz,9px)/1 "IBM Plex Mono",monospace;opacity:.75}
+.sc-ptc i{font:500 var(--fz,9px)/1 "IBM Plex Mono",monospace;font-style:normal;opacity:.85;margin-top:3px}
+.sc-ptc em{position:absolute;inset:0;margin:auto;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);transition:width .6s ease,height .6s ease,opacity .5s;pointer-events:none}
+.sc-ptc.sc-lo{opacity:.22}
+.sc-ptc.sc-on{box-shadow:0 0 0 2px #E7B460,0 0 14px rgba(231,180,96,.55);z-index:2}
+.sc-ptc.sc-pz{z-index:2;animation:sc-ptpulse 1.4s ease-in-out infinite}
+@keyframes sc-ptpulse{0%,100%{box-shadow:0 0 0 2px #E7B460,0 0 0 0 rgba(231,180,96,.6);transform:scale(1)}50%{box-shadow:0 0 0 2px #FFE08A,0 0 0 7px rgba(231,180,96,0);transform:scale(1.08)}}
+.sc-pth{position:absolute;text-align:center;font:500 var(--fz,9px)/1 "IBM Plex Mono",monospace;color:#7F8E9A;transition:color .4s,opacity .4s}
+.sc-pth.sc-on{color:#FFE08A;font-weight:700}
+.sc-ptov{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.sc-ptov .sc-fade{transition:opacity .6s ease}
+.sc-ptcard{position:absolute;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:6px 12px;border-radius:8px;background:rgba(15,24,32,.72);border:1px solid rgba(154,168,179,.25);color:#E6ECF1;overflow:hidden;transition:opacity .3s}
+.sc-ptcard h4{font:800 clamp(.9rem,2.2vw,1.25rem)/1.1 "Bricolage Grotesque",sans-serif;margin:0;color:#fff}
+.sc-ptcard p{font-size:clamp(.72rem,1.6vw,.86rem);line-height:1.3;color:#B8C6D1;margin:0}
+.sc-ptcard p b{color:#fff;font-weight:600}
+.sc-ptcard .sc-sw{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.sc-leg{margin-top:8px;min-height:22px;align-items:center}
+.sc-leg .dot{border-radius:3px}
+.sc-grad{display:inline-block;width:120px;height:10px;border-radius:3px;vertical-align:middle}
+
+/* ---------- gráficas ---------- */
+.sc-graph text{font-family:"IBM Plex Sans",system-ui,sans-serif}
+.sc-g-ax{stroke:#6B7A86;stroke-width:1.2;fill:none}
+.sc-g-grid{stroke:rgba(154,168,179,.13);stroke-width:1}
+.sc-g-tk{fill:#9AA8B3;font-size:var(--gf,12px);font-variant-numeric:tabular-nums}
+.sc-g-al{fill:#C3CFD8;font-size:var(--gf,12px);font-weight:600}
+.sc-g-lb{font-size:var(--gf,12px);font-weight:600;paint-order:stroke;stroke:#0E161C;stroke-width:4px;stroke-linejoin:round}
+.sc-g-draw{transition:stroke-dashoffset var(--dd,1.4s) cubic-bezier(.45,.05,.3,1) var(--dl,0s)}
+.sc-g-in{opacity:0;transition:opacity .6s ease var(--dl,0s)}
+.sc-g-in.sc-v{opacity:1}
+.sc-g-guide{stroke:#C3CFD8;stroke-width:1.2;stroke-dasharray:4 4;fill:none;opacity:.7}
+.sc-reduce .sc-g-draw,.sc-reduce .sc-g-in,.sc-reduce .sc-layer{transition:none}

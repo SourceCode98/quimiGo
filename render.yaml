@@ -1,0 +1,27 @@
+# Blueprint de Render para la API de QuimicaLearn (plan gratuito).
+# En Render: New > Blueprint > elige este repositorio. Te pedirá los valores marcados con sync: false.
+services:
+  - type: web
+    name: quimicalearn-api
+    runtime: node
+    plan: free
+    region: ohio
+    rootDir: api
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_DRIVER
+        value: oracle
+      - key: ORACLE_USER
+        value: QUIMICALEARN
+      - key: ORACLE_PASSWORD
+        sync: false
+      - key: ORACLE_CONNECT_STRING
+        sync: false

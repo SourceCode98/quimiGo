@@ -1,0 +1,187 @@
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import bcrypt from 'bcryptjs';
+import { SignJWT, jwtVerify } from 'jose';
+import { randomInt } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { applyResult, addDay } from './game.js';
+
+const LESSONS = new Set(JSON.parse(readFileSync(new URL('./lessons.json', import.meta.url))).map((l) => l.id));
+const COOKIE = 'ql_session';
+const MAX_AGE = 30 * 24 * 3600;
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+const bad = (res, status, error) => res.status(status).json({ error });
+const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+const nameKey = (n) => n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
+
+// Límite simple de intentos por IP para los inicios de sesión.
+function limiter(max, windowMs) {
+  const hits = new Map();
+  return (req, res, next) => {
+    const key = req.ip || 'x';
+    const now = Date.now();
+    const h = hits.get(key);
+    if (!h || h.reset < now) hits.set(key, { n: 1, reset: now + windowMs });
+    else if (++h.n > max) return bad(res, 429, 'Demasiados intentos. Espera un minuto.');
+    if (hits.size > 5000) for (const [k, v] of hits) if (v.reset < now) hits.delete(k);
+    next();
+  };
+}
+
+export function createApp({ store, secret, secureCookies = false }) {
+  if (!secret || secret.length < 32) throw new Error('SESSION_SECRET debe tener al menos 32 caracteres');
+  const key = new TextEncoder().encode(secret);
+  const app = express();
+  app.set('trust proxy', true);
+  app.disable('x-powered-by');
+  app.use(express.json({ limit: '32kb' }));
+  app.use(cookieParser());
+
+  async function startSession(res, payload) {
+    const token = await new SignJWT(payload).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime(`${MAX_AGE}s`).sign(key);
+    res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: secureCookies, maxAge: MAX_AGE * 1000, path: '/' });
+  }
+  async function session(req) {
+    const t = req.cookies?.[COOKIE];
+    if (!t) return null;
+    try { return (await jwtVerify(t, key)).payload; } catch { return null; }
+  }
+  const need = (role) => async (req, res, next) => {
+    const s = await session(req);
+    if (!s || s.role !== role) return bad(res, 401, 'Inicia sesión para continuar.');
+    req.session = s;
+    next();
+  };
+  const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+  const loginLimit = limiter(10, 60_000);
+
+  app.get('/api/health', wrap(async (_req, res) => { await store.ping(); res.json({ ok: true, db: store.kind }); }));
+
+  /* ---------- docentes ---------- */
+  app.post('/api/teacher/register', loginLimit, wrap(async (req, res) => {
+    const name = str(req.body?.name, 100), email = str(req.body?.email, 254).toLowerCase(), password = typeof req.body?.password === 'string' ? req.body.password : '';
+    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad(res, 400, 'Escribe tu nombre y un correo válido.');
+    if (password.length < 8 || password.length > 128) return bad(res, 400, 'La contraseña debe tener entre 8 y 128 caracteres.');
+    let t;
+    try { t = await store.createTeacher({ name, email, passHash: await bcrypt.hash(password, 10) }); }
+    catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, 'Ese correo ya tiene una cuenta. Inicia sesión.'); throw e; }
+    await startSession(res, { sub: t.id, role: 'teacher' });
+    res.status(201).json({ user: { role: 'teacher', id: t.id, name: t.name } });
+  }));
+
+  app.post('/api/teacher/login', loginLimit, wrap(async (req, res) => {
+    const email = str(req.body?.email, 254).toLowerCase(), password = typeof req.body?.password === 'string' ? req.body.password : '';
+    const t = email && (await store.findTeacherByEmail(email));
+    if (!t || !(await bcrypt.compare(password, t.passHash))) return bad(res, 401, 'Correo o contraseña incorrectos.');
+    await startSession(res, { sub: t.id, role: 'teacher' });
+    res.json({ user: { role: 'teacher', id: t.id, name: t.name } });
+  }));
+
+  /* ---------- estudiantes: entran con el código del curso, su nombre y un PIN ---------- */
+  app.post('/api/student/join', loginLimit, wrap(async (req, res) => {
+    const code = str(req.body?.code, 8).toUpperCase(), name = str(req.body?.name, 60), pin = str(req.body?.pin, 8);
+    if (!code || !name) return bad(res, 400, 'Escribe el código del curso y tu nombre.');
+    if (!/^\d{4}$/.test(pin)) return bad(res, 400, 'El PIN debe tener 4 números.');
+    const c = await store.findClassByCode(code);
+    if (!c) return bad(res, 404, 'No existe un curso con ese código. Pídeselo a tu profe.');
+    const k = nameKey(name);
+    let s = await store.findStudent(c.id, k);
+    if (s) {
+      if (!(await bcrypt.compare(pin, s.pinHash))) return bad(res, 401, 'Ese nombre ya existe en el curso y el PIN no coincide. Si olvidaste tu PIN, pídele a tu profe que lo cambie.');
+    } else {
+      try { s = await store.createStudent({ classId: c.id, name, nameKey: k, pinHash: await bcrypt.hash(pin, 10) }); }
+      catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, 'Ese nombre ya existe. Intenta de nuevo.'); throw e; }
+    }
+    await startSession(res, { sub: s.id, role: 'student', cls: c.id });
+    res.json({ user: { role: 'student', id: s.id, name: s.name, className: c.name, grade: c.grade } });
+  }));
+
+  app.post('/api/logout', (_req, res) => { res.clearCookie(COOKIE, { path: '/' }); res.json({ ok: true }); });
+
+  app.get('/api/me', wrap(async (req, res) => {
+    const s = await session(req);
+    if (!s) return res.json({ user: null });
+    if (s.role === 'teacher') {
+      const t = await store.getTeacher(s.sub);
+      return res.json({ user: t ? { role: 'teacher', id: t.id, name: t.name } : null });
+    }
+    const st = await store.getStudent(s.sub);
+    if (!st) return res.json({ user: null });
+    const c = await store.getClass(st.classId);
+    const rows = await store.getProgress(st.id);
+    res.json({
+      user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade },
+      xp: st.xp, days: st.days,
+      progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act }])),
+    });
+  }));
+
+  app.post('/api/progress', need('student'), wrap(async (req, res) => {
+    const lessonId = str(req.body?.lessonId, 20);
+    if (!LESSONS.has(lessonId)) return bad(res, 400, 'Lección desconocida.');
+    const act = req.body?.act === true;
+    const stars = Number.isInteger(req.body?.stars) && req.body.stars >= 0 && req.body.stars <= 3 ? req.body.stars : undefined;
+    if (!act && stars === undefined) return bad(res, 400, 'Nada que guardar.');
+    const st = await store.getStudent(req.session.sub);
+    if (!st) return bad(res, 401, 'Tu cuenta ya no existe.');
+    const prev = (await store.getProgress(st.id)).find((r) => r.lessonId === lessonId);
+    const { next, gained } = applyResult(prev, { act, stars });
+    await store.saveProgress(st.id, { lessonId, stars: next.stars ?? null, act: next.act, attempts: next.attempts || 0 });
+    const xp = await store.addXp(st.id, gained, addDay(st.days, today()));
+    res.json({ xp, gained, record: { stars: next.stars ?? null, act: next.act } });
+  }));
+
+  /* ---------- cursos del docente ---------- */
+  async function ownClass(req, res) {
+    const c = await store.getClass(String(req.params.id));
+    if (!c || c.teacherId !== req.session.sub) { bad(res, 404, 'Curso no encontrado.'); return null; }
+    return c;
+  }
+
+  app.get('/api/classes', need('teacher'), wrap(async (req, res) => res.json({ classes: await store.listClasses(req.session.sub) })));
+
+  app.post('/api/classes', need('teacher'), wrap(async (req, res) => {
+    const name = str(req.body?.name, 100), grade = Number(req.body?.grade);
+    if (!name || !Number.isInteger(grade) || grade < 6 || grade > 11) return bad(res, 400, 'Escribe un nombre y elige un grado entre 6 y 11.');
+    for (let i = 0; i < 5; i++) {
+      const code = Array.from({ length: 6 }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
+      try { return res.status(201).json({ class: await store.createClass({ teacherId: req.session.sub, name, grade, code }) }); }
+      catch (e) { if (e.code !== 'DUPLICATE') throw e; }
+    }
+    bad(res, 500, 'No se pudo generar un código. Intenta otra vez.');
+  }));
+
+  app.get('/api/classes/:id', need('teacher'), wrap(async (req, res) => {
+    const c = await ownClass(req, res); if (!c) return;
+    res.json({ class: c, students: await store.listStudentsWithProgress(c.id) });
+  }));
+
+  app.post('/api/classes/:id/students/:sid/pin', need('teacher'), wrap(async (req, res) => {
+    const c = await ownClass(req, res); if (!c) return;
+    const pin = str(req.body?.pin, 8);
+    if (!/^\d{4}$/.test(pin)) return bad(res, 400, 'El PIN debe tener 4 números.');
+    const s = await store.getStudent(String(req.params.sid));
+    if (!s || s.classId !== c.id) return bad(res, 404, 'Estudiante no encontrado.');
+    await store.setStudentPin(s.id, await bcrypt.hash(pin, 10));
+    res.json({ ok: true });
+  }));
+
+  app.delete('/api/classes/:id/students/:sid', need('teacher'), wrap(async (req, res) => {
+    const c = await ownClass(req, res); if (!c) return;
+    const s = await store.getStudent(String(req.params.sid));
+    if (!s || s.classId !== c.id) return bad(res, 404, 'Estudiante no encontrado.');
+    await store.deleteStudent(s.id);
+    res.json({ ok: true });
+  }));
+
+  app.use('/api', (_req, res) => bad(res, 404, 'Ruta no encontrada.'));
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, _req, res, _next) => {
+    if (err?.type === 'entity.parse.failed') return bad(res, 400, 'JSON inválido.');
+    console.error(err);
+    bad(res, 500, 'Error del servidor. Intenta de nuevo.');
+  });
+  return app;
+}
