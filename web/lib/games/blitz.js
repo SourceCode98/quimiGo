@@ -87,14 +87,23 @@ export default function blitz(el, spec, finish) {
           const left = g.loseLife();
           g.pause();
           exp.hidden = false;
-          exp.innerHTML = '<b>Respuesta: ' + esc(cur.right) + '.</b> ' + esc(cur.e);
+          // Con respuesta incorrecta el juego espera (reloj en pausa) hasta que el estudiante lea la explicación.
+          exp.innerHTML = '<b>Respuesta: ' + esc(cur.right) + '.</b> ' + esc(cur.e) +
+            '<div class="gm-exp-go"><button type="button" class="gm-btn sm">' + (left <= 0 ? 'Ver resultado' : 'Entendido, continuar') + '</button></div>';
           g.bump(exp, 'gm-in');
-          g.after(cur.e ? 1900 : 1300, () => (left <= 0 ? done('Te quedaste sin vidas') : next()));
+          const goB = exp.querySelector('button');
+          waiting = () => { waiting = null; left <= 0 ? done('Te quedaste sin vidas') : next(); };
+          goB.onclick = () => waiting && waiting();
+          g.after(60, () => goB.focus());
         }
       }
 
       opts.addEventListener('click', (e) => { const b = e.target.closest('.gm-opt'); if (b) choose(+b.dataset.i); });
-      g.key((e) => { const n = parseInt(e.key, 10); if (n >= 1 && n <= 9) { e.preventDefault(); choose(n - 1); } });
+      let waiting = null;
+      g.key((e) => {
+        if (waiting) { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); waiting(); } return; }
+        const n = parseInt(e.key, 10); if (n >= 1 && n <= 9) { e.preventDefault(); choose(n - 1); }
+      });
       g.clock(TIME, () => done('¡Se acabó el tiempo!'));
       if (!deck.length) { qt.textContent = 'No hay preguntas en este reto.'; return; }
       next();

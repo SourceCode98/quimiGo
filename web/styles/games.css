@@ -160,8 +160,8 @@
 }
 
 /* ---- Parejas ---- */
-.gm-grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:12px;perspective:1000px}
-.gm-card{position:relative;aspect-ratio:5/4;border:0;padding:0;background:none;border-radius:14px;min-height:64px}
+.gm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;perspective:1000px}
+.gm-card{position:relative;aspect-ratio:3/2;border:0;padding:0;background:none;border-radius:14px;min-height:72px}
 .gm-cin{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,1.3,.5,1);border-radius:14px}
 .gm-card.open .gm-cin,.gm-card.done .gm-cin{transform:rotateY(180deg)}
 .gm-cf{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;padding:8px;text-align:center}
@@ -171,9 +171,10 @@
 .gm-card:hover .gm-cback svg{transform:rotate(30deg) scale(1.08)}
 .gm-card:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .gm-cface{transform:rotateY(180deg);background:var(--surface);border:3px solid var(--accent);color:var(--ink);
-  font:700 1.1rem/1.2 "IBM Plex Sans",sans-serif;box-shadow:0 4px 0 var(--line);overflow-wrap:anywhere;hyphens:auto}
+  font:700 1.1rem/1.2 "IBM Plex Sans",sans-serif;box-shadow:0 4px 0 var(--line);overflow-wrap:break-word;word-break:normal;hyphens:auto;-webkit-hyphens:auto}
 .gm-card.s1 .gm-cface{border-color:var(--gold);background:var(--gold-soft)}
 .gm-cface.long{font-size:.95rem}
+.gm-cface.xl{font-size:.85rem;line-height:1.15}
 .gm-fml{font:800 1.9rem "Bricolage Grotesque",sans-serif;letter-spacing:.01em;white-space:nowrap}
 .gm-cface.fl .gm-fml{font-size:1.5rem}
 .gm-fml sub{font-size:.6em}
@@ -182,12 +183,18 @@
 .gm-card.done .gm-cface{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);animation:gm-match .6s cubic-bezier(.3,1.6,.5,1)}
 @keyframes gm-match{40%{transform:rotateY(180deg) scale(1.1)}}
 @container gm (max-width:560px){
-  .gm-grid{grid-template-columns:repeat(var(--mcols),minmax(0,1fr));gap:8px}
+  .gm-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .gm-card{aspect-ratio:1/1}
-  .gm-cface{font-size:.95rem}
-  .gm-cface.long{font-size:.82rem}
+  .gm-cf{padding:5px}
+  .gm-cface{font-size:.92rem;line-height:1.15;border-width:2px}
+  .gm-cface.long{font-size:.78rem}
+  .gm-cface.xl{font-size:.7rem}
   .gm-fml{font-size:1.4rem}
   .gm-cface.fl .gm-fml{font-size:1.1rem}
+}
+@container gm (max-width:330px){
+  .gm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gm-card{aspect-ratio:3/2}
 }
 
 /* ---- Constructor 3D ---- */
@@ -651,3 +658,5 @@
   .gm-ca-say.on,.gm-ca-lvl.gm-ca-lvlin{opacity:1}
   .gm-ca-bub,.gm-wd-bubs circle{animation:none!important;opacity:0!important}
 }
+.gm-exp-go{display:flex;justify-content:flex-end;margin-top:10px}
+.gm-cface.short{font-size:1.8rem}

@@ -6,12 +6,13 @@ import { molFor, compOf } from './molecules-extra.js';
 import { THREE, SC, makeStage, Bond, atomMat, lab, unlab, drop, glowTex, fitZoom, aspectOf, sub, ease, easeOut, seg, clamp, lerp, reduce } from './b-kit.js';
 
 const PHASES = [
-  ['hold0', 1.1, 'Reactivos'],
-  ['appr', 1.0, 'Las moléculas chocan'],
-  ['brk', .7, 'Se rompen enlaces'],
-  ['trav', 1.8, 'Los átomos se reorganizan'],
-  ['form', .7, 'Se forman enlaces nuevos'],
-  ['hold1', 2.3, 'Productos: los mismos átomos'],
+  // Cada fase dura lo suficiente para leer su texto (mínimo ~1,8 s).
+  ['hold0', 2.2, 'Reactivos'],
+  ['appr', 2.0, 'Las moléculas chocan'],
+  ['brk', 1.8, 'Se rompen enlaces'],
+  ['trav', 2.6, 'Los átomos se reorganizan'],
+  ['form', 1.8, 'Se forman enlaces nuevos'],
+  ['hold1', 3.2, 'Productos: los mismos átomos'],
 ];
 const T = {}; (() => { let t = 0; PHASES.forEach(([k, d]) => { T[k] = [t, t + d]; t += d; }); T.end = t; })();
 const FADE = .45;

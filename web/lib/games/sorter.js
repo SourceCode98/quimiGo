@@ -78,7 +78,7 @@ export default function sorter(el, spec, finish) {
           bin.classList.add('hit');
           g.after(350, () => bin.classList.remove('hit'));
           g.add(100 * m + hb, bin);
-          speed = Math.min(1 / 2.3, speed * 1.06);
+          speed = Math.min(1 / 3.8, speed * 1.04); // se acelera poco: la tarjeta debe alcanzar a leerse
           remove(card, 360);
           draw();
         } else {

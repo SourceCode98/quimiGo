@@ -29,6 +29,9 @@ export function Learn({ l, onSeenAll }: { l: LessonRef; onSeenAll: () => void })
     const k = Math.max(0, Math.min(n - 1, i));
     setCur(k);
     scene.current?.step(k);
+    // Vuelve a mostrar la animación: en celular queda arriba del texto y se pierde al leer.
+    const r = box.current?.getBoundingClientRect();
+    if (r && (r.top < 0 || r.bottom > innerHeight)) box.current!.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     setSeen((s) => { if (s.has(k)) return s; const x = new Set(s); x.add(k); return x; });
   };
 

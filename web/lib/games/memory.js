@@ -24,7 +24,7 @@ export default function memory(el, spec, finish) {
       const mcols = n <= 12 ? 3 : 4;
       g.stage.innerHTML = '<div class="gm-grid" role="grid" style="--cols:' + cols + ';--mcols:' + mcols + '">' +
         cards.map((c, i) => '<button type="button" class="gm-card s' + c.s + '" data-i="' + i + '" aria-label="Carta ' + (i + 1) + ', boca abajo">' +
-          '<span class="gm-cin"><span class="gm-cf gm-cback">' + ATOM + '</span><span class="gm-cf gm-cface' + (c.t.length > 16 ? ' long' : '') + (c.t.length > 5 ? ' fl' : '') + '">' + face(c.t) + '</span></span></button>').join('') +
+          '<span class="gm-cin"><span class="gm-cf gm-cback">' + ATOM + '</span><span class="gm-cf gm-cface' + (c.t.length > 26 ? ' long xl' : c.t.length > 14 ? ' long' : c.t.length <= 2 ? ' short' : '') + (c.t.length > 5 ? ' fl' : '') + '">' + face(c.t) + '</span></span></button>').join('') +
         '</div>';
       const btns = [...g.stage.querySelectorAll('.gm-card')];
       let open = [], moves = 0, found = 0, busy = null;

@@ -114,8 +114,8 @@ export default function truefalse(el, spec, finish) {
           g.say((ok ? 'Correcto. ' : 'Incorrecto. ') + (cur.a ? 'Es verdad. ' : 'Es un mito. ') + (cur.e || ''));
         });
         state = left <= 0 ? 'dying' : 'show';
-        const ms = ok ? (cur.e ? 1900 : 900) : (cur.e ? 3600 : 1800);
-        waitT = g.after(ms, cont);
+        // Si acierta sigue solo; si falla, espera a que lea la explicación y toque "Seguir".
+        if (ok) waitT = g.after(cur.e ? 1900 : 900, cont);
       }
       function cont() {
         if (state === 'dying') { state = 'over'; return done('Te quedaste sin vidas'); }

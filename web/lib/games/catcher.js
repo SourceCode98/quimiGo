@@ -26,7 +26,8 @@ export default function catcher(el, spec, finish) {
   const TIME = spec.time || 45;
   const LIVES = spec.lives || 3;
   const k = TIME / 45;
-  const th = [Math.max(3, Math.round(8 * k)), Math.max(5, Math.round(16 * k)), Math.max(7, Math.round(24 * k))];
+  // Metas acordes al ritmo más pausado (unas 20 partículas correctas caen en 45 s).
+  const th = [Math.max(3, Math.round(5 * k)), Math.max(5, Math.round(10 * k)), Math.max(7, Math.round(15 * k))];
   return makeGame(el, spec, finish, {
     key: 'catcher', name: 'Atrapa partículas', icon: '⚗', time: 'down', lives: LIVES,
     how: 'Mueve el vaso para atrapar solo lo que cumple la regla y esquiva lo demás.',
@@ -77,7 +78,8 @@ export default function catcher(el, spec, finish) {
         let x = 6 + Math.random() * Math.max(0, W - w - 12);
         const last = items[items.length - 1];
         if (last && Math.abs(last.x - x) < w * 0.6 && last.y < h) x = clamp(x + (x > W / 2 ? -1 : 1) * w * 1.2, 6, Math.max(6, W - w - 6));
-        const fallT = Math.max(1.35, 3.5 - elapsed * 0.05);
+        // Las palabras caen más despacio que los símbolos para que alcancen a leerse (más largas, más lentas).
+        const fallT = e ? Math.max(2, 4.2 - elapsed * 0.04) : Math.max(3.6, 6 - elapsed * 0.035) + Math.min(1.5, String(s).length * 0.05);
         const wob = level >= 3 ? (Math.random() < 0.5 ? -1 : 1) * Math.min(1, (level - 2) * 0.35) * (10 + Math.random() * 18) : 0;
         const it = { el: d, s, good: isGood, x, x0: x, y: -h - 4, w, h, v: (H + h) / fallT, st: 'fall', ph: Math.random() * 6, wob };
         place(it);
@@ -173,7 +175,7 @@ export default function catcher(el, spec, finish) {
         if (nl !== level) { level = nl; draw(); lvlE.textContent = '¡Nivel ' + level + '!'; g.bump(lvlE, 'gm-ca-lvlin'); g.after(1300, () => lvlE.classList.remove('gm-ca-lvlin')); }
         // aparición
         spawnT -= dt;
-        if (spawnT <= 0) { spawn(); spawnT = Math.max(0.42, 1.05 - elapsed * 0.016) * (0.8 + Math.random() * 0.4); }
+        if (spawnT <= 0) { spawn(); spawnT = Math.max(0.8, 1.45 - elapsed * 0.012) * (0.8 + Math.random() * 0.4); }
         const mouth = H - bh + bh * 0.12;
         for (let i = 0; i < items.length; i++) {
           const it = items[i];
