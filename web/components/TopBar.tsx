@@ -71,7 +71,7 @@ export function TopBar() {
                 {user.role === 'teacher' ? <Link className="pill" href="/docente">Mis cursos</Link> : <span className="muted">{user.name}</span>}
                 <button className="pill" onClick={async () => { await logout(); router.push('/'); }}>Salir</button>
               </span>
-            ) : <Link className="pill" href="/entrar" style={{ textDecoration: 'none' }}>Entrar</Link>)}
+            ) : <><Link className="pill" href="/entrar" style={{ textDecoration: 'none' }}>Entrar</Link><Link className="pill" href="/entrar#docente" style={{ textDecoration: 'none' }}>Soy docente</Link></>)}
           </div>
         </div>
       </div>

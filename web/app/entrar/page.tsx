@@ -45,7 +45,7 @@ export default function Entrar() {
           <button className="btn" disabled={st.busy}>{st.busy ? 'Entrando…' : 'Entrar al curso'}</button>
         </form>
 
-        <form className="card form" onSubmit={tc.run(async () => {
+        <form id="docente" className="card form" onSubmit={tc.run(async () => {
           await api('/teacher/login', { body: { email: t.email, password: t.password } });
           await refresh(); router.push('/docente');
         })}>

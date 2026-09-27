@@ -29,7 +29,7 @@ export function Home() {
             <p>Escribe el código que te dio tu profe, tu nombre y un PIN de 4 números.</p>
             <span className="btn">Entrar con código</span>
           </Link>
-          <Link className="entry" href="/entrar">
+          <Link className="entry" href="/entrar#docente">
             <span className="mono">Soy docente</span>
             <h3>Crea tus cursos</h3>
             <p>Abre los módulos a tu ritmo, fija los intentos y mira el avance de cada estudiante.</p>
