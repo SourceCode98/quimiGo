@@ -39,6 +39,11 @@ const nameKey = (n) => n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().
 const LIMIT_KINDS = ['quiz', 'game', 'reto'];
 const kindOf = (id) => (/r$/.test(id) ? 'reto' : /j\d+$/.test(id) ? 'game' : 'quiz');
 const cleanLimits = (l) => Object.fromEntries(LIMIT_KINDS.map((k) => [k, Number.isInteger(l?.[k]) && l[k] >= 0 && l[k] <= 20 ? l[k] : 0]));
+// Usuario del estudiante: minúsculas sin tildes; letras, números, punto y guion bajo. Debe ser distinto al nombre.
+const cleanUsername = (v) => (typeof v === 'string' ? v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().slice(0, 30) : '');
+const USERNAME_RE = /^[a-z0-9][a-z0-9._]{2,19}$/;
+const bare = (v) => cleanUsername(v).replace(/[^a-z0-9]/g, '');
+const sameAsName = (u, name) => { const b = bare(u); return bare(name) === b || cleanUsername(name).split(/\s+/).map(bare).includes(b); };
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
 
 // Límite simple de intentos por IP para los inicios de sesión.
@@ -119,27 +124,50 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
     res.json({ user: { role: 'teacher', id: t.id, name: t.name } });
   }));
 
-  /* ---------- estudiantes: entran con el código del curso, su nombre y un PIN ---------- */
+  /* ---------- estudiantes: se inscriben una vez con el código del curso y luego entran con usuario y PIN ---------- */
+  const studentUser = (s, c) => ({ role: 'student', id: s.id, name: s.name, username: s.username || null, className: c?.name, grade: c?.grade, units: c?.units || [], limits: cleanLimits(c?.limits) });
+  // Bloqueo por usuario tras varios PIN errados: con 4 números hay que frenar a quien pruebe al azar.
+  const pinFails = new Map();
+  const PIN_MAX = 5, PIN_LOCK_MS = 10 * 60_000;
+  const locked = (u) => { const f = pinFails.get(u); return f && f.n >= PIN_MAX && f.until > Date.now(); };
+  const failPin = (u) => { const f = pinFails.get(u); const n = f && f.until > Date.now() ? f.n + 1 : 1; pinFails.set(u, { n, until: Date.now() + PIN_LOCK_MS }); if (pinFails.size > 20000) pinFails.clear(); };
+  const taken = (u) => `El usuario "${u}" ya existe. Elige otro.`;
+
   app.post('/api/student/join', joinLimit, wrap(async (req, res) => {
     const code = str(req.body?.code, 8).toUpperCase(), name = str(req.body?.name, 60), pin = str(req.body?.pin, 8);
+    const username = cleanUsername(req.body?.username);
     if (!code || !name) return bad(res, 400, 'Escribe el código del curso y tu nombre.');
+    if (!USERNAME_RE.test(username)) return bad(res, 400, 'El usuario debe tener de 3 a 20 letras o números, sin espacios (puede llevar punto o guion bajo).');
+    if (sameAsName(username, name)) return bad(res, 400, 'El usuario debe ser distinto a tu nombre. Inventa uno, por ejemplo con un apodo o un número.');
     if (!/^\d{4}$/.test(pin)) return bad(res, 400, 'El PIN debe tener 4 números.');
     const c = await store.findClassByCode(code);
     if (!c) return bad(res, 404, 'No existe un curso con ese código. Pídeselo a tu profe.');
+    if (await store.findStudentByUsername(username)) return bad(res, 409, taken(username));
     const k = nameKey(name);
-    // mode "login": estudiante que vuelve (nunca crea); "new": primera vez (nunca entra a una cuenta existente).
-    const mode = req.body?.mode;
     let s = await store.findStudent(c.id, k);
-    if (mode === 'login' && !s) return bad(res, 404, `No encontramos a "${name}" en el curso ${c.name}. Escribe tu nombre igual que la primera vez, o elige "Es mi primera vez".`);
-    if (mode === 'new' && s) return bad(res, 409, `"${s.name}" ya está inscrito en ${c.name}. Elige "Ya estoy inscrito" y usa tu PIN.`);
     if (s) {
-      if (!(await bcrypt.compare(pin, s.pinHash))) return bad(res, 401, 'Ese nombre ya existe en el curso y el PIN no coincide. Si olvidaste tu PIN, pídele a tu profe que lo cambie.');
+      // Estudiante inscrito antes de que existieran los usuarios: con su PIN elige usuario y conserva su avance.
+      if (s.username || !(await bcrypt.compare(pin, s.pinHash))) return bad(res, 409, `Ya hay un estudiante llamado "${s.name}" en ${c.name}. Si eres tú, entra con tu usuario y PIN; si no, escribe también tu segundo apellido.`);
+      try { await store.setStudentUsername(s.id, username); } catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, taken(username)); throw e; }
+      s = { ...s, username };
     } else {
-      try { s = await store.createStudent({ classId: c.id, name, nameKey: k, pinHash: await bcrypt.hash(pin, 10) }); }
-      catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, 'Ese nombre ya existe. Intenta de nuevo.'); throw e; }
+      try { s = await store.createStudent({ classId: c.id, name, nameKey: k, username, pinHash: await bcrypt.hash(pin, 10) }); }
+      catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, taken(username)); throw e; }
     }
     await startSession(res, { sub: s.id, role: 'student', cls: c.id });
-    res.json({ user: { role: 'student', id: s.id, name: s.name, className: c.name, grade: c.grade, units: c.units || [], limits: cleanLimits(c.limits) } });
+    res.json({ user: studentUser(s, c) });
+  }));
+
+  app.post('/api/student/login', joinLimit, wrap(async (req, res) => {
+    const username = cleanUsername(req.body?.username), pin = str(req.body?.pin, 8);
+    if (!username || !/^\d{4}$/.test(pin)) return bad(res, 400, 'Escribe tu usuario y tu PIN de 4 números.');
+    if (locked(username)) return bad(res, 429, 'Demasiados intentos con este usuario. Espera 10 minutos o pídele a tu profe que cambie tu PIN.');
+    const s = await store.findStudentByUsername(username);
+    if (!s || !(await bcrypt.compare(pin, s.pinHash))) { failPin(username); return bad(res, 401, 'Usuario o PIN incorrectos. Si olvidaste tu PIN, pídele a tu profe que lo cambie.'); }
+    pinFails.delete(username);
+    const c = await store.getClass(s.classId);
+    await startSession(res, { sub: s.id, role: 'student', cls: s.classId });
+    res.json({ user: studentUser(s, c) });
   }));
 
   app.post('/api/logout', (_req, res) => { res.clearCookie(COOKIE, { path: '/' }); res.json({ ok: true }); });
@@ -156,7 +184,7 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
     const c = await store.getClass(st.classId);
     const rows = await store.getProgress(st.id);
     res.json({
-      user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade, units: c?.units || [], limits: cleanLimits(c?.limits) },
+      user: studentUser(st, c),
       xp: st.xp, days: st.days,
       progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act, learn: !!r.learn, attempts: r.attempts || 0 }])),
     });

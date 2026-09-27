@@ -19,6 +19,8 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
     classes.createIndex({ code: 1 }, { unique: true }),
     classes.createIndex({ teacherId: 1 }),
     students.createIndex({ classId: 1, nameKey: 1 }, { unique: true }),
+    // Usuario único en toda la plataforma (los estudiantes antiguos pueden no tenerlo).
+    students.createIndex({ username: 1 }, { unique: true, partialFilterExpression: { username: { $type: 'string' } } }),
     progress.createIndex({ studentId: 1, lessonId: 1 }, { unique: true }),
   ]);
 
@@ -26,7 +28,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
 
   const teacher = (r) => r && { id: r._id, name: r.name, email: r.email, passHash: r.passHash, createdAt: iso(r.createdAt) };
   const klass = (r) => r && { id: r._id, teacherId: r.teacherId, name: r.name, grade: r.grade, code: r.code, units: r.units || [], limits: r.limits || {}, createdAt: iso(r.createdAt) };
-  const student = (r) => r && { id: r._id, classId: r.classId, name: r.name, nameKey: r.nameKey, pinHash: r.pinHash, xp: r.xp, days: r.days || [], lastActive: iso(r.lastActive) };
+  const student = (r) => r && { id: r._id, classId: r.classId, name: r.name, nameKey: r.nameKey, username: r.username || null, pinHash: r.pinHash, xp: r.xp, days: r.days || [], lastActive: iso(r.lastActive) };
   const prog = (r) => ({ lessonId: r.lessonId, stars: r.stars, act: r.act, learn: !!r.learn, attempts: r.attempts, updatedAt: iso(r.updatedAt) });
 
   return {
@@ -63,8 +65,10 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
     async setClassLimits(id, limits) { await classes.updateOne({ _id: id }, { $set: { limits } }); },
 
     async findStudent(classId, nameKey) { return student(await students.findOne({ classId, nameKey })); },
-    async createStudent({ classId, name, nameKey, pinHash }) {
-      const doc = { _id: randomUUID(), classId, name, nameKey, pinHash, xp: 0, days: [], lastActive: new Date(), createdAt: new Date() };
+    async findStudentByUsername(username) { return student(await students.findOne({ username })); },
+    async setStudentUsername(id, username) { try { await students.updateOne({ _id: id }, { $set: { username } }); } catch (e) { dup(e); } },
+    async createStudent({ classId, name, nameKey, username, pinHash }) {
+      const doc = { _id: randomUUID(), classId, name, nameKey, username, pinHash, xp: 0, days: [], lastActive: new Date(), createdAt: new Date() };
       try { await students.insertOne(doc); } catch (e) { dup(e); }
       return student(doc);
     },
@@ -96,7 +100,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
       const p = await progress.find({ studentId: { $in: rows.map((r) => r._id) } }).toArray();
       const byStudent = new Map();
       for (const r of p) { if (!byStudent.has(r.studentId)) byStudent.set(r.studentId, []); byStudent.get(r.studentId).push(prog(r)); }
-      return rows.map(student).map((st) => ({ id: st.id, name: st.name, xp: st.xp, lastActive: st.lastActive, progress: byStudent.get(st.id) || [] }));
+      return rows.map(student).map((st) => ({ id: st.id, name: st.name, username: st.username, xp: st.xp, lastActive: st.lastActive, progress: byStudent.get(st.id) || [] }));
     },
   };
 }

@@ -39,8 +39,14 @@ export function createMemoryStore() {
     async findClassByCode(code) { for (const c of classes.values()) if (c.code === code) return c; return null; },
 
     async findStudent(classId, nameKey) { for (const s of students.values()) if (s.classId === classId && s.nameKey === nameKey) return s; return null; },
-    async createStudent({ classId, name, nameKey, pinHash }) {
-      const s = { id: randomUUID(), classId, name, nameKey, pinHash, xp: 0, days: [], lastActive: now(), createdAt: now() };
+    async findStudentByUsername(username) { for (const s of students.values()) if (s.username === username) return s; return null; },
+    async setStudentUsername(id, username) {
+      for (const s of students.values()) if (s.username === username && s.id !== id) { const e = new Error('duplicate'); e.code = 'DUPLICATE'; throw e; }
+      const s = students.get(id); if (s) s.username = username;
+    },
+    async createStudent({ classId, name, nameKey, username, pinHash }) {
+      for (const x of students.values()) if (x.username === username) { const e = new Error('duplicate'); e.code = 'DUPLICATE'; throw e; }
+      const s = { id: randomUUID(), classId, name, nameKey, username, pinHash, xp: 0, days: [], lastActive: now(), createdAt: now() };
       students.set(s.id, s);
       return s;
     },
@@ -61,7 +67,7 @@ export function createMemoryStore() {
     },
     async listStudentsWithProgress(classId) {
       return [...students.values()].filter((s) => s.classId === classId)
-        .map((s) => ({ id: s.id, name: s.name, xp: s.xp, lastActive: s.lastActive, progress: [...(progress.get(s.id)?.values() || [])] }));
+        .map((s) => ({ id: s.id, name: s.name, username: s.username || null, xp: s.xp, lastActive: s.lastActive, progress: [...(progress.get(s.id)?.values() || [])] }));
     },
   };
 }

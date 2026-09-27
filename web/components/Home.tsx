@@ -25,9 +25,9 @@ export function Home() {
         <section className="entry-cards">
           <div className="entry">
             <span className="mono">Soy estudiante</span>
-            <h3>Tengo un código de curso</h3>
-            <p>Si ya entraste antes, usa tu nombre y tu PIN. Si es tu primera vez, escribe el código que te dio tu profe.</p>
-            <div className="row"><Link className="btn" href="/entrar#volver">Ya estoy inscrito</Link><Link className="btn ghost" href="/entrar#estudiante">Primera vez</Link></div>
+            <h3>Entrar a mi curso</h3>
+            <p>Entra con tu usuario y tu PIN. Si es tu primera vez, inscríbete con el código que te dio tu profe.</p>
+            <div className="row"><Link className="btn" href="/entrar">Ya tengo usuario</Link><Link className="btn ghost" href="/entrar#estudiante">Primera vez</Link></div>
           </div>
           <Link className="entry" href="/entrar#docente">
             <span className="mono">Soy docente</span>

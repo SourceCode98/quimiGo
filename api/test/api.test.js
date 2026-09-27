@@ -39,8 +39,14 @@ test('flujo completo docente y estudiante', async () => {
     assert.match(cls.code, /^[A-Z2-9]{6}$/);
 
     const s = client();
-    assert.equal((await s('POST', '/api/student/join', { code: 'NOPE00', name: 'Ana', pin: '1234' })).status, 404);
-    assert.equal((await s('POST', '/api/student/join', { code: cls.code.toLowerCase(), name: 'Ána ', pin: '1234' })).status, 200);
+    assert.equal((await s('POST', '/api/student/join', { code: 'NOPE00', name: 'Ana', username: 'estrella7', pin: '1234' })).status, 404);
+    // El usuario es obligatorio, válido y distinto al nombre.
+    assert.equal((await s('POST', '/api/student/join', { code: cls.code, name: 'Ána Pérez', pin: '1234' })).status, 400);
+    assert.equal((await s('POST', '/api/student/join', { code: cls.code, name: 'Ána Pérez', username: 'ANA', pin: '1234' })).status, 400);
+    assert.equal((await s('POST', '/api/student/join', { code: cls.code, name: 'Ána Pérez', username: 'ana.perez', pin: '1234' })).status, 400);
+    assert.equal((await s('POST', '/api/student/join', { code: cls.code, name: 'Ána Pérez', username: 'con espacio', pin: '1234' })).status, 400);
+    const j = await s('POST', '/api/student/join', { code: cls.code.toLowerCase(), name: 'Ána Pérez ', username: 'Estrella7', pin: '1234' });
+    assert.deepEqual([j.status, j.body.user.username], [200, 'estrella7']);
     assert.equal((await s('POST', '/api/classes', { name: 'x', grade: 7 })).status, 401);
 
     // Hasta que el docente habilite el módulo, el estudiante no puede registrar avance.
@@ -84,14 +90,20 @@ test('flujo completo docente y estudiante', async () => {
     assert.deepEqual(me.progress.g10u1l1, { stars: 3, act: true, learn: true, attempts: 3 });
     assert.equal(me.days.length, 1);
 
-    // Mismo nombre con otro PIN no entra; con el PIN correcto sí.
+    // Al volver entra con usuario y PIN, sin código del curso.
     const s2 = client();
-    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ana', pin: '9999' })).status, 401);
-    // Modos explícitos: volver a entrar nunca crea cuentas y "primera vez" no entra a una existente.
-    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'Anita', pin: '1234', mode: 'login' })).status, 404);
-    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'Ana', pin: '1234', mode: 'new' })).status, 409);
-    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ana ', pin: '1234', mode: 'login' })).status, 200);
-    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ANA', pin: '1234' })).status, 200);
+    assert.equal((await s2('POST', '/api/student/login', { username: 'estrella7', pin: '9999' })).status, 401);
+    assert.equal((await s2('POST', '/api/student/login', { username: 'nadie', pin: '1234' })).status, 401);
+    const back = await s2('POST', '/api/student/login', { username: ' ESTRELLA7', pin: '1234' });
+    assert.deepEqual([back.status, back.body.user.name, back.body.user.grade], [200, 'Ána Pérez', 10]);
+    assert.equal((await s2('GET', '/api/me')).body.user.username, 'estrella7');
+    // Usuario repetido y nombre repetido en el curso no crean cuentas nuevas.
+    const s3 = client();
+    assert.equal((await s3('POST', '/api/student/join', { code: cls.code, name: 'Luis', username: 'estrella7', pin: '1111' })).status, 409);
+    assert.equal((await s3('POST', '/api/student/join', { code: cls.code, name: 'ana perez', username: 'otra.ana', pin: '1111' })).status, 409);
+    // Tras 5 PIN errados el usuario queda bloqueado un rato.
+    for (let i = 0; i < 5; i++) await s3('POST', '/api/student/login', { username: 'bloq', pin: '0000' });
+    assert.equal((await s3('POST', '/api/student/login', { username: 'bloq', pin: '0000' })).status, 429);
 
     const detail = (await t('GET', `/api/classes/${cls.id}`)).body;
     assert.equal(detail.students.length, 1);
@@ -99,7 +111,8 @@ test('flujo completo docente y estudiante', async () => {
     assert.deepEqual(detail.class.units, ['g10u1']);
     const sid = detail.students[0].id;
     assert.equal((await t('POST', `/api/classes/${cls.id}/students/${sid}/pin`, { pin: '5555' })).status, 200);
-    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ana', pin: '5555' })).status, 200);
+    assert.equal(detail.students[0].username, 'estrella7');
+    assert.equal((await s2('POST', '/api/student/login', { username: 'estrella7', pin: '5555' })).status, 200);
 
     // Otro docente no ve el curso ajeno.
     const t2 = client();

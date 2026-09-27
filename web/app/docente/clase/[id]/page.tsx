@@ -10,7 +10,7 @@ import { api } from '@/lib/api';
 import { levelOf } from '@/lib/game';
 
 type Row = { lessonId: string; stars: number | null; act: boolean };
-type Student = { id: string; name: string; xp: number; lastActive: string; progress: Row[] };
+type Student = { id: string; name: string; username?: string | null; xp: number; lastActive: string; progress: Row[] };
 type Limits = { quiz: number; game: number; reto: number };
 type Klass = { id: string; name: string; grade: number; code: string; units?: string[]; limits?: Limits };
 const TRIES = [0, 1, 2, 3, 5];
@@ -95,7 +95,7 @@ export default function Clase() {
         <div className="row"><span>Código para tus estudiantes:</span><span className="bigcode">{c.code}</span>
           <button className="btn ghost sm" onClick={() => { navigator.clipboard?.writeText(c.code); toast('Código copiado'); }}>Copiar</button>
           <button className="btn ghost sm" onClick={load}>Actualizar</button></div>
-        <p className="muted">Pídeles que entren a la plataforma, toquen “Entrar” y escriban este código, su nombre y un PIN de 4 números.</p>
+        <p className="muted">La primera vez, tus estudiantes tocan “Entrar”, eligen “Es mi primera vez” y escriben este código, su nombre, un usuario que inventan y un PIN de 4 números. Después entran solo con usuario y PIN.</p>
       </section>
 
       <section className="block modules" aria-busy={saving}>
@@ -151,7 +151,7 @@ export default function Clase() {
             </tr></thead>
             <tbody>{students.map((s, i) => (
               <tr key={s.id}>
-                <td className="name">{s.name}<br /><small className="muted">Nivel {levelOf(s.xp).n}</small></td>
+                <td className="name">{s.name}<br /><small className="muted">{s.username ? `@${s.username} · ` : ''}Nivel {levelOf(s.xp).n}</small></td>
                 <td>{s.xp}</td><td>{when(s.lastActive)}</td>
                 {lessons.map((l) => {
                   const p = maps[i][l.id];

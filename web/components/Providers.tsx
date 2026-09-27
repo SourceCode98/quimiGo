@@ -6,7 +6,7 @@ import { applyResult, BADGES, earnedBadges, levelOf, todayBogota, type Lessons, 
 
 export type User =
   | { role: 'teacher'; id: string; name: string }
-  | { role: 'student'; id: string; name: string; className?: string; grade?: number; units?: string[]; limits?: Limits };
+  | { role: 'student'; id: string; name: string; username?: string | null; className?: string; grade?: number; units?: string[]; limits?: Limits };
 export type Limits = { quiz: number; game: number; reto: number };
 
 type Local = { name: string; xp: number; lessons: Lessons; days: string[]; grades: string[]; last: string | null };
