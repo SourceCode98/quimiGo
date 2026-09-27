@@ -1,0 +1,26 @@
+# Prueba el login docente sin mostrar la contraseña: la lee del evento y la oculta en los logs.
+name: Probar login docente
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL de la API en Render (sin / al final)'
+        default: 'https://quimicalearn-api.onrender.com'
+      email:
+        description: 'Correo del docente'
+        required: true
+      password:
+        description: 'Contraseña (no se muestra en los logs)'
+        required: true
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login docente
+        run: |
+          pw=$(jq -r '.inputs.password' "$GITHUB_EVENT_PATH")
+          echo "::add-mask::$pw"
+          body=$(jq -n --arg e "$(jq -r '.inputs.email' "$GITHUB_EVENT_PATH")" --arg p "$pw" '{email:$e,password:$p}')
+          url=$(jq -r '.inputs.url' "$GITHUB_EVENT_PATH")
+          curl -sS --max-time 120 -o out.json -w 'HTTP %{http_code}\n' -H 'content-type: application/json' -d "$body" "$url/api/teacher/login"
+          jq -c '{error, teacher: (.teacher // .user | if . then {name, email} else null end)}' out.json || cat out.json
