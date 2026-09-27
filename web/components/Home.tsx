@@ -42,7 +42,7 @@ export function Home() {
       )}
       {user?.role === 'teacher' && (
         <div className="notice row" style={{ justifyContent: 'space-between' }}>
-          <span>Hola, profe. Aquí ves las lecciones como tus estudiantes. Activa “Modo docente” para ver guías y planes.</span>
+          <span>Hola, profe. Aquí ves las lecciones como tus estudiantes. Activa “Guías docentes” para ver el plan del periodo y la guía de cada lección.</span>
           <Link className="btn" href="/docente">Ir a mis cursos</Link>
         </div>
       )}

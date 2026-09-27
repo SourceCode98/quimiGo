@@ -6,10 +6,11 @@ import { LESSON_BY_ID } from '@/content';
 import { BADGES, levelOf } from '@/lib/game';
 import { useQL } from './Providers';
 
-function useToggle(cls: string, key: string) {
+// allowed = false apaga la clase aunque esté guardada (ej. las guías docentes solo con sesión de docente).
+function useToggle(cls: string, key: string, allowed = true) {
   const [on, setOn] = useState(false);
   useEffect(() => { try { setOn(localStorage.getItem(key) === '1'); } catch { /* */ } }, [key]);
-  useEffect(() => { document.body.classList.toggle(cls, on); window.dispatchEvent(new Event('resize')); }, [cls, on]);
+  useEffect(() => { document.body.classList.toggle(cls, on && allowed); window.dispatchEvent(new Event('resize')); }, [cls, on, allowed]);
   return [on, () => setOn((v) => { try { localStorage.setItem(key, v ? '0' : '1'); } catch { /* */ } return !v; })] as const;
 }
 
@@ -42,7 +43,8 @@ export function TopBar() {
   const { user, state, badges, logout, ready } = useQL();
   const router = useRouter();
   const [big, toggleBig] = useToggle('big', 'ql-p-big');
-  const [teacher, toggleTeacher] = useToggle('docente', 'ql-p-docente');
+  const isTeacher = user?.role === 'teacher';
+  const [teacher, toggleTeacher] = useToggle('docente', 'ql-p-docente', isTeacher);
   const [open, setOpen] = useState(false);
   const lv = levelOf(state.xp);
   return (
@@ -63,7 +65,7 @@ export function TopBar() {
               </>
             )}
             <button className="pill" aria-pressed={big} onClick={toggleBig}>Texto grande</button>
-            <button className="pill" aria-pressed={teacher} onClick={toggleTeacher}>Modo docente</button>
+            {isTeacher && <button className="pill" aria-pressed={teacher} onClick={toggleTeacher}>Guías docentes</button>}
             {ready && (user ? (
               <span className="who">
                 {user.role === 'teacher' ? <Link className="pill" href="/docente">Mis cursos</Link> : <span className="muted">{user.name}</span>}
