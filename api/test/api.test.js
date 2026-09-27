@@ -1,10 +1,15 @@
-import { test } from 'node:test';
+import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from '../src/app.js';
 import { createMemoryStore } from '../src/store-memory.js';
+import { createPostgresStore } from '../src/store-postgres.js';
+
+// Con TEST_DATABASE_URL (una base de datos vacía de pruebas) el mismo flujo corre también contra PostgreSQL.
+const PG = process.env.TEST_DATABASE_URL;
+let store;
 
 async function boot() {
-  const app = createApp({ store: createMemoryStore(), secret: 'x'.repeat(40) });
+  const app = createApp({ store, secret: 'x'.repeat(40) });
   const server = await new Promise((r) => { const s = app.listen(0, () => r(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
   const client = () => {
@@ -17,6 +22,11 @@ async function boot() {
   };
   return { server, client };
 }
+
+for (const kind of PG ? ['memory', 'postgres'] : ['memory']) {
+describe(kind, () => {
+before(async () => { store = kind === 'postgres' ? await createPostgresStore({ connectionString: PG }) : createMemoryStore(); });
+after(async () => { await store.close?.(); });
 
 test('flujo completo docente y estudiante', async () => {
   const { server, client } = await boot();
@@ -72,3 +82,5 @@ test('flujo completo docente y estudiante', async () => {
     assert.equal((await t('GET', '/api/health')).body.ok, true);
   } finally { server.close(); }
 });
+});
+}

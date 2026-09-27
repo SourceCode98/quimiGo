@@ -1,4 +1,4 @@
-// Todas las llamadas a /api/* se reenvían al servidor en Oracle Cloud.
+// Todas las llamadas a /api/* se reenvían a la API en Render.
 // Así la cookie de sesión queda en el mismo dominio de la web (sin problemas de CORS ni cookies de terceros).
 const API_URL = (process.env.API_URL || 'http://127.0.0.1:4000').replace(/\/+$/, '');
 

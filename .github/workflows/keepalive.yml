@@ -1,11 +1,9 @@
-# Mantiene despierta la API gratuita de Render (se duerme a los 15 min sin visitas)
-# y la base de datos gratuita de Oracle (se detiene tras 7 días sin uso).
+# Mantiene despierta la API gratuita de Render (se duerme a los 15 min sin visitas).
 # Configura el secreto API_URL en GitHub: Settings > Secrets and variables > Actions (ej. https://quimicalearn-api.onrender.com).
 name: Mantener API despierta
 on:
   schedule:
     - cron: '*/10 11-23 * * 1-6'   # cada 10 min, 6 a. m. a 6 p. m. hora de Colombia, lunes a sábado
-    - cron: '0 */12 * * *'         # dos veces al día siempre, para que la base de datos no se detenga
   workflow_dispatch:
 jobs:
   ping:
