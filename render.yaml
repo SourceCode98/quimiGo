@@ -1,12 +1,5 @@
-# Blueprint de Render para QuimicaLearn: API (Node) + base de datos PostgreSQL, ambas en plan gratuito.
-# En Render: New > Blueprint > elige este repositorio. No pide ningún valor: todo se configura solo.
-databases:
-  - name: quimicalearn-db
-    plan: free
-    region: ohio
-    databaseName: quimicalearn
-    user: quimicalearn
-
+# Blueprint de Render para la API de QuimicaLearn (plan gratuito). La base de datos es MongoDB Atlas (plan M0 gratuito).
+# En Render: New > Blueprint > elige este repositorio. Te pedirá MONGODB_URI (la cadena de conexión de Atlas).
 services:
   - type: web
     name: quimicalearn-api
@@ -24,7 +17,5 @@ services:
         value: "22"
       - key: SESSION_SECRET
         generateValue: true
-      - key: DATABASE_URL
-        fromDatabase:
-          name: quimicalearn-db
-          property: connectionString
+      - key: MONGODB_URI
+        sync: false

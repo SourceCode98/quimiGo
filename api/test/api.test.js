@@ -2,10 +2,10 @@ import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from '../src/app.js';
 import { createMemoryStore } from '../src/store-memory.js';
-import { createPostgresStore } from '../src/store-postgres.js';
+import { createMongoStore } from '../src/store-mongo.js';
 
-// Con TEST_DATABASE_URL (una base de datos vacía de pruebas) el mismo flujo corre también contra PostgreSQL.
-const PG = process.env.TEST_DATABASE_URL;
+// Con TEST_MONGODB_URI (una base de datos vacía de pruebas) el mismo flujo corre también contra MongoDB.
+const MONGO = process.env.TEST_MONGODB_URI;
 let store;
 
 async function boot() {
@@ -23,9 +23,9 @@ async function boot() {
   return { server, client };
 }
 
-for (const kind of PG ? ['memory', 'postgres'] : ['memory']) {
+for (const kind of MONGO ? ['memory', 'mongodb'] : ['memory']) {
 describe(kind, () => {
-before(async () => { store = kind === 'postgres' ? await createPostgresStore({ connectionString: PG }) : createMemoryStore(); });
+before(async () => { store = kind === 'mongodb' ? await createMongoStore({ uri: MONGO, dbName: 'ql_test_' + Date.now() }) : createMemoryStore(); });
 after(async () => { await store.close?.(); });
 
 test('flujo completo docente y estudiante', async () => {
