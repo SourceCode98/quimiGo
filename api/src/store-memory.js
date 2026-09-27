@@ -20,6 +20,7 @@ export function createMemoryStore() {
       return t;
     },
     async findTeacherByEmail(email) { for (const t of teachers.values()) if (t.email === email) return t; return null; },
+    async setTeacherPass(id, passHash) { const t = teachers.get(id); if (t) t.passHash = passHash; },
     async getTeacher(id) { return teachers.get(id) || null; },
 
     async createClass({ teacherId, name, grade, code }) {

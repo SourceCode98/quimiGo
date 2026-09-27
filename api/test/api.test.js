@@ -1,6 +1,6 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createApp } from '../src/app.js';
+import { createApp, ensureTeacher } from '../src/app.js';
 import { createMemoryStore } from '../src/store-memory.js';
 import { createMongoStore } from '../src/store-mongo.js';
 
@@ -9,7 +9,7 @@ const MONGO = process.env.TEST_MONGODB_URI;
 let store;
 
 async function boot() {
-  const app = createApp({ store, secret: 'x'.repeat(40) });
+  const app = createApp({ store, secret: 'x'.repeat(40), allowSignup: true });
   const server = await new Promise((r) => { const s = app.listen(0, () => r(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
   const client = () => {
@@ -97,6 +97,20 @@ test('flujo completo docente y estudiante', async () => {
     assert.equal((await t('POST', '/api/logout')).status, 200);
     assert.equal((await t('GET', '/api/me')).body.user, null);
     assert.equal((await t('GET', '/api/health')).body.ok, true);
+  } finally { server.close(); }
+});
+
+test('cuenta fija de docente y registro cerrado', async () => {
+  await ensureTeacher(store, { email: 'Diego@X.co', password: 'clave-fija-1', name: 'Diego' });
+  await ensureTeacher(store, { email: 'diego@x.co', password: 'clave-nueva-2' });
+  const app = createApp({ store, secret: 'x'.repeat(40) });
+  const server = await new Promise((r) => { const s = app.listen(0, () => r(s)); });
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const post = (path, body) => fetch(base + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.status);
+  try {
+    assert.equal(await post('/api/teacher/register', { name: 'X', email: 'x@y.co', password: 'secreta123' }), 403);
+    assert.equal(await post('/api/teacher/login', { email: 'diego@x.co', password: 'clave-fija-1' }), 401);
+    assert.equal(await post('/api/teacher/login', { email: 'diego@x.co', password: 'clave-nueva-2' }), 200);
   } finally { server.close(); }
 });
 });

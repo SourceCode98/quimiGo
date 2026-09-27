@@ -33,7 +33,7 @@ export function Home() {
             <span className="mono">Soy docente</span>
             <h3>Crea tus cursos</h3>
             <p>Abre los módulos a tu ritmo, fija los intentos y mira el avance de cada estudiante.</p>
-            <span className="btn ghost">Entrar o crear cuenta</span>
+            <span className="btn ghost">Entrar como docente</span>
           </Link>
         </section>
       )}

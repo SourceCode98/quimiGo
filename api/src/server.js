@@ -1,4 +1,4 @@
-import { createApp } from './app.js';
+import { createApp, ensureTeacher } from './app.js';
 import { createMemoryStore } from './store-memory.js';
 import { createMongoStore } from './store-mongo.js';
 
@@ -9,7 +9,11 @@ if (useMemory && env.NODE_ENV === 'production') console.warn('AVISO: la API est�
 const store = useMemory ? createMemoryStore() : await createMongoStore({ uri: env.MONGODB_URI });
 
 const secret = env.SESSION_SECRET || (useMemory && env.NODE_ENV !== 'production' ? 'solo-para-desarrollo-local-no-usar-en-produccion' : '');
-const app = createApp({ store, secret, secureCookies: env.NODE_ENV === 'production' });
+// Cuenta fija de docente: se crea (o se le actualiza la contraseña) cada vez que arranca la API.
+const admin = await ensureTeacher(store, { email: env.ADMIN_EMAIL, password: env.ADMIN_PASSWORD, name: env.ADMIN_NAME });
+if (admin) console.log(`Cuenta de docente lista: ${admin.email}`);
+else console.warn('AVISO: falta ADMIN_EMAIL o ADMIN_PASSWORD; nadie podrá entrar como docente.');
+const app = createApp({ store, secret, secureCookies: env.NODE_ENV === 'production', allowSignup: env.ALLOW_TEACHER_SIGNUP === 'true' });
 const port = Number(env.PORT || 4000);
 const host = env.HOST || '0.0.0.0';
 const server = app.listen(port, host, () => console.log(`API de QuimicaLearn en http://${host}:${port} (base de datos: ${store.kind})`));

@@ -18,9 +18,8 @@ export default function Entrar() {
   const { refresh } = useQL();
   const router = useRouter();
   const st = useSubmit(), tc = useSubmit();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [s, setS] = useState({ code: '', name: '', pin: '' });
-  const [t, setT] = useState({ name: '', email: '', password: '' });
+  const [t, setT] = useState({ email: '', password: '' });
 
   return (
     <>
@@ -47,24 +46,16 @@ export default function Entrar() {
         </form>
 
         <form className="card form" onSubmit={tc.run(async () => {
-          if (mode === 'register') await api('/teacher/register', { body: t });
-          else await api('/teacher/login', { body: { email: t.email, password: t.password } });
+          await api('/teacher/login', { body: { email: t.email, password: t.password } });
           await refresh(); router.push('/docente');
         })}>
           <h2>Soy docente</h2>
-          <div className="row">
-            <button type="button" className="chip" aria-pressed={mode === 'login'} onClick={() => setMode('login')}>Iniciar sesión</button>
-            <button type="button" className="chip" aria-pressed={mode === 'register'} onClick={() => setMode('register')}>Crear cuenta</button>
-          </div>
-          {mode === 'register' && <div className="field"><label htmlFor="tname">Nombre</label>
-            <input id="tname" required maxLength={100} autoComplete="name" value={t.name} onChange={(e) => setT({ ...t, name: e.target.value })} /></div>}
           <div className="field"><label htmlFor="email">Correo</label>
             <input id="email" type="email" required autoComplete="email" value={t.email} onChange={(e) => setT({ ...t, email: e.target.value })} /></div>
           <div className="field"><label htmlFor="pw">Contraseña</label>
-            <input id="pw" type="password" required minLength={8} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} value={t.password} onChange={(e) => setT({ ...t, password: e.target.value })} />
-            {mode === 'register' && <small>Mínimo 8 caracteres.</small>}</div>
+            <input id="pw" type="password" required autoComplete="current-password" value={t.password} onChange={(e) => setT({ ...t, password: e.target.value })} /></div>
           {tc.err && <div className="fb no">{tc.err}</div>}
-          <button className="btn" disabled={tc.busy}>{tc.busy ? 'Un momento…' : mode === 'register' ? 'Crear cuenta de docente' : 'Entrar'}</button>
+          <button className="btn" disabled={tc.busy}>{tc.busy ? 'Un momento…' : 'Entrar'}</button>
         </form>
       </div>
     </>

@@ -24,7 +24,7 @@ La web reenvía `/api/*` a la API, así la sesión funciona en el mismo dominio 
 
 ## Cómo funcionan las cuentas
 
-- **Docente:** se registra con correo y contraseña, crea cursos (ej. "10A") y recibe un código de 6 caracteres por curso.
+- **Docente:** entra con la cuenta fija (`ADMIN_EMAIL` / `ADMIN_PASSWORD` en Render; el registro está cerrado), crea cursos (ej. "10A") y recibe un código de 6 caracteres por curso.
 - **Estudiante:** entra con el código del curso, su nombre y un PIN de 4 números que inventa la primera vez. No necesita correo (útil con menores de edad). Si olvida el PIN, el docente lo cambia desde el panel.
 - **Sin cuenta:** la plataforma funciona igual y guarda el avance en el navegador.
 - El XP lo calcula el servidor (20 por actividad, 10 por cada estrella nueva del quiz), así nadie lo puede inflar desde el navegador.
@@ -58,7 +58,8 @@ La API crea sola la base `quimicalearn`, sus colecciones e índices la primera v
 ### 2. API en Render
 1. Crea una cuenta en https://render.com con tu cuenta de GitHub.
 2. *New › Blueprint* › elige el repositorio. Render lee `render.yaml` y crea el servicio `quimicalearn-api` (plan Free).
-3. Te pide `MONGODB_URI`: pega la cadena de Atlas. `SESSION_SECRET` se genera solo.
+3. Te pide `MONGODB_URI` (pega la cadena de Atlas) y la cuenta de docente: `ADMIN_EMAIL` y `ADMIN_PASSWORD` (mínimo 8 caracteres). `SESSION_SECRET` se genera solo.
+   - El registro de docentes está cerrado: solo existe esa cuenta. La API la crea al arrancar y, si cambias `ADMIN_PASSWORD` en Render, actualiza la contraseña. Para abrir el registro pon `ALLOW_TEACHER_SIGNUP=true`.
 4. Cuando termine, abre `https://quimicalearn-api.onrender.com/api/health` (tu URL puede variar): debe decir `{"ok":true,"db":"mongodb"}`.
 
 ### 3. Web en Vercel

@@ -1,5 +1,6 @@
 # Blueprint de Render para la API de QuimicaLearn (plan gratuito). La base de datos es MongoDB Atlas (plan M0 gratuito).
-# En Render: New > Blueprint > elige este repositorio. Te pedirá MONGODB_URI (la cadena de conexión de Atlas).
+# En Render: New > Blueprint > elige este repositorio. Te pedirá MONGODB_URI (la cadena de conexión de Atlas)
+# y el correo y la contraseña de la cuenta fija de docente (ADMIN_EMAIL, ADMIN_PASSWORD).
 services:
   - type: web
     name: quimicalearn-api
@@ -19,3 +20,10 @@ services:
         generateValue: true
       - key: MONGODB_URI
         sync: false
+      # Cuenta fija de docente (el registro está cerrado). La API la crea al arrancar.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        value: Diego

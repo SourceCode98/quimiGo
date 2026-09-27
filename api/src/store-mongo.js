@@ -40,6 +40,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
       return teacher(doc);
     },
     async findTeacherByEmail(email) { return teacher(await teachers.findOne({ email })); },
+    async setTeacherPass(id, passHash) { await teachers.updateOne({ _id: id }, { $set: { passHash } }); },
     async getTeacher(id) { return teacher(await teachers.findOne({ _id: id })); },
 
     async createClass({ teacherId, name, grade, code }) {

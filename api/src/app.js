@@ -43,7 +43,18 @@ function limiter(max, windowMs) {
   };
 }
 
-export function createApp({ store, secret, secureCookies = false }) {
+/** Crea o actualiza la cuenta fija de docente (la contraseña se toma siempre de las variables de entorno). */
+export async function ensureTeacher(store, { email, password, name }) {
+  email = String(email || '').trim().toLowerCase();
+  if (!email || !password) return null;
+  if (password.length < 8) throw new Error('ADMIN_PASSWORD debe tener al menos 8 caracteres');
+  const t = await store.findTeacherByEmail(email);
+  if (!t) return store.createTeacher({ name: name || 'Docente', email, passHash: await bcrypt.hash(password, 10) });
+  if (!(await bcrypt.compare(password, t.passHash))) await store.setTeacherPass(t.id, await bcrypt.hash(password, 10));
+  return t;
+}
+
+export function createApp({ store, secret, secureCookies = false, allowSignup = false }) {
   if (!secret || secret.length < 32) throw new Error('SESSION_SECRET debe tener al menos 32 caracteres');
   const key = new TextEncoder().encode(secret);
   const app = express();
@@ -74,6 +85,8 @@ export function createApp({ store, secret, secureCookies = false }) {
 
   /* ---------- docentes ---------- */
   app.post('/api/teacher/register', loginLimit, wrap(async (req, res) => {
+    // Por ahora el registro está cerrado: solo existe la cuenta fija de ADMIN_EMAIL (ver server.js).
+    if (!allowSignup) return bad(res, 403, 'El registro de docentes está cerrado.');
     const name = str(req.body?.name, 100), email = str(req.body?.email, 254).toLowerCase(), password = typeof req.body?.password === 'string' ? req.body.password : '';
     if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return bad(res, 400, 'Escribe tu nombre y un correo válido.');
     if (password.length < 8 || password.length > 128) return bad(res, 400, 'La contraseña debe tener entre 8 y 128 caracteres.');
