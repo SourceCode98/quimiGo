@@ -24,7 +24,7 @@ export function createMemoryStore() {
 
     async createClass({ teacherId, name, grade, code }) {
       for (const c of classes.values()) if (c.code === code) { const e = new Error('duplicate'); e.code = 'DUPLICATE'; throw e; }
-      const c = { id: randomUUID(), teacherId, name, grade, code, createdAt: now() };
+      const c = { id: randomUUID(), teacherId, name, grade, code, units: [], createdAt: now() };
       classes.set(c.id, c);
       return c;
     },
@@ -33,6 +33,7 @@ export function createMemoryStore() {
         .map((c) => ({ ...c, studentCount: [...students.values()].filter((s) => s.classId === c.id).length }));
     },
     async getClass(id) { return classes.get(id) || null; },
+    async setClassUnits(id, units) { const c = classes.get(id); if (c) c.units = units; },
     async findClassByCode(code) { for (const c of classes.values()) if (c.code === code) return c; return null; },
 
     async findStudent(classId, nameKey) { for (const s of students.values()) if (s.classId === classId && s.nameKey === nameKey) return s; return null; },

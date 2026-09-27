@@ -7,7 +7,7 @@ import { useQL } from './Providers';
 import { gc, Stars } from './ui';
 
 export function CourseView({ n }: { n: number }) {
-  const { state } = useQL();
+  const { state, canOpen, user } = useQL();
   const g = GRADES.find((x) => x.n === n)!;
   const ls = g.units.flatMap((u) => u.lessons);
   const d = ls.filter((l) => isDone(state.lessons, l.id)).length;
@@ -29,7 +29,7 @@ export function CourseView({ n }: { n: number }) {
         </table></div>
       </section>
       <section className="units" style={gc(g.id)}>
-        {g.units.map((u, ui) => (
+        {g.units.map((u, ui) => canOpen(u.id) ? (
           <div className="unit" key={u.id}>
             <div className="unit-h"><h2>{ui + 1}. {u.title}</h2><span className="mono">{u.lessons.filter((l) => isDone(state.lessons, l.id)).length}/{u.lessons.length}</span></div>
             <p style={{ color: 'var(--muted)', fontSize: '.92rem' }}>{u.desc}</p>
@@ -49,6 +49,12 @@ export function CourseView({ n }: { n: number }) {
                 </Link>
               )}
             </div>
+          </div>
+        ) : (
+          <div className="unit unit-locked" key={u.id}>
+            <div className="unit-h"><h2>{ui + 1}. {u.title}</h2><span className="lock-badge">Bloqueado</span></div>
+            <p style={{ color: 'var(--muted)', fontSize: '.92rem' }}>{u.desc}</p>
+            <p className="muted" style={{ fontSize: '.88rem' }}>{u.lessons.length} lecciones{UNIT_GAMES[u.id] ? ' y un reto' : ''}. {user?.role === 'student' && user.grade === g.n ? 'Tu profe lo habilitará cuando lleguen a este tema.' : 'Este módulo no es de tu curso.'}</p>
           </div>
         ))}
       </section>

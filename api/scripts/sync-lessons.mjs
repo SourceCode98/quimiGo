@@ -15,5 +15,11 @@ for (const file of readdirSync(contentDir).filter((f) => /^g\d+\.ts$/.test(f)).s
 const games = readFileSync(join(contentDir, 'games.js'), 'utf8');
 let retos = 0;
 for (const m of games.matchAll(/^\s*(g(\d+)u(\d+)): \{ game:/gm)) { lessons.push({ id: m[1] + 'r', grade: Number(m[2]), unit: Number(m[3]), reto: true }); retos++; }
+// Juegos de la sección "Juega" de cada lección: id = <lección>j1 y <lección>j2 (web/content/lesson-games-*.js).
+let juegos = 0;
+for (const f of readdirSync(contentDir).filter((f) => /^lesson-games-.*\.js$/.test(f))) {
+  const src = readFileSync(join(contentDir, f), 'utf8');
+  for (const m of src.matchAll(/^\s*(g(\d+)u(\d+)l\d+): \[/gm)) for (const j of [1, 2]) { lessons.push({ id: `${m[1]}j${j}`, grade: Number(m[2]), unit: Number(m[3]), juego: true }); juegos++; }
+}
 writeFileSync(join(here, '../src/lessons.json'), JSON.stringify(lessons, null, 1) + '\n');
-console.log(`${lessons.length - retos} lecciones y ${retos} retos exportados`);
+console.log(`${lessons.length - retos - juegos} lecciones, ${retos} retos y ${juegos} juegos exportados`);

@@ -8,8 +8,12 @@ import hunter from './hunter.js';
 import sorter from './sorter.js';
 import balancer from './balancer.js';
 import reactor from './reactor.js';
+import catcher from './catcher.js';
+import word from './word.js';
+import truefalse from './truefalse.js';
+import order from './order.js';
 
-export const GAMES = { blitz, memory, builder, hunter, sorter, balancer, reactor };
+export const GAMES = { blitz, memory, builder, hunter, sorter, balancer, reactor, catcher, word, truefalse, order };
 export const GAME_INFO = {
   blitz: { name: 'Contrarreloj', ic: '⏱' },
   memory: { name: 'Parejas', ic: '▦' },
@@ -18,6 +22,10 @@ export const GAME_INFO = {
   sorter: { name: 'Atrapa y clasifica', ic: '⇣' },
   balancer: { name: 'Balanceo relámpago', ic: '⚖' },
   reactor: { name: 'Controla el reactor', ic: '◎' },
+  catcher: { name: 'Atrapa partículas', ic: '⚗' },
+  word: { name: 'Palabra secreta', ic: '✎' },
+  truefalse: { name: '¿Mito o verdad?', ic: '⇄' },
+  order: { name: 'Ordena la secuencia', ic: '⇅' },
 };
 
 export function mountGame(el, spec, finish) {

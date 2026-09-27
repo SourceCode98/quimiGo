@@ -277,6 +277,8 @@ export default function (el) {
       t.div.style.top = t.y + 'px';
       t.div.style.left = tx + 'px';
       const lx = t.side === 'r' ? tx - 4 : tx + 4;
+      // Antes del primer cuadro con tamaño real la proyección da NaN o Infinity: no se dibuja la guía.
+      if (![lx, t.y, t.ax, t.ay].every((v) => v == null || Number.isFinite(v))) { t.y = null; return; }
       t.line.setAttribute('x1', lx); t.line.setAttribute('y1', t.y); t.line.setAttribute('x2', t.ax || 0); t.line.setAttribute('y2', t.ay || 0);
       t.dot.setAttribute('cx', t.ax || 0); t.dot.setAttribute('cy', t.ay || 0);
     });

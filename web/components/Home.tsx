@@ -38,7 +38,7 @@ export function Home() {
         </div>
       )}
       {user?.role === 'student' && (
-        <div className="notice">Estás en el curso <b>{user.className}</b>. Tu avance se guarda en tu cuenta y tu profe lo puede ver.</div>
+        <div className="notice">Estás en el curso <b>{user.className}</b>. Tu avance se guarda en tu cuenta y tu profe lo puede ver. {user.units?.length ? <>Tienes <b>{user.units.length} {user.units.length === 1 ? 'módulo abierto' : 'módulos abiertos'}</b> en {user.grade}°.</> : <>Tu profe aún no ha abierto ningún módulo; mientras tanto puedes jugar en <Link href="/juegos">Juegos</Link>.</>}</div>
       )}
       {user?.role === 'teacher' && (
         <div className="notice row" style={{ justifyContent: 'space-between' }}>

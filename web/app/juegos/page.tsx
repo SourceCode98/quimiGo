@@ -7,8 +7,9 @@ import { GameHost } from '@/components/GameHost';
 import { useQL } from '@/components/Providers';
 import { Stars } from '@/components/ui';
 
+import { GAME_NAME as NAME } from '@/content/game-names';
+
 const IC: Record<string, string> = { blitz: '⏱', memory: '▦', builder: '⚛', hunter: '⌖', sorter: '⇣', balancer: '⚖', reactor: '◎' };
-const NAME: Record<string, string> = { blitz: 'Contrarreloj', memory: 'Parejas', builder: 'Constructor 3D', hunter: 'Cazador de elementos', sorter: 'Atrapa y clasifica', balancer: 'Balanceo relámpago', reactor: 'Controla el reactor' };
 type Free = { game: string; id: string; title: string; d: string; [k: string]: unknown };
 const FREE: Free[] = [
   { game: 'hunter', id: 'free-hunter', title: 'Cazador de elementos', d: 'Toda la tabla, Z 1 a 36', time: 90 },
@@ -18,7 +19,7 @@ const FREE: Free[] = [
 ];
 
 export default function Juegos() {
-  const { state } = useQL();
+  const { state, canOpen } = useQL();
   const [free, setFree] = useState<Free | null>(null);
   if (free) return (
     <>
@@ -44,8 +45,8 @@ export default function Juegos() {
             {g.units.filter((u) => UNIT_GAMES[u.id]).map((u) => {
               const sp = UNIT_GAMES[u.id];
               return (
-                <Link key={u.id} href={`/reto/${u.id}`} className="gamecard" style={{ ['--gc' as string]: `var(--${g.id})` }}>
-                  <span className="gi">{IC[sp.game]}</span><b>{sp.title}</b><small>{NAME[sp.game]} · {u.title}</small><Stars n={state.lessons[u.id + 'r']?.stars} />
+                <Link key={u.id} href={`/reto/${u.id}`} className={'gamecard' + (canOpen(u.id) ? '' : ' is-locked')} aria-disabled={!canOpen(u.id)} tabIndex={canOpen(u.id) ? undefined : -1} style={{ ['--gc' as string]: `var(--${g.id})` }}>
+                  <span className="gi">{canOpen(u.id) ? IC[sp.game] : '🔒'}</span><b>{sp.title}</b><small>{NAME[sp.game]} · {u.title}</small><Stars n={state.lessons[u.id + 'r']?.stars} />
                 </Link>
               );
             })}

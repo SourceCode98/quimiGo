@@ -6,7 +6,16 @@ import { randomInt } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { applyResult, addDay } from './game.js';
 
-const LESSONS = new Set(JSON.parse(readFileSync(new URL('./lessons.json', import.meta.url))).map((l) => l.id));
+const LESSON_LIST = JSON.parse(readFileSync(new URL('./lessons.json', import.meta.url)));
+const LESSONS = new Set(LESSON_LIST.map((l) => l.id));
+// Unidad de cada lección, reto o juego (ej. g8u1l2j1 → g8u1) y unidades de cada grado.
+const UNIT_OF = new Map(LESSON_LIST.map((l) => [l.id, `g${l.grade}u${l.unit}`]));
+const UNITS_BY_GRADE = new Map();
+for (const l of LESSON_LIST) {
+  const u = `g${l.grade}u${l.unit}`;
+  if (!UNITS_BY_GRADE.has(l.grade)) UNITS_BY_GRADE.set(l.grade, []);
+  if (!UNITS_BY_GRADE.get(l.grade).includes(u)) UNITS_BY_GRADE.get(l.grade).push(u);
+}
 const COOKIE = 'ql_session';
 const MAX_AGE = 30 * 24 * 3600;
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -95,7 +104,7 @@ export function createApp({ store, secret, secureCookies = false }) {
       catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, 'Ese nombre ya existe. Intenta de nuevo.'); throw e; }
     }
     await startSession(res, { sub: s.id, role: 'student', cls: c.id });
-    res.json({ user: { role: 'student', id: s.id, name: s.name, className: c.name, grade: c.grade } });
+    res.json({ user: { role: 'student', id: s.id, name: s.name, className: c.name, grade: c.grade, units: c.units || [] } });
   }));
 
   app.post('/api/logout', (_req, res) => { res.clearCookie(COOKIE, { path: '/' }); res.json({ ok: true }); });
@@ -112,7 +121,7 @@ export function createApp({ store, secret, secureCookies = false }) {
     const c = await store.getClass(st.classId);
     const rows = await store.getProgress(st.id);
     res.json({
-      user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade },
+      user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade, units: c?.units || [] },
       xp: st.xp, days: st.days,
       progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act }])),
     });
@@ -126,6 +135,9 @@ export function createApp({ store, secret, secureCookies = false }) {
     if (!act && stars === undefined) return bad(res, 400, 'Nada que guardar.');
     const st = await store.getStudent(req.session.sub);
     if (!st) return bad(res, 401, 'Tu cuenta ya no existe.');
+    // El docente decide qué módulos (unidades) están abiertos para su curso.
+    const c = await store.getClass(st.classId);
+    if (!c?.units?.includes(UNIT_OF.get(lessonId))) return bad(res, 403, 'Tu profe aún no habilita este módulo.');
     const prev = (await store.getProgress(st.id)).find((r) => r.lessonId === lessonId);
     const { next, gained } = applyResult(prev, { act, stars });
     await store.saveProgress(st.id, { lessonId, stars: next.stars ?? null, act: next.act, attempts: next.attempts || 0 });
@@ -156,6 +168,15 @@ export function createApp({ store, secret, secureCookies = false }) {
   app.get('/api/classes/:id', need('teacher'), wrap(async (req, res) => {
     const c = await ownClass(req, res); if (!c) return;
     res.json({ class: c, students: await store.listStudentsWithProgress(c.id) });
+  }));
+
+  app.put('/api/classes/:id/units', need('teacher'), wrap(async (req, res) => {
+    const c = await ownClass(req, res); if (!c) return;
+    const valid = UNITS_BY_GRADE.get(c.grade) || [];
+    const units = Array.isArray(req.body?.units) ? [...new Set(req.body.units.filter((u) => valid.includes(u)))] : null;
+    if (!units) return bad(res, 400, 'Envía la lista de módulos.');
+    await store.setClassUnits(c.id, units);
+    res.json({ units });
   }));
 
   app.post('/api/classes/:id/students/:sid/pin', need('teacher'), wrap(async (req, res) => {

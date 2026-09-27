@@ -5,7 +5,7 @@ import { applyResult, BADGES, earnedBadges, levelOf, todayBogota, type Lessons, 
 
 export type User =
   | { role: 'teacher'; id: string; name: string }
-  | { role: 'student'; id: string; name: string; className?: string; grade?: number };
+  | { role: 'student'; id: string; name: string; className?: string; grade?: number; units?: string[] };
 
 type Local = { name: string; xp: number; lessons: Lessons; days: string[]; grades: string[]; last: string | null };
 const EMPTY: Local = { name: '', xp: 0, lessons: {}, days: [], grades: [], last: null };
@@ -26,6 +26,8 @@ type Ctx = {
   visit: (lessonId: string, gradeId: string) => void;
   record: (lessonId: string, input: { act?: boolean; stars?: number }) => Promise<void>;
   toast: (msg: string) => void;
+  /** Un estudiante solo abre los módulos (unidades) que su docente habilitó; docentes e invitados, todos. */
+  canOpen: (unitId: string) => boolean;
 };
 
 const C = createContext<Ctx | null>(null);
@@ -127,8 +129,10 @@ export function Providers({ children }: { children: ReactNode }) {
     setState(read(GUEST_KEY, EMPTY));
   }, []);
 
-  const value = useMemo<Ctx>(() => ({ ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast }),
-    [ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast]);
+  const canOpen = useCallback((unitId: string) => user?.role !== 'student' || !!user.units?.includes(unitId), [user]);
+
+  const value = useMemo<Ctx>(() => ({ ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen }),
+    [ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen]);
 
   return (
     <C.Provider value={value}>

@@ -1,17 +1,21 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ACT_NAME, ALL_LESSONS, LESSON_BY_ID } from '@/content';
 import { useQL } from './Providers';
 import { Quiz } from './Quiz';
 import { gc } from './ui';
 import { Widget } from './Widget';
 import { Learn } from './Learn';
+import { Locked } from './Locked';
+import { GameHost } from './GameHost';
+import { lessonGames } from '@/content/lesson-games';
+import { GAME_NAME } from '@/content/game-names';
 
 const html = (s: string) => ({ __html: s });
 
 export function LessonView({ id }: { id: string }) {
-  const { state, visit, record } = useQL();
+  const { state, visit, record, canOpen, ready } = useQL();
   const l = LESSON_BY_ID[id];
   const g = l.grade;
   const idx = ALL_LESSONS.indexOf(l);
@@ -19,8 +23,16 @@ export function LessonView({ id }: { id: string }) {
   const r = state.lessons[id] || { stars: null, act: false };
   const act = ACT_NAME[l.act.type] || '';
   const [learned, setLearned] = useState(false);
+  const games = useMemo(() => lessonGames(id), [id]);
+  const [gi, setGi] = useState(0);
+  const open = canOpen(l.unit.id);
+  const played = games.filter((x) => state.lessons[x.id]?.stars != null).length;
 
-  useEffect(() => { visit(id, g.id); }, [id, g.id, visit]);
+  useEffect(() => { if (open) visit(id, g.id); }, [id, g.id, visit, open]);
+  useEffect(() => { setGi(0); }, [id]);
+
+  if (!ready) return <p className="muted">Cargando…</p>;
+  if (!open) return <Locked what={`El módulo “${l.unit.title}”`} gradeN={g.n} />;
 
   return (
     <>
@@ -30,7 +42,8 @@ export function LessonView({ id }: { id: string }) {
         <nav className="phases" aria-label="Momentos">
           <a href="#aprende" className={learned ? 'ok' : ''}>1 Aprende</a>
           <a href="#practica" className={r.act ? 'ok' : ''}>2 Practica</a>
-          <a href="#demuestra" className={r.stars !== null && r.stars !== undefined ? 'ok' : ''}>3 Demuestra</a>
+          {games.length > 0 && <a href="#juega" className={played === games.length ? 'ok' : ''}>3 Juega</a>}
+          <a href="#demuestra" className={r.stars !== null && r.stars !== undefined ? 'ok' : ''}>{games.length > 0 ? 4 : 3} Demuestra</a>
         </nav>
       </section>
 
@@ -57,8 +70,22 @@ export function LessonView({ id }: { id: string }) {
         <Widget key={id} spec={l.act} onDone={() => { if (!r.act) record(id, { act: true }); }} />
       </section>
 
+      {games.length > 0 && (
+        <section className={'block' + (played === games.length ? ' ok' : '')} id="juega">
+          <div className="bhead"><span className="i">3</span><div><h2>Juega</h2><span className="mono">{games.length} minijuegos · +20 XP y hasta 3 estrellas cada uno</span></div></div>
+          <div className="juega-tabs" role="group" aria-label="Minijuegos de la lección">
+            {games.map((x, i) => (
+              <button key={x.id} aria-pressed={gi === i} onClick={() => setGi(i)}>
+                <b>{x.title}</b><small>{GAME_NAME[x.game] || 'Minijuego'} · {state.lessons[x.id]?.stars != null ? '★'.repeat(state.lessons[x.id]!.stars!) + '☆'.repeat(3 - state.lessons[x.id]!.stars!) : 'Sin jugar'}</small>
+              </button>
+            ))}
+          </div>
+          <GameHost key={games[gi].id} spec={games[gi]} onFinish={(res) => record(games[gi].id, { act: true, stars: Math.max(0, Math.min(3, res.stars | 0)) })} />
+        </section>
+      )}
+
       <section className={'block' + (r.stars !== null && r.stars !== undefined ? ' ok' : '')} id="demuestra">
-        <div className="bhead"><span className="i">3</span><div><h2>Demuestra</h2><span className="mono">3 preguntas · 10 XP por acierto</span></div></div>
+        <div className="bhead"><span className="i">{games.length > 0 ? 4 : 3}</span><div><h2>Demuestra</h2><span className="mono">3 preguntas · 10 XP por acierto</span></div></div>
         <Quiz key={id} items={l.quiz} onFinish={(n) => record(id, { stars: n })} />
       </section>
 

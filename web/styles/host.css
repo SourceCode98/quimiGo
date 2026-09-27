@@ -35,3 +35,30 @@
 .gamecard:hover{border-color:var(--gc,var(--gold))}
 .gamecard .gi{font:800 1.5rem "Bricolage Grotesque",sans-serif;color:var(--gc,var(--gold))}
 .gamecard small{color:var(--muted);font-size:.8rem}
+
+/* módulos bloqueados por el docente */
+.unit-locked{opacity:.72;border-style:dashed}
+.lock-badge{font:700 .75rem "Bricolage Grotesque",sans-serif;padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.locked-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;border:1px dashed var(--line);border-radius:14px;padding:28px 22px;background:var(--surface)}
+.locked-card .lock-ic{font-size:2.2rem}
+.locked-card p{color:var(--muted)}
+.gamecard.is-locked{opacity:.5;pointer-events:none}
+
+/* sección Juega de cada lección */
+.juega-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.juega-tabs button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surface);color:inherit;text-align:left;min-height:44px;font:inherit}
+.juega-tabs button small{color:var(--muted);font-size:.78rem}
+.juega-tabs button[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 -3px 0 var(--gold)}
+
+/* panel docente: módulos habilitados */
+.modules{display:flex;flex-direction:column;gap:12px}
+.mod-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.mod{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface);color:inherit;text-align:left;font:inherit;min-height:56px;cursor:pointer}
+.mod small{display:block;color:var(--muted);font-size:.8rem}
+.mod.on{border-color:var(--ok)}
+.mod .sw{width:44px;height:26px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);position:relative;transition:background .2s}
+.mod .sw i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.mod.on .sw{background:var(--ok)}
+.mod.on .sw i{transform:translateX(18px);background:#fff}
+.mod:disabled{cursor:progress}
+@media (prefers-reduced-motion: reduce){.mod .sw,.mod .sw i{transition:none}}

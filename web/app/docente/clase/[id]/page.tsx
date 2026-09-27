@@ -11,7 +11,7 @@ import { levelOf } from '@/lib/game';
 
 type Row = { lessonId: string; stars: number | null; act: boolean };
 type Student = { id: string; name: string; xp: number; lastActive: string; progress: Row[] };
-type Klass = { id: string; name: string; grade: number; code: string };
+type Klass = { id: string; name: string; grade: number; code: string; units?: string[] };
 
 const when = (iso: string) => {
   if (!iso) return '—';
@@ -24,6 +24,7 @@ export default function Clase() {
   const { user, ready, toast } = useQL();
   const [data, setData] = useState<{ class: Klass; students: Student[] } | null>(null);
   const [err, setErr] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     try { setData(await api(`/classes/${id}`)); } catch (e) { setErr((e as Error).message); }
@@ -52,6 +53,17 @@ export default function Clase() {
   const weekAgo = Date.now() - 7 * 864e5;
   const active = students.filter((s) => s.lastActive && new Date(s.lastActive).getTime() > weekAgo).length;
 
+  const units = c.units || [];
+  const saveUnits = async (next: string[]) => {
+    setSaving(true);
+    try {
+      const r = await api<{ units: string[] }>(`/classes/${c.id}/units`, { method: 'PUT', body: { units: next } });
+      setData((d) => d && { ...d, class: { ...d.class, units: r.units } });
+    } catch (e) { toast((e as Error).message); }
+    setSaving(false);
+  };
+  const toggleUnit = (u: string) => saveUnits(units.includes(u) ? units.filter((x) => x !== u) : [...units, u]);
+
   const resetPin = async (s: Student) => {
     const pin = window.prompt(`Nuevo PIN de 4 números para ${s.name}:`);
     if (pin === null) return;
@@ -71,6 +83,27 @@ export default function Clase() {
           <button className="btn ghost sm" onClick={() => { navigator.clipboard?.writeText(c.code); toast('Código copiado'); }}>Copiar</button>
           <button className="btn ghost sm" onClick={load}>Actualizar</button></div>
         <p className="muted">Pídeles que entren a la plataforma, toquen “Entrar” y escriban este código, su nombre y un PIN de 4 números.</p>
+      </section>
+
+      <section className="block modules" aria-busy={saving}>
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <div><h2>Módulos del curso</h2><span className="mono">Tus estudiantes solo ven los módulos que habilites · {units.length} de {grade.units.length} abiertos</span></div>
+          <div className="row">
+            <button className="btn ghost sm" disabled={saving || units.length === grade.units.length} onClick={() => saveUnits(grade.units.map((u) => u.id))}>Habilitar todos</button>
+            <button className="btn ghost sm" disabled={saving || units.length === 0} onClick={() => saveUnits([])}>Bloquear todos</button>
+          </div>
+        </div>
+        <div className="mod-list">
+          {grade.units.map((u, ui) => {
+            const on = units.includes(u.id);
+            return (
+              <button key={u.id} className={'mod' + (on ? ' on' : '')} role="switch" aria-checked={on} disabled={saving} onClick={() => toggleUnit(u.id)}>
+                <span className="sw" aria-hidden><i /></span>
+                <span><b>{ui + 1}. {u.title}</b><small>{u.lessons.length} lecciones{UNIT_GAMES[u.id] ? ' y un reto' : ''} · {on ? 'Abierto' : 'Bloqueado'}</small></span>
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       <section className="stats">

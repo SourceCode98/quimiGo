@@ -21,6 +21,8 @@ export const BADGES = [
   { id: 'mil', ic: '1k', t: 'Mil XP', d: 'Llega a 1.000 XP' },
   { id: 'jugador', ic: '▶', t: 'Jugador', d: 'Supera 5 retos de unidad' },
   { id: 'campeon', ic: '♛', t: 'Campeón', d: 'Consigue 3 estrellas en 10 retos' },
+  { id: 'gamer', ic: '◆', t: 'Fiebre de juegos', d: 'Juega 20 minijuegos de las lecciones' },
+  { id: 'perfecto', ic: '✦', t: 'Juego perfecto', d: 'Consigue 3 estrellas en 10 minijuegos de lecciones' },
 ];
 
 export const isDone = (lessons: Lessons, id: string) => {
@@ -32,7 +34,9 @@ export const isDone = (lessons: Lessons, id: string) => {
 export function earnedBadges(s: { xp: number; lessons: Lessons; days: string[]; grades: string[] }): Set<string> {
   const out = new Set<string>();
   const done = (l: LessonRef) => isDone(s.lessons, l.id);
-  const recs = Object.values(s.lessons);
+  // Lecciones (g8u1l2), retos de unidad (g8u1r) y minijuegos de lección (g8u1l2j1) se cuentan por separado.
+  const recs = Object.entries(s.lessons).filter(([k]) => /l\d+$/.test(k)).map(([, r]) => r);
+  const juegos = Object.entries(s.lessons).filter(([k]) => /j\d+$/.test(k)).map(([, r]) => r);
   if (ALL_LESSONS.some(done)) out.add('primera');
   const byUnit = new Map<string, LessonRef[]>();
   const byGrade = new Map<string, LessonRef[]>();
@@ -50,6 +54,8 @@ export function earnedBadges(s: { xp: number; lessons: Lessons; days: string[]; 
   const retos = Object.entries(s.lessons).filter(([k]) => /r$/.test(k)).map(([, r]) => r);
   if (retos.filter((r) => r.stars !== null && r.stars !== undefined).length >= 5) out.add('jugador');
   if (retos.filter((r) => r.stars === 3).length >= 10) out.add('campeon');
+  if (juegos.filter((r) => r.stars !== null && r.stars !== undefined).length >= 20) out.add('gamer');
+  if (juegos.filter((r) => r.stars === 3).length >= 10) out.add('perfecto');
   return out;
 }
 
