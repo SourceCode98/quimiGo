@@ -1,0 +1,16 @@
+# Revisa a mano si la API responde: Actions > Diagnóstico de la API > Run workflow (pega la URL de Render).
+name: Diagnóstico de la API
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL de la API en Render (sin / al final)'
+        default: 'https://quimicalearn-api.onrender.com'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Salud de la API
+        run: curl -sS --max-time 120 -w '\nHTTP %{http_code}\n' "${{ inputs.url }}/api/health"
+      - name: Login con datos falsos (debe responder 401)
+        run: curl -sS --max-time 60 -w '\nHTTP %{http_code}\n' -H 'content-type: application/json' -d '{"email":"nadie@x.co","password":"x"}' "${{ inputs.url }}/api/teacher/login"
