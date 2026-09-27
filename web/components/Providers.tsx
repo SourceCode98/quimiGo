@@ -5,7 +5,8 @@ import { applyResult, BADGES, earnedBadges, levelOf, todayBogota, type Lessons, 
 
 export type User =
   | { role: 'teacher'; id: string; name: string }
-  | { role: 'student'; id: string; name: string; className?: string; grade?: number; units?: string[] };
+  | { role: 'student'; id: string; name: string; className?: string; grade?: number; units?: string[]; limits?: Limits };
+export type Limits = { quiz: number; game: number; reto: number };
 
 type Local = { name: string; xp: number; lessons: Lessons; days: string[]; grades: string[]; last: string | null };
 const EMPTY: Local = { name: '', xp: 0, lessons: {}, days: [], grades: [], last: null };
@@ -28,6 +29,8 @@ type Ctx = {
   toast: (msg: string) => void;
   /** Un estudiante solo abre los módulos (unidades) que su docente habilitó; docentes e invitados, todos. */
   canOpen: (unitId: string) => boolean;
+  /** Intentos que le quedan al estudiante en un quiz, juego o reto (Infinity si no hay límite). */
+  triesLeft: (id: string) => { left: number; limit: number; used: number };
 };
 
 const C = createContext<Ctx | null>(null);
@@ -129,10 +132,16 @@ export function Providers({ children }: { children: ReactNode }) {
     setState(read(GUEST_KEY, EMPTY));
   }, []);
 
+  const triesLeft = useCallback((id: string) => {
+    const kind = /r$/.test(id) ? 'reto' : /j\d+$/.test(id) ? 'game' : 'quiz';
+    const limit = user?.role === 'student' ? user.limits?.[kind] || 0 : 0;
+    const used = state.lessons[id]?.attempts || 0;
+    return { limit, used, left: limit ? Math.max(0, limit - used) : Infinity };
+  }, [user, state.lessons]);
   const canOpen = useCallback((unitId: string) => user?.role !== 'student' || !!user.units?.includes(unitId), [user]);
 
-  const value = useMemo<Ctx>(() => ({ ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen }),
-    [ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen]);
+  const value = useMemo<Ctx>(() => ({ ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen, triesLeft }),
+    [ready, user, synced, state, badges, refresh, logout, setGuestName, visit, record, toast, canOpen, triesLeft]);
 
   return (
     <C.Provider value={value}>

@@ -1,6 +1,6 @@
 import { ALL_LESSONS, type LessonRef } from '@/content';
 
-export type Rec = { stars: number | null; act: boolean };
+export type Rec = { stars: number | null; act: boolean; attempts?: number };
 export type Lessons = Record<string, Rec>;
 
 export const LEVELS = ['Aprendiz', 'Curioso', 'Observador', 'Experimentador', 'Laboratorista', 'Analista', 'Investigador', 'Científico', 'Premio Nobel'];

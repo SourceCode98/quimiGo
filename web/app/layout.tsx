@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Providers } from '@/components/Providers';
 import { TopBar } from '@/components/TopBar';
+import { AccessGate } from '@/components/AccessGate';
 import './globals.css';
 import '@/styles/host.css';
 import '@/styles/scenes-a.css';
@@ -26,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers>
           <TopBar />
-          <main className="wrap">{children}</main>
+          <main className="wrap"><AccessGate>{children}</AccessGate></main>
         </Providers>
       </body>
     </html>

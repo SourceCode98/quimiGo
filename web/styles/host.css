@@ -62,3 +62,18 @@
 .mod.on .sw i{transform:translateX(18px);background:#fff}
 .mod:disabled{cursor:progress}
 @media (prefers-reduced-motion: reduce){.mod .sw,.mod .sw i{transition:none}}
+
+/* intentos agotados */
+.notries{display:flex;flex-direction:column;gap:6px;border:1px dashed var(--line);border-radius:12px;padding:16px 18px;background:var(--surface2)}
+.notries .stars-big{color:var(--gold);font-size:1.3rem;letter-spacing:2px}
+.notries small{color:var(--muted)}
+.tries-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.tries-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+.tries-row small{display:block;color:var(--muted);font-size:.8rem}
+.tries-row select{min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 8px;font:inherit}
+
+/* portada sin sesión */
+.entry-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.entry{display:flex;flex-direction:column;align-items:flex-start;gap:8px;border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface);text-decoration:none;color:inherit}
+.entry:hover{border-color:var(--accent)}
+.entry p{color:var(--muted)}

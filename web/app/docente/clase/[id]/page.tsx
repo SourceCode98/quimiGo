@@ -11,7 +11,10 @@ import { levelOf } from '@/lib/game';
 
 type Row = { lessonId: string; stars: number | null; act: boolean };
 type Student = { id: string; name: string; xp: number; lastActive: string; progress: Row[] };
-type Klass = { id: string; name: string; grade: number; code: string; units?: string[] };
+type Limits = { quiz: number; game: number; reto: number };
+type Klass = { id: string; name: string; grade: number; code: string; units?: string[]; limits?: Limits };
+const TRIES = [0, 1, 2, 3, 5];
+const SECTIONS: [keyof Limits, string, string][] = [['quiz', 'Demuestra', 'Quiz de cada lección'], ['game', 'Juega', 'Cada minijuego de la lección'], ['reto', 'Reto', 'Reto al final de cada módulo']];
 
 const when = (iso: string) => {
   if (!iso) return '—';
@@ -62,6 +65,16 @@ export default function Clase() {
     } catch (e) { toast((e as Error).message); }
     setSaving(false);
   };
+  const limits: Limits = c.limits || { quiz: 0, game: 0, reto: 0 };
+  const saveLimit = async (k: keyof Limits, v: number) => {
+    setSaving(true);
+    try {
+      const r = await api<{ limits: Limits }>(`/classes/${c.id}/limits`, { method: 'PUT', body: { limits: { ...limits, [k]: v } } });
+      setData((d) => d && { ...d, class: { ...d.class, limits: r.limits } });
+      toast('Intentos guardados');
+    } catch (e) { toast((e as Error).message); }
+    setSaving(false);
+  };
   const toggleUnit = (u: string) => saveUnits(units.includes(u) ? units.filter((x) => x !== u) : [...units, u]);
 
   const resetPin = async (s: Student) => {
@@ -104,6 +117,21 @@ export default function Clase() {
             );
           })}
         </div>
+      </section>
+
+      <section className="block modules" aria-busy={saving}>
+        <div><h2>Intentos por sección</h2><span className="mono">Cuántas veces puede presentar cada estudiante · Practica siempre es libre</span></div>
+        <div className="tries-grid">
+          {SECTIONS.map(([k, name, d]) => (
+            <label key={k} className="tries-row">
+              <span><b>{name}</b><small>{d}</small></span>
+              <select value={limits[k]} disabled={saving} onChange={(e) => saveLimit(k, Number(e.target.value))}>
+                {TRIES.map((t) => <option key={t} value={t}>{t === 0 ? 'Sin límite' : `${t} ${t === 1 ? 'intento' : 'intentos'}`}</option>)}
+              </select>
+            </label>
+          ))}
+        </div>
+        <p className="muted" style={{ fontSize: '.85rem' }}>Se cuenta un intento cada vez que el estudiante termina el quiz, un minijuego o el reto. Se guarda su mejor resultado.</p>
       </section>
 
       <section className="stats">

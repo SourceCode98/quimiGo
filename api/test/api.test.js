@@ -51,6 +51,9 @@ test('flujo completo docente y estudiante', async () => {
     assert.deepEqual((await s('GET', '/api/me')).body.user.units, ['g10u1']);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u2l1', act: true })).status, 403);
 
+    // Intentos: el docente limita el quiz a 2; la actividad (Practica) no cuenta.
+    assert.deepEqual((await t('PUT', `/api/classes/${cls.id}/limits`, { limits: { quiz: 2, game: 'x', reto: 50 } })).body.limits, { quiz: 2, game: 0, reto: 0 });
+    assert.deepEqual((await s('GET', '/api/me')).body.user.limits, { quiz: 2, game: 0, reto: 0 });
     let r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', act: true });
     assert.equal(r.body.gained, 20);
     // Juegos de la lección (sección "Juega") y reto de la unidad.
@@ -60,13 +63,15 @@ test('flujo completo docente y estudiante', async () => {
     assert.equal(r.body.gained, 20);
     r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 1, act: true });
     assert.equal(r.body.gained, 0);
+    assert.equal((await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 3 })).status, 403);
+    assert.equal((await t('PUT', `/api/classes/${cls.id}/limits`, { limits: { quiz: 0 } })).status, 200);
     r = await s('POST', '/api/progress', { lessonId: 'g10u1l1', stars: 3 });
-    assert.deepEqual([r.body.gained, r.body.xp], [10, 80]);
+    assert.deepEqual([r.body.gained, r.body.xp, r.body.record.attempts], [10, 80, 3]);
     assert.equal((await s('POST', '/api/progress', { lessonId: 'falsa', stars: 3 })).status, 400);
 
     const me = (await s('GET', '/api/me')).body;
     assert.equal(me.xp, 80);
-    assert.deepEqual(me.progress.g10u1l1, { stars: 3, act: true });
+    assert.deepEqual(me.progress.g10u1l1, { stars: 3, act: true, attempts: 3 });
     assert.equal(me.days.length, 1);
 
     // Mismo nombre con otro PIN no entra; con el PIN correcto sí.

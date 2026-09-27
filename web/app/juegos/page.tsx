@@ -19,7 +19,8 @@ const FREE: Free[] = [
 ];
 
 export default function Juegos() {
-  const { state, canOpen } = useQL();
+  const { state, canOpen, user } = useQL();
+  const shown = user?.role === 'student' && user.grade ? GRADES.filter((g) => g.n === user.grade) : GRADES;
   const [free, setFree] = useState<Free | null>(null);
   if (free) return (
     <>
@@ -34,13 +35,13 @@ export default function Juegos() {
         <p>Retos de cada unidad para ganar XP y estrellas, y juegos libres para practicar. Ideales para iniciar o cerrar una clase en video beam.</p></section>
       <div className="arcade">
         <section className="arcade-grade"><h2>Juego libre</h2><div className="gamecards">
-          {FREE.map((f) => (
+          {FREE.filter((f) => !f.gc || shown.some((g) => g.id === f.gc)).map((f) => (
             <button key={f.id} className="gamecard" style={{ ['--gc' as string]: f.gc ? `var(--${f.gc})` : 'var(--accent)' }} onClick={() => setFree(f)}>
               <span className="gi">{IC[f.game]}</span><b>{f.title}</b><small>{NAME[f.game]} · {f.d}</small>
             </button>
           ))}
         </div></section>
-        {GRADES.map((g) => (
+        {shown.map((g) => (
           <section className="arcade-grade" key={g.id}><h2>Retos de {g.n}° · {g.title}</h2><div className="gamecards">
             {g.units.filter((u) => UNIT_GAMES[u.id]).map((u) => {
               const sp = UNIT_GAMES[u.id];

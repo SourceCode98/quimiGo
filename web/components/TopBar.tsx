@@ -54,8 +54,8 @@ export function TopBar() {
           <Link className="brand" href="/">Quimica<span>Learn</span></Link>
           <Crumbs />
           <div className="hud">
-            <Link className="pill" href="/juegos" style={{ textDecoration: 'none' }}>Juegos</Link>
-            {user?.role !== 'teacher' && (
+            {user && <Link className="pill" href="/juegos" style={{ textDecoration: 'none' }}>Juegos</Link>}
+            {user?.role === 'student' && (
               <>
                 <div className="lvl">
                   <div className="lvl-row"><span>Nivel {lv.n} · {lv.name}</span><b>{state.xp} XP</b></div>

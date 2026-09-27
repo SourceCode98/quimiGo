@@ -25,7 +25,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
   const dup = (err) => { if (err.code === 11000) { const e = new Error('duplicate'); e.code = 'DUPLICATE'; throw e; } throw err; };
 
   const teacher = (r) => r && { id: r._id, name: r.name, email: r.email, passHash: r.passHash, createdAt: iso(r.createdAt) };
-  const klass = (r) => r && { id: r._id, teacherId: r.teacherId, name: r.name, grade: r.grade, code: r.code, units: r.units || [], createdAt: iso(r.createdAt) };
+  const klass = (r) => r && { id: r._id, teacherId: r.teacherId, name: r.name, grade: r.grade, code: r.code, units: r.units || [], limits: r.limits || {}, createdAt: iso(r.createdAt) };
   const student = (r) => r && { id: r._id, classId: r.classId, name: r.name, nameKey: r.nameKey, pinHash: r.pinHash, xp: r.xp, days: r.days || [], lastActive: iso(r.lastActive) };
   const prog = (r) => ({ lessonId: r.lessonId, stars: r.stars, act: r.act, attempts: r.attempts, updatedAt: iso(r.updatedAt) });
 
@@ -43,7 +43,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
     async getTeacher(id) { return teacher(await teachers.findOne({ _id: id })); },
 
     async createClass({ teacherId, name, grade, code }) {
-      const doc = { _id: randomUUID(), teacherId, name, grade, code, units: [], createdAt: new Date() };
+      const doc = { _id: randomUUID(), teacherId, name, grade, code, units: [], limits: {}, createdAt: new Date() };
       try { await classes.insertOne(doc); } catch (e) { dup(e); }
       return klass(doc);
     },
@@ -59,6 +59,7 @@ export async function createMongoStore({ uri, dbName = 'quimicalearn' }) {
     async getClass(id) { return klass(await classes.findOne({ _id: id })); },
     async findClassByCode(code) { return klass(await classes.findOne({ code })); },
     async setClassUnits(id, units) { await classes.updateOne({ _id: id }, { $set: { units } }); },
+    async setClassLimits(id, limits) { await classes.updateOne({ _id: id }, { $set: { limits } }); },
 
     async findStudent(classId, nameKey) { return student(await students.findOne({ classId, nameKey })); },
     async createStudent({ classId, name, nameKey, pinHash }) {

@@ -1,41 +1,41 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import { GRADES, LESSON_BY_ID } from '@/content';
 import { isDone } from '@/lib/game';
 import { useQL } from './Providers';
 import { gc } from './ui';
 
 export function Home() {
-  const { user, state, setGuestName, ready } = useQL();
-  const [name, setName] = useState('');
-  useEffect(() => setName(state.name), [state.name]);
+  const { user, state, ready } = useQL();
   const last = state.last ? LESSON_BY_ID[state.last] : null;
-  const display = user?.name || state.name;
+  const display = user?.name || '';
   const myGrade = user?.role === 'student' ? user.grade : undefined;
-  const grades = myGrade ? [...GRADES].sort((a, b) => (b.n === myGrade ? 1 : 0) - (a.n === myGrade ? 1 : 0)) : GRADES;
+  // Estudiante: solo su grado. Docente: todos. Sin cuenta: ninguno (solo la portada para entrar).
+  const grades = user?.role === 'teacher' ? GRADES : myGrade ? GRADES.filter((g) => g.n === myGrade) : [];
 
   return (
     <>
       <section className="hero">
         <span className="mono">Química para colegio · Grados 6° a 11° · Alineado a Estándares y DBA del MEN</span>
         <h1>{display ? `Hola, ${display}. ` : ''}¿Qué vamos a descubrir hoy?</h1>
-        <p>Cada lección tiene tres momentos: aprende la idea, practícala en una actividad interactiva y demuestra lo que sabes. Ganas XP, subes de nivel y desbloqueas insignias.</p>
-        {ready && !user && (
-          <div className="namebox">
-            <label htmlFor="nameIn" className="mono">Tu nombre</label>
-            <input id="nameIn" maxLength={30} autoComplete="off" placeholder="Escribe tu nombre" value={name}
-              onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') setGuestName(name.trim()); }} />
-            <button className="btn ghost" onClick={() => setGuestName(name.trim())}>Guardar</button>
-          </div>
-        )}
+        <p>Cada lección tiene cuatro momentos: aprende la idea en 3D, practícala, juega dos minijuegos y demuestra lo que sabes. Ganas XP, subes de nivel y desbloqueas insignias.</p>
       </section>
 
       {ready && !user && (
-        <div className="notice row" style={{ justifyContent: 'space-between' }}>
-          <span>¿Tu profe te dio un código de curso? Entra con él para que tu avance quede guardado y tu profe lo vea.</span>
-          <Link className="btn" href="/entrar">Entrar con código</Link>
-        </div>
+        <section className="entry-cards">
+          <Link className="entry" href="/entrar">
+            <span className="mono">Soy estudiante</span>
+            <h3>Tengo un código de curso</h3>
+            <p>Escribe el código que te dio tu profe, tu nombre y un PIN de 4 números.</p>
+            <span className="btn">Entrar con código</span>
+          </Link>
+          <Link className="entry" href="/entrar">
+            <span className="mono">Soy docente</span>
+            <h3>Crea tus cursos</h3>
+            <p>Abre los módulos a tu ritmo, fija los intentos y mira el avance de cada estudiante.</p>
+            <span className="btn ghost">Entrar o crear cuenta</span>
+          </Link>
+        </section>
       )}
       {user?.role === 'student' && (
         <div className="notice">Estás en el curso <b>{user.className}</b>. Tu avance se guarda en tu cuenta y tu profe lo puede ver. {user.units?.length ? <>Tienes <b>{user.units.length} {user.units.length === 1 ? 'módulo abierto' : 'módulos abiertos'}</b> en {user.grade}°.</> : <>Tu profe aún no ha abierto ningún módulo; mientras tanto puedes jugar en <Link href="/juegos">Juegos</Link>.</>}</div>
@@ -47,7 +47,7 @@ export function Home() {
         </div>
       )}
 
-      {last && (
+      {user && last && (
         <div className="resume">
           <div><span className="mono">Continúa donde ibas</span><h3>{last.grade.n}° · {last.title}</h3></div>
           <Link className="btn" href={`/leccion/${last.id}`}>Continuar</Link>
@@ -68,7 +68,7 @@ export function Home() {
           );
         })}
       </section>
-      <footer>QuimicaLearn. {user?.role === 'student' ? 'Tu progreso se guarda en tu cuenta.' : 'Sin cuenta, el progreso se guarda en este navegador.'} Basado en los Estándares Básicos de Competencias en Ciencias Naturales (MEN, 2004) y los DBA de Ciencias Naturales (MEN, 2016).</footer>
+      <footer>QuimicaLearn. {user?.role === 'student' ? 'Tu progreso se guarda en tu cuenta. ' : ''}Basado en los Estándares Básicos de Competencias en Ciencias Naturales (MEN, 2004) y los DBA de Ciencias Naturales (MEN, 2016).</footer>
     </>
   );
 }

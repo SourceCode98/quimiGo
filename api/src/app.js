@@ -23,6 +23,10 @@ const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const bad = (res, status, error) => res.status(status).json({ error });
 const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const nameKey = (n) => n.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+// Secciones con intentos limitables por el docente: quiz de la lección, minijuegos de "Juega" y reto de la unidad.
+const LIMIT_KINDS = ['quiz', 'game', 'reto'];
+const kindOf = (id) => (/r$/.test(id) ? 'reto' : /j\d+$/.test(id) ? 'game' : 'quiz');
+const cleanLimits = (l) => Object.fromEntries(LIMIT_KINDS.map((k) => [k, Number.isInteger(l?.[k]) && l[k] >= 0 && l[k] <= 20 ? l[k] : 0]));
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
 
 // Límite simple de intentos por IP para los inicios de sesión.
@@ -104,7 +108,7 @@ export function createApp({ store, secret, secureCookies = false }) {
       catch (e) { if (e.code === 'DUPLICATE') return bad(res, 409, 'Ese nombre ya existe. Intenta de nuevo.'); throw e; }
     }
     await startSession(res, { sub: s.id, role: 'student', cls: c.id });
-    res.json({ user: { role: 'student', id: s.id, name: s.name, className: c.name, grade: c.grade, units: c.units || [] } });
+    res.json({ user: { role: 'student', id: s.id, name: s.name, className: c.name, grade: c.grade, units: c.units || [], limits: cleanLimits(c.limits) } });
   }));
 
   app.post('/api/logout', (_req, res) => { res.clearCookie(COOKIE, { path: '/' }); res.json({ ok: true }); });
@@ -121,9 +125,9 @@ export function createApp({ store, secret, secureCookies = false }) {
     const c = await store.getClass(st.classId);
     const rows = await store.getProgress(st.id);
     res.json({
-      user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade, units: c?.units || [] },
+      user: { role: 'student', id: st.id, name: st.name, className: c?.name, grade: c?.grade, units: c?.units || [], limits: cleanLimits(c?.limits) },
       xp: st.xp, days: st.days,
-      progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act }])),
+      progress: Object.fromEntries(rows.map((r) => [r.lessonId, { stars: r.stars, act: r.act, attempts: r.attempts || 0 }])),
     });
   }));
 
@@ -139,10 +143,13 @@ export function createApp({ store, secret, secureCookies = false }) {
     const c = await store.getClass(st.classId);
     if (!c?.units?.includes(UNIT_OF.get(lessonId))) return bad(res, 403, 'Tu profe aún no habilita este módulo.');
     const prev = (await store.getProgress(st.id)).find((r) => r.lessonId === lessonId);
+    // Cada envío con estrellas es un intento; 0 = sin límite.
+    const limit = cleanLimits(c.limits)[kindOf(lessonId)];
+    if (stars !== undefined && limit && (prev?.attempts || 0) >= limit) return bad(res, 403, `Ya usaste tus ${limit} ${limit === 1 ? 'intento' : 'intentos'}.`);
     const { next, gained } = applyResult(prev, { act, stars });
     await store.saveProgress(st.id, { lessonId, stars: next.stars ?? null, act: next.act, attempts: next.attempts || 0 });
     const xp = await store.addXp(st.id, gained, addDay(st.days, today()));
-    res.json({ xp, gained, record: { stars: next.stars ?? null, act: next.act } });
+    res.json({ xp, gained, record: { stars: next.stars ?? null, act: next.act, attempts: next.attempts || 0 } });
   }));
 
   /* ---------- cursos del docente ---------- */
@@ -167,7 +174,7 @@ export function createApp({ store, secret, secureCookies = false }) {
 
   app.get('/api/classes/:id', need('teacher'), wrap(async (req, res) => {
     const c = await ownClass(req, res); if (!c) return;
-    res.json({ class: c, students: await store.listStudentsWithProgress(c.id) });
+    res.json({ class: { ...c, limits: cleanLimits(c.limits) }, students: await store.listStudentsWithProgress(c.id) });
   }));
 
   app.put('/api/classes/:id/units', need('teacher'), wrap(async (req, res) => {
@@ -177,6 +184,13 @@ export function createApp({ store, secret, secureCookies = false }) {
     if (!units) return bad(res, 400, 'Envía la lista de módulos.');
     await store.setClassUnits(c.id, units);
     res.json({ units });
+  }));
+
+  app.put('/api/classes/:id/limits', need('teacher'), wrap(async (req, res) => {
+    const c = await ownClass(req, res); if (!c) return;
+    const limits = cleanLimits(req.body?.limits);
+    await store.setClassLimits(c.id, limits);
+    res.json({ limits });
   }));
 
   app.post('/api/classes/:id/students/:sid/pin', need('teacher'), wrap(async (req, res) => {

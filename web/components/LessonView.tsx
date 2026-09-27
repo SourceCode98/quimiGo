@@ -8,6 +8,7 @@ import { gc } from './ui';
 import { Widget } from './Widget';
 import { Learn } from './Learn';
 import { Locked } from './Locked';
+import { NoTries, useTriesLabel } from './Tries';
 import { GameHost } from './GameHost';
 import { lessonGames } from '@/content/lesson-games';
 import { GAME_NAME } from '@/content/game-names';
@@ -15,7 +16,7 @@ import { GAME_NAME } from '@/content/game-names';
 const html = (s: string) => ({ __html: s });
 
 export function LessonView({ id }: { id: string }) {
-  const { state, visit, record, canOpen, ready } = useQL();
+  const { state, visit, record, canOpen, ready, triesLeft } = useQL();
   const l = LESSON_BY_ID[id];
   const g = l.grade;
   const idx = ALL_LESSONS.indexOf(l);
@@ -25,11 +26,14 @@ export function LessonView({ id }: { id: string }) {
   const [learned, setLearned] = useState(false);
   const games = useMemo(() => lessonGames(id), [id]);
   const [gi, setGi] = useState(0);
+  const [quizPlayed, setQuizPlayed] = useState(false);
+  const quizLabel = useTriesLabel(id);
+  const gameLabel = useTriesLabel(games[gi]?.id || id + 'j1');
   const open = canOpen(l.unit.id);
   const played = games.filter((x) => state.lessons[x.id]?.stars != null).length;
 
   useEffect(() => { if (open) visit(id, g.id); }, [id, g.id, visit, open]);
-  useEffect(() => { setGi(0); }, [id]);
+  useEffect(() => { setGi(0); setQuizPlayed(false); }, [id]);
 
   if (!ready) return <p className="muted">Cargando…</p>;
   if (!open) return <Locked what={`El módulo “${l.unit.title}”`} gradeN={g.n} />;
@@ -80,13 +84,18 @@ export function LessonView({ id }: { id: string }) {
               </button>
             ))}
           </div>
-          <GameHost key={games[gi].id} spec={games[gi]} onFinish={(res) => record(games[gi].id, { act: true, stars: Math.max(0, Math.min(3, res.stars | 0)) })} />
+          {gameLabel && <span className="mono">{gameLabel}</span>}
+          {triesLeft(games[gi].id).left <= 0
+            ? <NoTries id={games[gi].id} what={`“${games[gi].title}”`} />
+            : <GameHost key={games[gi].id} spec={games[gi]} onFinish={(res) => record(games[gi].id, { act: true, stars: Math.max(0, Math.min(3, res.stars | 0)) })} />}
         </section>
       )}
 
       <section className={'block' + (r.stars !== null && r.stars !== undefined ? ' ok' : '')} id="demuestra">
-        <div className="bhead"><span className="i">{games.length > 0 ? 4 : 3}</span><div><h2>Demuestra</h2><span className="mono">3 preguntas · 10 XP por acierto</span></div></div>
-        <Quiz key={id} items={l.quiz} onFinish={(n) => record(id, { stars: n })} />
+        <div className="bhead"><span className="i">{games.length > 0 ? 4 : 3}</span><div><h2>Demuestra</h2><span className="mono">3 preguntas · 10 XP por acierto{quizLabel ? ` · ${quizLabel}` : ''}</span></div></div>
+        {triesLeft(id).left <= 0 && !quizPlayed
+          ? <NoTries id={id} what="este quiz" />
+          : <Quiz key={id} items={l.quiz} canRetry={triesLeft(id).left > 0} onFinish={(n) => { setQuizPlayed(true); record(id, { stars: n }); }} />}
       </section>
 
       <div className="nav">

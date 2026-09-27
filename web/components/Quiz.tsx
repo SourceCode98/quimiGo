@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import type { QuizItem } from '@/content/types';
 
-export function Quiz({ items, onFinish }: { items: QuizItem[]; onFinish: (correct: number) => void }) {
+export function Quiz({ items, onFinish, canRetry = true }: { items: QuizItem[]; onFinish: (correct: number) => void; canRetry?: boolean }) {
   const [round, setRound] = useState(0);
   const [ans, setAns] = useState<Record<number, number>>({});
   const total = Object.keys(ans).length;
@@ -43,8 +43,10 @@ export function Quiz({ items, onFinish }: { items: QuizItem[]; onFinish: (correc
         <div className="result" style={{ marginTop: 14 }}>
           <span className="mono">Resultado</span>
           <span className="big">{'★'.repeat(correct)}{'☆'.repeat(3 - correct)}</span>
-          <p>{correct === 3 ? '¡Perfecto! Dominas esta lección.' : correct === 2 ? 'Muy bien. Revisa la explicación de la que fallaste.' : 'Vuelve a leer “Aprende” y repite el quiz para ganar más estrellas.'}</p>
-          <button className="btn ghost" onClick={() => { setAns({}); setRound((r) => r + 1); }}>Repetir quiz</button>
+          <p>{correct === 3 ? '¡Perfecto! Dominas esta lección.' : correct === 2 ? 'Muy bien. Revisa la explicación de la que fallaste.' : (canRetry ? 'Vuelve a leer “Aprende” y repite el quiz para ganar más estrellas.' : 'Vuelve a leer “Aprende” y revisa las explicaciones.')}</p>
+          {canRetry
+            ? <button className="btn ghost" onClick={() => { setAns({}); setRound((r) => r + 1); }}>Repetir quiz</button>
+            : <p className="muted">Ya no te quedan intentos para este quiz.</p>}
         </div>
       )}
     </div>
