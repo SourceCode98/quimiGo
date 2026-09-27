@@ -23,12 +23,12 @@ export function Home() {
 
       {ready && !user && (
         <section className="entry-cards">
-          <Link className="entry" href="/entrar">
+          <div className="entry">
             <span className="mono">Soy estudiante</span>
             <h3>Tengo un código de curso</h3>
-            <p>Escribe el código que te dio tu profe, tu nombre y un PIN de 4 números.</p>
-            <span className="btn">Entrar con código</span>
-          </Link>
+            <p>Si ya entraste antes, usa tu nombre y tu PIN. Si es tu primera vez, escribe el código que te dio tu profe.</p>
+            <div className="row"><Link className="btn" href="/entrar#volver">Ya estoy inscrito</Link><Link className="btn ghost" href="/entrar#estudiante">Primera vez</Link></div>
+          </div>
           <Link className="entry" href="/entrar#docente">
             <span className="mono">Soy docente</span>
             <h3>Crea tus cursos</h3>

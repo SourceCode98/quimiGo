@@ -92,6 +92,8 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
   };
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
   const loginLimit = limiter(10, 60_000);
+  // Un salón entero suele salir a internet por la misma IP, así que los estudiantes tienen más margen.
+  const joinLimit = limiter(60, 60_000);
 
   app.get('/api/health', wrap(async (_req, res) => { await store.ping(); res.json({ ok: true, db: store.kind }); }));
 
@@ -118,14 +120,18 @@ export function createApp({ store, secret, secureCookies = false, allowSignup = 
   }));
 
   /* ---------- estudiantes: entran con el código del curso, su nombre y un PIN ---------- */
-  app.post('/api/student/join', loginLimit, wrap(async (req, res) => {
+  app.post('/api/student/join', joinLimit, wrap(async (req, res) => {
     const code = str(req.body?.code, 8).toUpperCase(), name = str(req.body?.name, 60), pin = str(req.body?.pin, 8);
     if (!code || !name) return bad(res, 400, 'Escribe el código del curso y tu nombre.');
     if (!/^\d{4}$/.test(pin)) return bad(res, 400, 'El PIN debe tener 4 números.');
     const c = await store.findClassByCode(code);
     if (!c) return bad(res, 404, 'No existe un curso con ese código. Pídeselo a tu profe.');
     const k = nameKey(name);
+    // mode "login": estudiante que vuelve (nunca crea); "new": primera vez (nunca entra a una cuenta existente).
+    const mode = req.body?.mode;
     let s = await store.findStudent(c.id, k);
+    if (mode === 'login' && !s) return bad(res, 404, `No encontramos a "${name}" en el curso ${c.name}. Escribe tu nombre igual que la primera vez, o elige "Es mi primera vez".`);
+    if (mode === 'new' && s) return bad(res, 409, `"${s.name}" ya está inscrito en ${c.name}. Elige "Ya estoy inscrito" y usa tu PIN.`);
     if (s) {
       if (!(await bcrypt.compare(pin, s.pinHash))) return bad(res, 401, 'Ese nombre ya existe en el curso y el PIN no coincide. Si olvidaste tu PIN, pídele a tu profe que lo cambie.');
     } else {

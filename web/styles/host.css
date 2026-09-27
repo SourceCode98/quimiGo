@@ -80,3 +80,7 @@
 .btn.is-locked{opacity:.65;background:var(--muted)}
 .lrow.is-locked,.reto-row.is-locked{opacity:.55;cursor:not-allowed}
 .lrow.is-locked .n{font-size:.9rem}
+.seg{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.seg button{flex:1;border:0;border-radius:9px;padding:9px 6px;background:none;font:600 .9rem inherit;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.entry .row{display:flex;gap:8px;flex-wrap:wrap}

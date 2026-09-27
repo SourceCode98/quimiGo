@@ -87,6 +87,10 @@ test('flujo completo docente y estudiante', async () => {
     // Mismo nombre con otro PIN no entra; con el PIN correcto sí.
     const s2 = client();
     assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ana', pin: '9999' })).status, 401);
+    // Modos explícitos: volver a entrar nunca crea cuentas y "primera vez" no entra a una existente.
+    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'Anita', pin: '1234', mode: 'login' })).status, 404);
+    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'Ana', pin: '1234', mode: 'new' })).status, 409);
+    assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ana ', pin: '1234', mode: 'login' })).status, 200);
     assert.equal((await s2('POST', '/api/student/join', { code: cls.code, name: 'ANA', pin: '1234' })).status, 200);
 
     const detail = (await t('GET', `/api/classes/${cls.id}`)).body;
