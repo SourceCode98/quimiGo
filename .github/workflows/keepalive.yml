@@ -1,5 +1,5 @@
 # Mantiene despierta la API gratuita de Render (se duerme a los 15 min sin visitas).
-# Configura el secreto API_URL en GitHub: Settings > Secrets and variables > Actions (ej. https://quimicalearn-api.onrender.com).
+# Usa el secreto API_URL si existe; si no, la URL de Render por defecto.
 name: Mantener API despierta
 on:
   schedule:
@@ -8,5 +8,21 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
-      - run: curl -fsS --max-time 90 --retry 2 "${{ secrets.API_URL }}/api/health"
+      - name: Despertar la API
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: |
+          url="${API_URL:-https://quimicalearn-api.onrender.com}"
+          url="${url%/}"
+          echo "Probando $url/api/health"
+          # Render tarda hasta ~1 min en despertar: reintenta ante cualquier error.
+          for i in 1 2 3 4; do
+            code=$(curl -sS --max-time 120 -o out.txt -w '%{http_code}' "$url/api/health" || echo 000)
+            echo "Intento $i: HTTP $code $(head -c 300 out.txt 2>/dev/null)"
+            [ "$code" = 200 ] && exit 0
+            sleep 20
+          done
+          echo "::error::La API no respondió 200 (último HTTP $code). Si es 500, revisa MongoDB Atlas (clúster pausado o acceso de red)."
+          exit 1
