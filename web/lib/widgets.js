@@ -178,7 +178,12 @@ W.atom=(el,s,done)=>{
   return()=>{o&&o.dispose()};
 };
 
+// Clasificar tiene tres presentaciones para que no se sienta igual en cada lección (s.mode):
+// 'lista' (cada ítem con sus botones), 'tarjetas' (una tarjeta a la vez con respuesta inmediata)
+// y 'cajas' (tocas un ítem y luego la caja donde va; se van llenando las cajas).
 W.classify=(el,s,done)=>{
+  if(s.mode==='tarjetas')return clsCards(el,s,done);
+  if(s.mode==='cajas')return clsBoxes(el,s,done);
   const pick={};const items=s.shuffle===false?s.items:shuffle(s.items);
   el.innerHTML='<div class="w"><p>'+s.prompt+'</p><div class="cls">'+items.map((it,i)=>'<div class="citem" data-i="'+i+'"><span>'+it[0]+'</span><div class="bins">'+s.bins.map((b,bi)=>'<button data-b="'+bi+'" aria-pressed="false">'+b+'</button>').join('')+'</div></div>').join('')+'</div><div class="row"><button class="btn" id="ck">Comprobar</button><span id="ckr" class="mono"></span></div><div id="ckf"></div></div>';
   el.querySelectorAll('.citem').forEach(r=>r.querySelectorAll('.bins button').forEach(b=>b.onclick=()=>{pick[r.dataset.i]=+b.dataset.b;r.classList.remove('right','wrong');r.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
@@ -187,6 +192,34 @@ W.classify=(el,s,done)=>{
     el.querySelector('#ckf').innerHTML=n===items.length?'<div class="fb ok">¡Todo correcto! '+(s.e||'')+'</div>':'<div class="fb no">Revisa las que están en rojo o sin elegir y vuelve a comprobar.</div>';
     if(n===items.length)done()};
 };
+
+function clsCards(el,s,done){
+  const items=shuffle(s.items);let k=0,miss=0,busy=false;
+  function render(){
+    if(k>=items.length){el.innerHTML='<div class="w ms-cards"><div class="ms-card-done"><b>¡Listo!</b><span>Clasificaste '+items.length+' tarjetas'+(miss?' con '+miss+(miss===1?' error':' errores')+' en el camino':' sin errores')+'.</span></div>'+(s.e?'<div class="fb ok">'+s.e+'</div>':'')+'</div>';done();return}
+    const it=items[k];
+    el.innerHTML='<div class="w ms-cards"><p>'+s.prompt+'</p><div class="ms-deck"><span class="mono">Tarjeta '+(k+1)+' de '+items.length+'</span><div class="ms-cardx" aria-live="polite">'+it[0]+'</div></div><div class="ms-binrow">'+s.bins.map((b,bi)=>'<button class="btn ghost" data-b="'+bi+'">'+b+'</button>').join('')+'</div><div class="ms-cfb"></div></div>';
+    el.querySelectorAll('.ms-binrow button').forEach(b=>b.onclick=()=>{if(busy)return;const ok=+b.dataset.b===it[1];const c=el.querySelector('.ms-cardx');const f=el.querySelector('.ms-cfb');
+      if(ok){busy=true;c.classList.add('ok');f.innerHTML='<div class="fb ok">Correcto: va en “'+s.bins[it[1]]+'”.</div>';setTimeout(()=>{busy=false;k++;render()},reduce?300:750)}
+      else{miss++;c.classList.remove('no');void c.offsetWidth;c.classList.add('no');b.disabled=true;f.innerHTML='<div class="fb no">No va en “'+s.bins[+b.dataset.b]+'”. Piénsalo otra vez.</div>'}})}
+  render();
+}
+function clsBoxes(el,s,done){
+  const items=shuffle(s.items.map((x,i)=>({x,i})));const at={};let sel=null;
+  function render(fb){
+    const free=items.filter(it=>at[it.i]===undefined);
+    el.innerHTML='<div class="w"><p>'+s.prompt+'</p><span class="mono">Toca una ficha y luego la caja donde va</span><div class="ms-pool">'+(free.length?free.map(it=>'<button class="ms-chip'+(sel===it.i?' sel':'')+'" data-i="'+it.i+'" aria-pressed="'+(sel===it.i)+'">'+it.x[0]+'</button>').join(''):'<span class="muted">Todas las fichas están en una caja.</span>')+'</div>'+
+      '<div class="ms-boxes">'+s.bins.map((b,bi)=>'<div class="ms-box" data-b="'+bi+'" role="button" tabindex="0" aria-label="Poner en '+esc(String(b).replace(/<[^>]+>/g,''))+'"><b>'+b+'</b><div>'+items.filter(it=>at[it.i]===bi).map(it=>'<button class="ms-chip in'+(fb&&fb[it.i]===false?' wrong':fb&&fb[it.i]?' right':'')+'" data-i="'+it.i+'" title="Toca para sacarla">'+it.x[0]+'</button>').join('')+'</div></div>').join('')+'</div>'+
+      '<div class="row"><button class="btn" id="ck" '+(free.length?'disabled':'')+'>Comprobar</button><span class="mono" id="ckr"></span></div><div id="ckf"></div></div>';
+    el.querySelectorAll('.ms-pool .ms-chip').forEach(c=>c.onclick=()=>{sel=sel===+c.dataset.i?null:+c.dataset.i;render()});
+    el.querySelectorAll('.ms-box .ms-chip').forEach(c=>c.onclick=e=>{e.stopPropagation();delete at[+c.dataset.i];sel=+c.dataset.i;render()});
+    el.querySelectorAll('.ms-box').forEach(bx=>{const put=()=>{if(sel===null)return;at[sel]=+bx.dataset.b;sel=null;render()};bx.onclick=put;bx.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();put()}}});
+    el.querySelector('#ck').onclick=()=>{const r={};let n=0;items.forEach(it=>{r[it.i]=at[it.i]===it.x[1];if(r[it.i])n++});
+      if(n===items.length){render(r);el.querySelector('#ckr').textContent=n+' de '+items.length+' correctas';el.querySelector('#ckf').innerHTML='<div class="fb ok">¡Todo correcto! '+(s.e||'')+'</div>';done()}
+      else{items.forEach(it=>{if(!r[it.i])delete at[it.i]});render();el.querySelector('#ckr').textContent=n+' de '+items.length+' bien ubicadas';el.querySelector('#ckf').innerHTML='<div class="fb no">Las '+(items.length-n)+' que estaban mal volvieron arriba. Intenta ubicarlas otra vez.</div>'}};
+  }
+  render();
+}
 
 W.order=(el,s,done)=>{
   const items=shuffle(s.items.map((x,i)=>({x,i})));let seq=[];

@@ -62,3 +62,34 @@
 .ms-sum{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;color:var(--muted)}
 .ms-sum b{color:var(--gold)}
 .quiz-count{color:var(--muted)}
+
+/* Practica · Clasificar en tarjetas y en cajas */
+.ms-cards{align-items:stretch}
+.ms-deck{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ms-cardx{width:min(100%,420px);min-height:120px;display:grid;place-items:center;text-align:center;padding:20px;border:2px solid var(--line);border-radius:14px;background:var(--surface2);font:700 1.2rem "Bricolage Grotesque",sans-serif;box-shadow:0 6px 0 var(--line);transition:transform .2s,border-color .2s}
+.ms-cardx.ok{border-color:var(--ok);background:var(--ok-soft);transform:translateY(-4px) rotate(-2deg)}
+.ms-cardx.no{border-color:var(--bad);animation:msshake .35s}
+@keyframes msshake{25%{transform:translateX(-7px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.ms-binrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.ms-binrow .btn{min-height:46px;flex:1 1 140px;max-width:260px}
+.ms-card-done{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:12px}
+.ms-card-done b{font:800 1.5rem "Bricolage Grotesque",sans-serif;color:var(--ok)}
+.ms-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;padding:10px;border:1px dashed var(--line);border-radius:10px}
+.ms-chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:40px;font-size:.92rem;text-align:left}
+.ms-chip.sel{border-color:var(--accent);background:var(--accent);color:var(--accent-ink);transform:translateY(-2px)}
+.ms-chip.in{padding:5px 10px;min-height:32px;font-size:.84rem}
+.ms-chip.right{border-color:var(--ok);background:var(--ok-soft)}
+.ms-chip.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.ms-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px}
+.ms-box{border:2px solid var(--line);border-radius:12px;padding:10px;min-height:96px;background:var(--bg);display:flex;flex-direction:column;gap:8px;cursor:pointer}
+.ms-box:hover,.ms-box:focus-visible{border-color:var(--accent);outline:none}
+.ms-box>div{display:flex;flex-wrap:wrap;gap:6px}
+@media (prefers-reduced-motion:reduce){.ms-cardx,.ms-cardx.ok{transition:none;transform:none}.ms-cardx.no{animation:none}}
+
+/* Demuestra · formatos de pregunta */
+.ms-fmt{align-self:flex-start;font:700 .72rem "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);background:var(--gold-soft);border-radius:999px;padding:3px 10px}
+.ms-proposal{display:flex;flex-direction:column;gap:4px;border:2px dashed var(--accent);border-radius:12px;padding:14px 16px;font-size:1.1rem;font-weight:600}
+.ms-proposal.right{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.ms-proposal.wrong{border-style:solid;border-color:var(--bad);background:var(--bad-soft)}
+.ms-proposal .mono{font-weight:500;font-size:.72rem;color:var(--muted)}
+.opt.ms-elim.gone{opacity:.45;text-decoration:line-through}

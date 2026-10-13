@@ -18,6 +18,8 @@ import { isDone } from '@/lib/game';
 const html = (s: string) => ({ __html: s });
 const stars = (k: number) => '★'.repeat(k) + '☆'.repeat(3 - k);
 const SECTION = ['', 'Aprende', 'Practica', 'Juega', 'Demuestra'];
+const CLS_MODES = ['tarjetas', 'cajas', 'lista'];
+const CLASSIFY_IDS = ALL_LESSONS.filter((x) => x.act.type === 'classify').map((x) => x.id);
 
 // Cada lección es una misión: una pantalla a la vez, como en Brilliant.
 // ¿Qué crees? → Aprende (pasos con escena) → Idea clave → Practica → Juega → Demuestra → Misión cumplida.
@@ -48,6 +50,9 @@ export function LessonView({ id }: { id: string }) {
   const learnDone = !!r.learn || learnSeen;
   const onSeenAll = () => { setLearnSeen(true); if (!r.learn) record(id, { learn: true }); };
   const hook = l.quiz[0];
+  // Clasificar rota entre tres presentaciones según la lección, para que dos lecciones seguidas no se vean iguales.
+  const actSpec = useMemo(() => (l.act.type === 'classify' && !l.act.mode
+    ? { ...l.act, mode: CLS_MODES[CLASSIFY_IDS.indexOf(id) % CLS_MODES.length] } : l.act), [l.act, id]);
 
   const screens = useMemo<Screen[]>(() => [
     ...(hook ? [{ k: 'hook', sec: 1, label: '¿Qué crees?' } as Screen] : []),
@@ -172,14 +177,14 @@ export function LessonView({ id }: { id: string }) {
           {l.co && <div className="co"><span className="mono">En Colombia</span><p dangerouslySetInnerHTML={html(l.co)} /></div>}
         </div>
       );
-      case 'act': return <Widget key={id} spec={l.act} onDone={() => { if (!r.act) record(id, { act: true }); }} />;
+      case 'act': return <Widget key={id} spec={actSpec} onDone={() => { if (!r.act) record(id, { act: true }); }} />;
       case 'game': return <GameScreen key={game!.id} game={game!} gameMin={gameMin} />;
       case 'quiz': return (
         <>
           {quizLabel && <span className="mono">{quizLabel}</span>}
           {triesLeft(id).left <= 0 && !quizPlayed
             ? <NoTries id={id} what="este quiz" />
-            : <Quiz key={id} oneByOne items={l.quiz} canRetry={triesLeft(id).left > 0} onFinish={(n) => { setQuizPlayed(true); record(id, { stars: n }); }} />}
+            : <Quiz key={id} oneByOne seed={idx} items={l.quiz} canRetry={triesLeft(id).left > 0} onFinish={(n) => { setQuizPlayed(true); record(id, { stars: n }); }} />}
         </>
       );
       case 'end': return (
