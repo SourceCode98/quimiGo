@@ -17,7 +17,7 @@ export function CourseView({ n }: { n: number }) {
         <span className="mono">Grado {g.n}° · {g.units.length} unidades · {ls.length} lecciones</span>
         <h1>{g.title}</h1>
         <p style={{ color: 'var(--muted)' }}>{g.desc}</p>
-        <div className="gprog" style={{ maxWidth: 360 }}><div className="bar"><i style={{ width: (d / ls.length) * 100 + '%', background: `var(--${g.id})` }} /></div>{d} de {ls.length} completadas</div>
+        <div className="gprog" style={{ maxWidth: 360 }}><div className="bar"><i style={{ width: (d / ls.length) * 100 + '%', background: `var(--${g.id})` }} /></div>{d} de {ls.length} misiones cumplidas</div>
       </section>
       <section className="tbox teacher">
         <span className="mono">Plan del periodo para el docente</span>
@@ -30,36 +30,42 @@ export function CourseView({ n }: { n: number }) {
       </section>
       <section className="units" style={gc(g.id)}>
         {g.units.map((u, ui) => canOpen(u.id) ? (
-          <div className="unit" key={u.id}>
+          <div className="unit" key={u.id} id={u.id}>
             <div className="unit-h"><h2>{ui + 1}. {u.title}</h2><span className="mono">{u.lessons.filter((l) => isDone(state.lessons, l.id)).length}/{u.lessons.length}</span></div>
             <p style={{ color: 'var(--muted)', fontSize: '.92rem' }}>{u.desc}</p>
-            <div className="lessons">
-              {u.lessons.map((l, li) => lessonOpen(l.id) ? (
-                <Link key={l.id} href={`/leccion/${l.id}`} className={'lrow' + (isDone(state.lessons, l.id) ? ' done' : '')}>
-                  <span className="n">{li + 1}</span>
-                  <span><b>{l.title}</b><small>{ACT_NAME[l.act.type]} · {l.time} min</small></span>
-                  <Stars n={state.lessons[l.id]?.stars} />
-                </Link>
-              ) : (
-                <div key={l.id} className="lrow is-locked" aria-disabled>
-                  <span className="n" aria-hidden>🔒</span>
-                  <span><b>{l.title}</b><small>Se abre al completar la lección {li}</small></span>
-                </div>
-              ))}
-              {UNIT_GAMES[u.id] && !retoOpen(u.id) && (
-                <div className="reto-row is-locked" aria-disabled>
-                  <span className="gi">🔒</span>
-                  <span><b>Reto de la unidad: {UNIT_GAMES[u.id].title}</b><small>Se abre al completar todas las lecciones del módulo</small></span>
-                </div>
+            <ol className="mpath" aria-label={`Misiones de ${u.title}`}>
+              {u.lessons.map((l, li) => {
+                const done = isDone(state.lessons, l.id);
+                const open = lessonOpen(l.id);
+                const here = open && !done && u.lessons.slice(0, li).every((x) => isDone(state.lessons, x.id));
+                return (
+                  <li key={l.id} className={'mnode' + (done ? ' done' : '') + (here ? ' here' : '') + (open ? '' : ' is-locked')}>
+                    {open ? (
+                      <Link href={`/leccion/${l.id}`} className="mdot" aria-label={`Misión ${li + 1}: ${l.title}${done ? ' (cumplida)' : ''}`}>{done ? '✓' : li + 1}</Link>
+                    ) : <span className="mdot" aria-hidden>🔒</span>}
+                    <span className="mlabel">
+                      {here && <em>Tu siguiente misión</em>}
+                      <b>{l.title}</b>
+                      <small>{open ? `${ACT_NAME[l.act.type]} · ${l.time} min` : `Se abre al cumplir la misión ${li}`}</small>
+                      {done && <Stars n={state.lessons[l.id]?.stars} />}
+                    </span>
+                  </li>
+                );
+              })}
+              {UNIT_GAMES[u.id] && (
+                <li className={'mnode boss' + (retoOpen(u.id) ? '' : ' is-locked') + (state.lessons[u.id + 'r']?.stars != null ? ' done' : '')}>
+                  {retoOpen(u.id)
+                    ? <Link href={`/reto/${u.id}`} className="mdot" aria-label={`Reto de la unidad: ${UNIT_GAMES[u.id].title}`}>★</Link>
+                    : <span className="mdot" aria-hidden>🔒</span>}
+                  <span className="mlabel">
+                    <em>Reto final</em>
+                    <b>{UNIT_GAMES[u.id].title}</b>
+                    <small>{retoOpen(u.id) ? 'Minijuego · +20 XP y hasta 3 estrellas' : 'Se abre al cumplir todas las misiones del módulo'}</small>
+                    {state.lessons[u.id + 'r']?.stars != null && <Stars n={state.lessons[u.id + 'r']?.stars} />}
+                  </span>
+                </li>
               )}
-              {UNIT_GAMES[u.id] && retoOpen(u.id) && (
-                <Link href={`/reto/${u.id}`} className="reto-row">
-                  <span className="gi">★</span>
-                  <span><b>Reto de la unidad: {UNIT_GAMES[u.id].title}</b><small>Minijuego · +20 XP y hasta 3 estrellas</small></span>
-                  <Stars n={state.lessons[u.id + 'r']?.stars} />
-                </Link>
-              )}
-            </div>
+            </ol>
           </div>
         ) : (
           <div className="unit unit-locked" key={u.id}>

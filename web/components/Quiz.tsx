@@ -2,8 +2,10 @@
 import { useState } from 'react';
 import type { QuizItem } from '@/content/types';
 
-export function Quiz({ items, onFinish, canRetry = true }: { items: QuizItem[]; onFinish: (correct: number) => void; canRetry?: boolean }) {
+// oneByOne: una pregunta por pantalla, como en las misiones (estilo Brilliant).
+export function Quiz({ items, onFinish, canRetry = true, oneByOne = false }: { items: QuizItem[]; onFinish: (correct: number) => void; canRetry?: boolean; oneByOne?: boolean }) {
   const [round, setRound] = useState(0);
+  const [at, setAt] = useState(0);
   const [ans, setAns] = useState<Record<number, number>>({});
   const total = Object.keys(ans).length;
   const correct = Object.entries(ans).filter(([qi, oi]) => items[+qi].a === oi).length;
@@ -17,7 +19,9 @@ export function Quiz({ items, onFinish, canRetry = true }: { items: QuizItem[]; 
 
   return (
     <div key={round}>
+      {oneByOne && <div className="mono quiz-count">Pregunta {at + 1} de {items.length}</div>}
       {items.map((q, qi) => {
+        if (oneByOne && qi !== at) return null;
         const chosen = ans[qi];
         const answered = chosen !== undefined;
         return (
@@ -36,16 +40,19 @@ export function Quiz({ items, onFinish, canRetry = true }: { items: QuizItem[]; 
                 {chosen === q.a ? 'Correcto. ' : 'No es esa. '}<span dangerouslySetInnerHTML={{ __html: q.e }} />
               </div>
             )}
+            {oneByOne && answered && qi < items.length - 1 && (
+              <button className="btn" style={{ alignSelf: 'flex-start' }} onClick={() => setAt(qi + 1)}>Siguiente pregunta →</button>
+            )}
           </div>
         );
       })}
-      {total === items.length && (
+      {total === items.length && (!oneByOne || at === items.length - 1) && (
         <div className="result" style={{ marginTop: 14 }}>
           <span className="mono">Resultado</span>
           <span className="big">{'★'.repeat(correct)}{'☆'.repeat(3 - correct)}</span>
           <p>{correct === 3 ? '¡Perfecto! Dominas esta lección.' : correct === 2 ? 'Muy bien. Revisa la explicación de la que fallaste.' : (canRetry ? 'Vuelve a leer “Aprende” y repite el quiz para ganar más estrellas.' : 'Vuelve a leer “Aprende” y revisa las explicaciones.')}</p>
           {canRetry
-            ? <button className="btn ghost" onClick={() => { setAns({}); setRound((r) => r + 1); }}>Repetir quiz</button>
+            ? <button className="btn ghost" onClick={() => { setAns({}); setAt(0); setRound((r) => r + 1); }}>Repetir quiz</button>
             : <p className="muted">Ya no te quedan intentos para este quiz.</p>}
         </div>
       )}

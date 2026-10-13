@@ -6,7 +6,7 @@ import { LESSON_SCENES } from '@/content/scenes';
 const html = (s: string) => ({ __html: s });
 
 // "Aprende" paso a paso: la escena (3D o animada) cambia con cada paso del texto.
-export function Learn({ l, onSeenAll }: { l: LessonRef; onSeenAll: () => void }) {
+export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; onSeenAll: () => void; onNext?: () => void; extras?: boolean }) {
   const spec = LESSON_SCENES[l.id] || { type: 'mol', mol: 'H2O', steps: [] };
   const steps = spec.steps || [];
   const n = Math.max(steps.length, l.body.length);
@@ -72,14 +72,14 @@ export function Learn({ l, onSeenAll }: { l: LessonRef; onSeenAll: () => void })
         </div>
         <div className="step-nav">
           <button className="btn ghost" disabled={cur === 0} onClick={() => go(cur - 1)}>← Anterior</button>
-          <button className="btn" onClick={() => (cur === n - 1 ? document.getElementById('practica')?.scrollIntoView({ behavior: 'smooth' }) : go(cur + 1))}>
-            {cur === n - 1 ? 'Ir a practicar →' : 'Siguiente →'}
+          <button className="btn" onClick={() => (cur < n - 1 ? go(cur + 1) : onNext ? onNext() : document.getElementById('practica')?.scrollIntoView({ behavior: 'smooth' }))}>
+            {cur < n - 1 ? 'Siguiente →' : onNext ? 'Continuar →' : 'Ir a practicar →'}
           </button>
         </div>
-        <div className="learn-extra">
+        {extras && <div className="learn-extra">
           <div className="key"><span className="mono">Idea clave</span><p dangerouslySetInnerHTML={html(l.key)} /></div>
           {l.co && <div className="co"><span className="mono">En Colombia</span><p dangerouslySetInnerHTML={html(l.co)} /></div>}
-        </div>
+        </div>}
       </div>
     </div>
   );

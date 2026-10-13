@@ -8,6 +8,7 @@ import '@/styles/scenes-a.css';
 import '@/styles/scenes-b.css';
 import '@/styles/scenes-2d.css';
 import '@/styles/games.css';
+import '@/styles/mission.css';
 
 export const metadata: Metadata = {
   title: 'QuimicaLearn',
