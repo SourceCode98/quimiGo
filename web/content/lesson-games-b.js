@@ -142,15 +142,14 @@ export const LESSON_GAMES_B = {
   /* ===================== GRADO 10° ===================== */
   g10u1l1: [
     { game: 'hunter', title: 'Cazador de electrones de valencia', time: 90, clues: [
-      { c: 'Mi configuración termina en 3p⁴', a: 'S' }, { c: 'Termino en 4s¹', a: 'K' }, { c: 'Termino en 2p¹', a: 'B' },
-      { c: 'Termino en 3p¹', a: 'Al' }, { c: 'Termino en 2s² (y no tengo 2p)', a: 'Be' }, { c: 'Termino en 4p⁵', a: 'Br' },
-      { c: 'Termino en 4s² 3d¹⁰', a: 'Zn' }, { c: 'Termino en 4p⁶: soy gas noble', a: 'Kr' }, { c: 'Termino en 4p¹', a: 'Ga' },
-      { c: 'Termino en 4s² 3d¹', a: 'Sc' }, { c: 'Termino en 4p³', a: 'As' }, { c: 'Tengo 6 electrones de valencia en el nivel 2', a: 'O' },
-      { c: 'Termino en 4s² y no tengo electrones d', a: 'Ca' }, { c: 'Tengo 5 electrones de valencia en el nivel 3', a: 'P' },
-      { c: 'Soy 1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁵', a: 'Mn' } ] },
-    { game: 'order', title: 'Diagonales en orden', time: 90, rounds: [
-      { prompt: 'Ordena los subniveles según el orden de llenado (Aufbau)', items: ['2p', '3s', '3p', '4s', '3d', '4p'] },
-      { prompt: 'Ordena los subniveles de menor a mayor capacidad de electrones', items: ['s', 'p', 'd', 'f'], labels: ['2', '6', '10', '14'] },
+      { c: 'Tengo un solo electrón: 1s¹', a: 'H' }, { c: 'Soy 1s²: el gas noble más pequeño', a: 'He' }, { c: 'Termino en 2s² y no tengo 2p', a: 'Be' },
+      { c: 'Termino en 2p¹', a: 'B' }, { c: 'Termino en 2p³', a: 'N' }, { c: 'Tengo 6 electrones de valencia en el piso 2', a: 'O' },
+      { c: 'Termino en 2p⁶: piso 2 lleno', a: 'Ne' }, { c: 'Termino en 3s¹', a: 'Na' }, { c: 'Termino en 3s²', a: 'Mg' },
+      { c: 'Termino en 3p¹', a: 'Al' }, { c: 'Tengo 5 electrones de valencia en el piso 3', a: 'P' }, { c: 'Termino en 3p⁴', a: 'S' },
+      { c: 'Tengo 7 electrones de valencia en el piso 3', a: 'Cl' }, { c: 'Termino en 3p⁶: piso 3 lleno hasta el p', a: 'Ar' }, { c: 'Termino en 4s¹', a: 'K' } ] },
+    { game: 'order', title: 'De abajo hacia arriba', time: 90, rounds: [
+      { prompt: 'Ordena los apartamentos según el orden de llenado', items: ['1s', '2s', '2p', '3s', '3p', '4s'] },
+      { prompt: 'Ordena los pasos para escribir la configuración del sodio (Z = 11)', items: ['Cuenta: tiene 11 electrones', 'Pon 2 en el 1s', 'Pon 2 en el 2s', 'Pon 6 en el 2p', 'El que sobra va al 3s'] },
       { prompt: 'Ordena de menor a mayor número de electrones de valencia', items: ['Na: …3s¹', 'Mg: …3s²', 'B: …2s² 2p¹', 'C: …2s² 2p²', 'O: …2s² 2p⁴', 'Cl: …3s² 3p⁵'], labels: ['1', '2', '3', '4', '6', '7'] },
       { prompt: 'Ordena de menor a mayor número atómico', items: ['1s² 2s¹', '1s² 2s² 2p³', '1s² 2s² 2p⁶ 3s²', '1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹'], labels: ['Li (3)', 'N (7)', 'Mg (12)', 'K (19)'] } ] },
   ],

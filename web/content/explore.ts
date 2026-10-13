@@ -424,18 +424,20 @@ export const EXPLORE: Record<string, Explore> = {
 
   /* ---------------- 10° ---------------- */
   g10u1l1: {
-    at: 1,
-    ctl: [{ id: 'z', label: 'Número atómico (Z)', min: 1, max: 18, step: 1, v: 1 }],
-    scene: (v) => ({ type: 'orbital', show: v.z > 10 ? ['1s', '2s', '2p', '3s'] : ['1s', '2s', '2p'], Z: v.z, hund: false }),
+    at: 4,
+    ctl: [{ id: 'z', label: 'Electrones (Z)', min: 1, max: 20, step: 1, v: 1 }],
+    scene: (v) => ({ type: 'building', Z: v.z, focus: 'valence', order: false }),
     read: (v) => {
-      const order: [string, number][] = [['1s', 2], ['2s', 2], ['2p', 6], ['3s', 2], ['3p', 6]];
+      const order: [string, number][] = [['1s', 2], ['2s', 2], ['2p', 6], ['3s', 2], ['3p', 6], ['4s', 2]];
       let left = v.z; const cfg: string[] = [];
       for (const [o, c] of order) { if (left <= 0) break; const k = Math.min(c, left); cfg.push(o + '<sup>' + k + '</sup>'); left -= k; }
-      return `<b>${PT[v.z - 1][1]}</b>: ${cfg.join(' ')}`;
+      const top = v.z > 18 ? 4 : v.z > 10 ? 3 : v.z > 2 ? 2 : 1, val = v.z - [0, 0, 2, 10, 18][top];
+      return `<b>${PT[v.z - 1][1]}</b>: ${cfg.join(' ')}<br>Último piso: ${top} · electrones de valencia: <b>${val}</b>`;
     },
     tasks: [
-      { ask: 'Encuentra el átomo que <b>llena por completo el 2p</b>.', ok: (v) => v.z === 10, win: 'El neón: 1s² 2s² 2p⁶. Nivel 2 completo, por eso es un gas noble.' },
-      { ask: 'Encuentra el átomo con <b>un solo electrón en el nivel 3</b>.', ok: (v) => v.z === 11, win: 'El sodio: …2p⁶ 3s¹. Ese electrón de valencia es el que pierde con facilidad.' },
+      { ask: 'Agrega electrones hasta llenar el <b>2s</b> sin poner nada en el 2p.', ok: (v) => v.z === 4, win: 'El berilio: 1s² 2s². Ya están llenos los dos apartamentos s de abajo.', hint: 'En 1s caben 2 y en 2s caben 2.' },
+      { ask: 'Ahora llena el piso 2 <b>por completo</b>.', ok: (v) => v.z === 10, win: 'El neón: 2 + 2 + 6 = 10. Piso 2 lleno, por eso casi no reacciona.' },
+      { ask: 'Encuentra el átomo con <b>un solo electrón de valencia</b> en el piso 3.', ok: (v) => v.z === 11, win: 'El sodio: …2p⁶ 3s¹. Ese electrón solito es el que regala con facilidad.' },
     ],
   },
   g10u1l2: {

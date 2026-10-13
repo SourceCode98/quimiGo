@@ -171,10 +171,15 @@ export const LESSON_SCENES = {
   ] },
 
   /* ---------------- 10° ---------------- */
-  g10u1l1: { type: 'orbital', Z: 8, steps: [
-    { t: 'Niveles y subniveles', show: ['1s', '2s', '2p'], Z: null },
-    { t: 'Orden de llenado', show: ['1s', '2s', '2p'], Z: 8 },
-    { t: 'Electrones de valencia', type: 'atom', model: 'bohr', Z: 8, N: 8, E: 8, focus: 'valence' },
+  g10u1l1: { type: 'building', Z: 0, steps: [
+    { t: 'El átomo es un edificio', focus: 'floors', Z: 0 },
+    { t: 'Pisos y apartamentos: s y p', focus: 'apts', Z: 0 },
+    { t: 'En s caben 2, en p caben 6', focus: 'cap', Z: 10 },
+    { t: 'Se llena de abajo hacia arriba', focus: null, order: true, Z: 6 },
+    { t: 'Ejemplo: el sodio', order: false, Z: 11 },
+    { t: 'Comprueba sumando', Z: 11 },
+    { t: 'Electrones de valencia', focus: 'valence', Z: 8 },
+    { t: 'Los que se regalan o comparten', type: 'atom', model: 'bohr', Z: 11, N: 12, E: 11, focus: 'valence' },
   ] },
   g10u1l2: { type: 'orbital', show: ['2p'], Z: 7, steps: [
     { t: 'Orbital: dónde está el electrón', show: ['1s', '2s'], Z: null },

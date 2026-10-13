@@ -42,7 +42,7 @@ export const CHECKS: Record<string, Check> = {
   g9u3l1: { at: 1, q: 'La lluvia ácida se forma principalmente por…', o: ['Óxidos de azufre y nitrógeno', 'Oxígeno puro', 'Vapor de agua solo'], a: 0, e: 'Esos óxidos, liberados al quemar combustibles fósiles, reaccionan con el agua y forman ácidos.' },
   g9u3l2: { at: 1, q: 'Un frasco tiene el pictograma de una llama. Significa que es…', o: ['Inflamable', 'Corrosivo', 'Tóxico'], a: 0, e: 'La llama indica inflamable: debe estar lejos del fuego y de fuentes de calor.' },
   /* 10° */
-  g10u1l1: { at: 1, q: 'Según el orden de llenado, ¿qué subnivel se llena justo después de 3p?', o: ['3d', '4s', '4p'], a: 1, e: 'Por la regla de las diagonales, 4s tiene menos energía que 3d: 1s 2s 2p 3s 3p 4s 3d…' },
+  g10u1l1: { at: 3, q: 'Un átomo tiene 4 electrones. ¿A qué apartamento va el cuarto?', o: ['1s', '2s', '2p'], a: 1, e: 'En 1s caben 2. Los otros 2 van al siguiente: 2s. Queda 1s² 2s².' },
   g10u1l2: { at: 1, q: 'El nitrógeno tiene 3 electrones en 2p. Según Hund, quedan…', o: ['Uno en cada orbital p', 'Dos juntos y uno solo', 'Los tres en un orbital'], a: 0, e: 'Primero ocupan orbitales vacíos, uno en cada uno, antes de aparearse. Además, un orbital admite máximo 2.' },
   g10u1l3: { at: 1, q: 'El carbono-14 tiene 6 protones y 8 neutrones. Es…', o: ['Otro elemento', 'Un isótopo del carbono', 'Un ion del carbono'], a: 1, e: 'Mismo número de protones (6), distinto número de neutrones: isótopo del mismo elemento.' },
   g10u2l1: { at: 1, q: 'En una estructura de Lewis, un par de electrones compartido entre dos átomos representa…', o: ['Un enlace', 'Un par libre', 'Un ion'], a: 0, e: 'Cada par compartido es un enlace; los pares que no se comparten son pares libres.' },

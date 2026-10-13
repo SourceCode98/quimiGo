@@ -12,8 +12,9 @@ import chain from './chain.js';
 import ptable from './ptable.js';
 import lab from './lab.js';
 import graph from './graph.js';
+import building from './building.js';
 
-export const SCENES = { particles, atom, orbital, column, mol, lattice, reaction, chain, ptable, lab, graph };
+export const SCENES = { particles, atom, orbital, column, mol, lattice, reaction, chain, ptable, lab, graph, building };
 
 /** spec = { type, ...estadoBase, steps: [ {cambios del paso 1}, {…paso 2}, … ] } */
 export function stateAt(spec, i) {
