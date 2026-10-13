@@ -4,9 +4,9 @@ export const LESSON_GAMES_B = {
   g9u1l1: [
     { game: 'sorter', title: '¿Soluto o solvente?', time: 60, bins: ['Soluto', 'Solvente'], items: [
       ['Panela en aguapanela', 0], ['Agua en aguapanela', 1], ['Sal en el suero', 0], ['Agua en el suero', 1],
-      ['CO₂ en la gaseosa', 0], ['Agua en la gaseosa', 1], ['Azúcar en el tinto', 0], ['Oxígeno en el aire', 0],
-      ['Nitrógeno en el aire', 1], ['Zinc en el latón', 0], ['Cobre en el latón', 1], ['Yodo en la tintura de yodo', 0],
-      ['Alcohol en la tintura de yodo', 1], ['Café soluble en el tinto', 0] ] },
+      ['CO₂ en la gaseosa', 0], ['Agua en la gaseosa', 1], ['Azúcar en el tinto', 0], ['Sal en el agua de mar', 0],
+      ['Agua del mar', 1], ['Cloro en el agua de la llave', 0], ['Agua de la limonada', 1], ['Azúcar de la limonada', 0],
+      ['Agua del tinto', 1], ['Café soluble en el tinto', 0] ] },
     { game: 'truefalse', title: 'Mitos de las soluciones', time: 60, lives: 3, items: [
       { s: 'El solvente siempre es agua.', a: false, e: 'Es el componente en mayor cantidad: en el aire, el solvente es el nitrógeno.' },
       { s: 'Una solución es una mezcla homogénea.', a: true, e: 'Se ve igual en todas sus partes.' },
@@ -40,7 +40,7 @@ export const LESSON_GAMES_B = {
   g9u1l3: [
     { game: 'memory', title: 'Parejas molares', pairs: [
       ['2 mol en 4 L', '0,5 M'], ['3 mol en 1 L', '3 M'], ['0,1 mol en 100 mL', '1 M'], ['1 mol en 5 L', '0,2 M'],
-      ['117 g de NaCl en 1 L', '2 M'], ['0,5 mol en 2 L', '0,25 M'], ['4 g de NaOH en 1 L', '0,1 M'], ['M₁ × V₁ = M₂ × V₂', 'Ecuación de dilución'] ] },
+      ['117 g de NaCl en 1 L', '2 M'], ['0,5 mol en 2 L', '0,25 M'], ['0,2 mol en 200 mL', '1 M'], ['M₁ × V₁ = M₂ × V₂', 'Ecuación de dilución'] ] },
     { game: 'order', title: 'Ordena por molaridad', time: 90, rounds: [
       { prompt: 'Ordena de menor a mayor molaridad', items: ['1 mol en 4 L', '0,5 mol en 1 L', '2 mol en 2 L', '3 mol en 2 L', '1 mol en 250 mL'], labels: ['0,25 M', '0,5 M', '1 M', '1,5 M', '4 M'] },
       { prompt: 'NaCl (58,5 g/mol): ordena de menor a mayor molaridad', items: ['11,7 g en 1 L', '29,25 g en 1 L', '58,5 g en 1 L', '58,5 g en 500 mL', '175,5 g en 1 L'], labels: ['0,2 M', '0,5 M', '1 M', '2 M', '3 M'] },
@@ -78,7 +78,7 @@ export const LESSON_GAMES_B = {
       { s: 'Todo lo que tiene pH bajo es peligroso para comer.', a: false, e: 'El limón (pH 2,2) y el vinagre son ácidos y los consumimos a diario.' },
       { s: 'La leche de magnesia es básica.', a: true, e: 'Su pH es cerca de 10,5.' },
       { s: 'La escala de pH va solo de 1 a 10.', a: false, e: 'En soluciones acuosas comunes va de 0 a 14.' },
-      { s: 'La sangre humana es ligeramente básica.', a: true, e: 'Su pH es cerca de 7,4.' } ] },
+      { s: 'Un pH de 12 indica una solución muy básica.', a: true, e: 'Está muy por encima de 7.' } ] },
   ],
   g9u2l3: [
     { game: 'balancer', title: 'Balanceo de neutralizaciones', rx: [
@@ -106,8 +106,8 @@ export const LESSON_GAMES_B = {
     { game: 'truefalse', title: 'Aire limpio: ¿verdad o mito?', time: 60, lives: 3, items: [
       { s: 'El CO₂ atrapa calor en la atmósfera.', a: true, e: 'Es el principal gas de efecto invernadero de origen humano.' },
       { s: 'La lluvia ácida se debe principalmente al CO₂.', a: false, e: 'Se debe sobre todo a óxidos de azufre y nitrógeno, que forman H₂SO₄ y HNO₃.' },
-      { s: 'El PM2,5 son partículas de menos de 2,5 micras.', a: true, e: 'Por su tamaño llegan hasta los alvéolos.' },
-      { s: 'El ozono cerca del suelo es beneficioso porque nos protege de los rayos UV.', a: false, e: 'Cerca del suelo es un contaminante; el ozono que protege está en la estratosfera.' },
+      { s: 'El PM2,5 son partículas tan pequeñas que entran a los pulmones.', a: true, e: 'Por eso son peligrosas para la salud.' },
+      { s: 'El ozono troposférico se forma sin necesidad de luz solar.', a: false, e: 'Se forma cuando la luz del sol actúa sobre los gases de los carros.' },
       { s: 'El ozono troposférico se forma por la luz solar sobre los gases de los carros.', a: true, e: 'Es un contaminante secundario, típico de días soleados con tráfico.' },
       { s: 'El metano de la ganadería es un gas de efecto invernadero.', a: true, e: 'El CH₄ atrapa calor con mucha eficacia.' },
       { s: 'Los motores diésel son una fuente de material particulado.', a: true, e: 'El hollín del diésel es PM2,5.' },
@@ -133,9 +133,9 @@ export const LESSON_GAMES_B = {
       { q: 'Blanqueador A: 5,25 % de hipoclorito. B: 3 %. ¿Cuál está más concentrado?', o: ['A', 'B', 'Iguales', 'No se puede saber'], a: 0, e: 'Más gramos de soluto por cada 100 de producto.' },
       { q: '¿Qué entidad exige registro sanitario a productos de aseo en Colombia?', o: ['INVIMA', 'DIAN', 'ICFES', 'IDEAM'], a: 0, e: 'El INVIMA también exige etiquetado en español.' },
       { q: 'Un destapador de cañerías de pH 14 es…', o: ['Neutro', 'Muy ácido', 'Muy básico y corrosivo', 'Inofensivo'], a: 2, e: 'Un pH tan alto destruye tejidos.' },
-      { q: 'Si un producto te salpica en los ojos, lo primero es…', o: ['Frotarlos', 'Lavar con abundante agua', 'Echar vinagre', 'Esperar a ver'], a: 1, e: 'Agua abundante y luego ayuda médica con la etiqueta en mano.' },
+      { q: '¿Qué gas tóxico sale al mezclar blanqueador con amoníaco?', o: ['Oxígeno', 'Cloraminas', 'Vapor de agua', 'Helio'], a: 1, e: 'Por eso nunca se mezclan productos de aseo.' },
       { q: 'El pictograma de la calavera indica…', o: ['Toxicidad aguda', 'Inflamable', 'Corrosivo', 'Gas a presión'], a: 0, e: 'Pequeñas cantidades pueden causar daño grave.' },
-      { q: '¿Por qué guardar los productos en su envase original?', o: ['Por estética', 'Para conservar la etiqueta y sus advertencias', 'Porque así no se evaporan', 'No importa'], a: 1, e: 'Evita confusiones e intoxicaciones.' },
+      { q: 'Un producto con el pictograma de la mano corroída es…', o: ['Corrosivo', 'Inflamable', 'Explosivo', 'Inofensivo'], a: 0, e: 'Daña la piel y los metales.' },
       { q: 'Un jabón dice "pH 5,5". Es un producto…', o: ['Ligeramente ácido', 'Muy básico', 'Neutro', 'Corrosivo'], a: 0, e: 'Un poco menor que 7.' } ] },
   ],
 
@@ -199,15 +199,15 @@ export const LESSON_GAMES_B = {
   g10u2l1: [
     { game: 'builder', title: 'Arma moléculas con octeto', targets: ['H2O', 'NH3', 'N2', 'Cl2', 'H2O2', 'CH3OH'], palette: ['H', 'C', 'N', 'O', 'Cl'] },
     { game: 'blitz', title: 'Contrarreloj de Lewis', time: 60, lives: 3, items: [
-      { q: '¿Cuántos pares libres hay en total en el N₂?', o: ['0', '1', '2', '4'], a: 2, e: 'Triple enlace y un par libre en cada nitrógeno.' },
+      { q: '¿Cuántos pares libres tiene el nitrógeno en el NH₃?', o: ['0', '1', '2', '3'], a: 1, e: '3 pares compartidos con los H + 1 par libre = 8 electrones.' },
       { q: 'En el Cl₂, los átomos se unen con un enlace…', o: ['Sencillo', 'Doble', 'Triple', 'Iónico'], a: 0, e: 'Cada Cl tiene 7 e⁻ y comparte 1 par.' },
       { q: '¿Cuántos electrones de valencia tiene el carbono?', o: ['2', '4', '6', '8'], a: 1, e: '2s² 2p²: forma 4 enlaces.' },
-      { q: 'En el CO₂ (O=C=O), el carbono tiene…', o: ['4 pares libres', '2 dobles enlaces y 0 pares libres', '1 triple enlace', '2 pares libres'], a: 1, e: '4 pares compartidos = 8 electrones.' },
+      { q: 'En el agua, ¿cuántos electrones rodean al oxígeno?', o: ['4', '6', '8', '10'], a: 2, e: '2 pares compartidos + 2 pares libres = 8.' },
       { q: 'El hidrógeno queda estable con … electrones', o: ['1', '2', '4', '8'], a: 1, e: 'Como el helio.' },
       { q: '¿Cuántos pares libres tiene el cloro en el HCl?', o: ['1', '2', '3', '4'], a: 2, e: '1 par compartido + 3 libres = 8 electrones.' },
       { q: 'En el CH₄, el carbono tiene…', o: ['4 enlaces y 0 pares libres', '2 enlaces y 2 pares libres', '3 enlaces y 1 par libre', '4 pares libres'], a: 0, e: 'Cuatro pares compartidos.' },
       { q: 'Un enlace covalente sencillo es…', o: ['Un par de electrones compartido', 'Un electrón', 'Dos pares compartidos', 'Un protón compartido'], a: 0, e: 'Se dibuja como una raya.' },
-      { q: 'Entre los dos N del N₂ hay un enlace…', o: ['Sencillo', 'Doble', 'Triple', 'Iónico'], a: 2, e: 'Cada N comparte 3 electrones.' },
+      { q: 'En el NH₃, el nitrógeno tiene…', o: ['3 enlaces y 1 par libre', '4 enlaces', '2 enlaces y 2 pares libres', '1 enlace y 3 pares libres'], a: 0, e: '3 + 1 = 4 pares: octeto completo.' },
       { q: 'En el H₂O₂ (H–O–O–H), cada oxígeno tiene … pares libres', o: ['0', '1', '2', '3'], a: 2, e: '2 enlaces + 2 pares libres = 8.' },
       { q: 'El oxígeno (6 e⁻ de valencia) completa el octeto con … enlaces sencillos', o: ['1', '2', '3', '4'], a: 1, e: '6 + 2 compartidos = 8.' } ] },
   ],
@@ -217,7 +217,7 @@ export const LESSON_GAMES_B = {
       { prompt: 'Ordena los enlaces de menor a mayor ΔEN', items: ['Cl–Cl', 'C–H', 'H–Cl', 'O–H', 'Na–Cl', 'K–F'], labels: ['0', '0,3', '1,0', '1,2', '2,3', '3,2'] },
       { prompt: 'Periodo 2: ordena de menor a mayor electronegatividad', items: ['Li', 'Be', 'B', 'C', 'N', 'O'], labels: ['1,0', '1,6', '2,0', '2,5', '3,0', '3,4'] } ] },
     { game: 'catcher', title: 'Atrapa los iónicos', time: 45, lives: 3,
-      rule: 'Atrapa solo los compuestos iónicos',
+      rule: 'Atrapa solo los iónicos: un metal con un no metal (mucha diferencia de electronegatividad)',
       good: ['KCl', 'MgO', 'CaCl₂', 'LiF', 'Na₂O', 'KBr', 'CaO', 'NaF', 'MgCl₂'],
       bad: ['H₂O', 'CH₄', 'CO₂', 'NH₃', 'O₂', 'Cl₂', 'HCl', 'N₂', 'CCl₄'] },
   ],
@@ -225,15 +225,15 @@ export const LESSON_GAMES_B = {
     { game: 'memory', title: 'Parejas de geometrías', pairs: [
       ['CH₄', 'Tetraédrica, 109,5°'], ['NH₃', 'Piramidal, 107°'], ['H₂O', 'Angular, 104,5°'], ['BF₃', 'Trigonal plana, 120°'],
       ['CO₂', 'Lineal, 180°'], ['RPECV', 'Los pares se repelen'], ['Par libre', 'Empuja más y cierra ángulos'] ] },
-    { game: 'sorter', title: 'Polar o apolar: decide la forma', time: 60, bins: ['Polar', 'Apolar'], items: [
-      ['H₂O', 0], ['NH₃', 0], ['CH₄', 1], ['CO₂', 1], ['BF₃', 1], ['HCl', 0], ['CCl₄', 1], ['H₂S', 0],
-      ['SO₂', 0], ['O₂', 1], ['N₂', 1], ['CH₃Cl', 0], ['HF', 0], ['BeCl₂', 1], ['SO₃', 1], ['NF₃', 0] ] },
+    { game: 'sorter', title: '¿Qué geometría tiene?', time: 60, bins: ['Tetraédrica', 'Piramidal', 'Angular'], items: [
+      ['CH₄', 0], ['4 enlaces, 0 pares libres', 0], ['109,5°', 0], ['NH₃', 1], ['3 enlaces y 1 par libre', 1], ['107°', 1],
+      ['H₂O', 2], ['2 enlaces y 2 pares libres', 2], ['104,5°', 2], ['El agua', 2], ['El amoníaco', 1], ['El metano del gas natural', 0] ] },
   ],
   g10u3l1: [
     { game: 'builder', title: 'Fábrica de óxidos', targets: ['CaO', 'CO2', 'CO', 'SO2', 'SO3', 'NO2'], palette: ['C', 'N', 'O', 'S', 'Ca'] },
     { game: 'catcher', title: 'Atrapa los óxidos ácidos', time: 45, lives: 3,
       rule: 'Atrapa solo los óxidos ácidos (no metal + oxígeno)',
-      good: ['SO₂', 'N₂O₅', 'Cl₂O₇', 'SiO₂', 'Cl₂O', 'N₂O₃', 'SeO₂', 'CO₂', 'P₂O₃'],
+      good: ['SO₂', 'N₂O₅', 'Cl₂O₇', 'SO₃', 'Cl₂O', 'N₂O₃', 'NO₂', 'CO₂', 'P₂O₃'],
       bad: ['K₂O', 'Li₂O', 'BaO', 'FeO', 'CuO', 'Cu₂O', 'NiO', 'SrO'] },
   ],
   g10u3l2: [
@@ -329,8 +329,8 @@ export const LESSON_GAMES_B = {
     { game: 'sorter', title: '¿Acelera o frena la reacción?', time: 60, bins: ['Acelera', 'Frena'], items: [
       ['Subir la temperatura', 0], ['Guardar en la nevera', 1], ['Panela en polvo', 0], ['Añadir un catalizador', 0],
       ['Diluir el reactivo', 1], ['Enzimas digestivas', 0], ['Leña en tronco entero', 1], ['Leña en astillas', 0],
-      ['Más concentración', 0], ['Congelar la carne', 1], ['Masticar bien', 0], ['Cocinar en olla a presión', 0],
-      ['Conservantes en el pan', 1], ['Pastilla entera, sin moler', 1] ] },
+      ['Más concentración', 0], ['Congelar la carne', 1], ['Masticar bien', 0], ['Calentar la olla', 0],
+      ['Panela en bloque entero', 1], ['Pastilla entera, sin moler', 1] ] },
     { game: 'word', title: 'Palabras de la cinética', lives: 6, words: [
       { w: 'CATALIZADOR', h: 'Sustancia que acelera una reacción y se recupera al final' },
       { w: 'COLISIÓN', h: 'Choque entre partículas; sin él no hay reacción' },
@@ -351,9 +351,9 @@ export const LESSON_GAMES_B = {
   g11u2l1: [
     { game: 'builder', title: 'Arma y mira: sp³, sp² o sp', targets: ['CH4', 'C2H6', 'C2H4', 'C2H2', 'H2CO', 'CO2'], palette: ['C', 'H', 'O'] },
     { game: 'sorter', title: 'Clasifica la hibridación', time: 60, bins: ['sp³', 'sp²', 'sp'], items: [
-      ['C del metano', 0], ['C del etano', 0], ['C del propano', 0], ['C del metanol', 0], ['C del diamante', 0],
-      ['C del eteno', 1], ['C del formaldehído', 1], ['C=O de la acetona', 1], ['C del benceno', 1], ['C del grafito', 1],
-      ['C del etino', 2], ['C del CO₂', 2], ['C del HCN', 2] ] },
+      ['C del metano', 0], ['C del etano', 0], ['C con cuatro enlaces sencillos', 0], ['C tetraédrico de 109,5°', 0],
+      ['C del eteno', 1], ['C con un doble enlace', 1], ['C trigonal plano de 120°', 1],
+      ['C del etino', 2], ['C con un triple enlace', 2], ['C lineal de 180°', 2], ['C del acetileno del soplete', 2] ] },
   ],
   g11u2l2: [
     { game: 'catcher', title: 'Atrapa los alquenos', time: 45, lives: 3,
@@ -367,18 +367,18 @@ export const LESSON_GAMES_B = {
   g11u2l3: [
     { game: 'sorter', title: '¿Qué tipo de isomería?', time: 60, bins: ['De cadena', 'De posición', 'De función'], items: [
       ['Butano / metilpropano', 0], ['Pentano / metilbutano', 0], ['Pentano / dimetilpropano', 0], ['Hexano / 2-metilpentano', 0],
-      ['1-propanol / 2-propanol', 1], ['1-buteno / 2-buteno', 1], ['1-butanol / 2-butanol', 1], ['2-pentanona / 3-pentanona', 1],
-      ['Etanol / dimetil éter', 2], ['Propanal / propanona', 2], ['Butanal / butanona', 2], ['1-butanol / dietil éter', 2] ] },
+      ['1-propanol / 2-propanol', 1], ['1-buteno / 2-buteno', 1], ['1-butanol / 2-butanol', 1], ['2-pentanol / 3-pentanol', 1],
+      ['Etanol / dimetil éter', 2], ['1-propanol / metil etil éter', 2], ['2-butanol / dietil éter', 2], ['1-butanol / dietil éter', 2] ] },
     { game: 'blitz', title: 'Contrarreloj de isómeros', time: 60, lives: 3, items: [
       { q: '¿Cuál es isómero del butano (C₄H₁₀)?', o: ['Metilpropano', 'Propano', 'Buteno', 'Pentano'], a: 0, e: 'También es C₄H₁₀, pero ramificado.' },
       { q: 'Etanol (líquido) y dimetil éter (gas) tienen igual…', o: ['Fórmula molecular', 'Punto de ebullición', 'Grupo funcional', 'Estructura'], a: 0, e: 'Ambos son C₂H₆O.' },
       { q: '1-buteno y 2-buteno son isómeros de…', o: ['Cadena', 'Posición', 'Función', 'No son isómeros'], a: 1, e: 'Cambia la posición del doble enlace.' },
       { q: '¿Cuántos isómeros estructurales tiene el C₄H₁₀?', o: ['1', '2', '3', '4'], a: 1, e: 'Butano y metilpropano.' },
-      { q: '¿Cuántos isómeros estructurales tiene el C₅H₁₂?', o: ['2', '3', '4', '5'], a: 1, e: 'Pentano, metilbutano y dimetilpropano.' },
-      { q: 'Propanal (aldehído) y propanona (cetona) son isómeros de…', o: ['Cadena', 'Posición', 'Función', 'No son isómeros'], a: 2, e: 'Misma fórmula, C₃H₆O, distinto grupo funcional.' },
+      { q: 'Butano e isobutano tienen la misma…', o: ['Fórmula molecular', 'Forma de la cadena', 'Estructura', 'Nada en común'], a: 0, e: 'Ambos son C₄H₁₀; cambia la forma de la cadena.' },
+      { q: 'Etanol (alcohol) y dimetil éter (éter) son isómeros de…', o: ['Cadena', 'Posición', 'Función', 'No son isómeros'], a: 2, e: 'Misma fórmula, C₂H₆O, distinto grupo funcional.' },
       { q: '¿Son isómeros el metano y el etano?', o: ['Sí, de cadena', 'No: tienen distinta fórmula molecular', 'Sí, de función', 'Sí, de posición'], a: 1, e: 'CH₄ y C₂H₆ no tienen los mismos átomos.' },
       { q: 'El 1-propanol y el 2-propanol se diferencian en…', o: ['La posición del –OH', 'El número de carbonos', 'La fórmula molecular', 'El grupo funcional'], a: 0, e: 'Ambos son alcoholes C₃H₈O.' },
-      { q: 'Entre dos isómeros de cadena, el más ramificado suele hervir…', o: ['A menor temperatura', 'A mayor temperatura', 'A la misma', 'Nunca hierve'], a: 0, e: 'Butano: −0,5 °C; isobutano: −12 °C.' },
+      { q: 'El alcohol isopropílico del botiquín es el…', o: ['1-propanol', '2-propanol', 'Etanol', 'Metanol'], a: 1, e: 'Tiene el –OH en el carbono del medio.' },
       { q: '¿Qué fórmula comparten el etanol y el dimetil éter?', o: ['C₂H₆O', 'C₂H₆', 'CH₄O', 'C₂H₄O₂'], a: 0, e: 'Por eso son isómeros de función.' } ] },
   ],
   g11u3l1: [
@@ -411,13 +411,13 @@ export const LESSON_GAMES_B = {
     { game: 'builder', title: 'Laboratorio de ácidos, ésteres y aminas', targets: ['HCOOH', 'CH3COOH', 'C2H5OH', 'CH3COOC2H5', 'CH3NH2'], palette: ['C', 'H', 'N', 'O'] },
     { game: 'memory', title: 'Parejas de olores y grupos', pairs: [
       ['–COOH', 'Ácido carboxílico'], ['–COO–', 'Éster'], ['–NH₂', 'Amina'], ['Ácido acético', 'Vinagre'],
-      ['Ácido fórmico', 'Picadura de hormiga'], ['Acetato de isoamilo', 'Olor a banano'], ['Trimetilamina', 'Olor a pescado'], ['Ácido + alcohol', 'Éster + agua'] ] },
+      ['Ésteres', 'Olor a frutas'], ['Aminas', 'Olor del pescado'], ['Terminación -oico', 'Ácido carboxílico'], ['Ácido + alcohol', 'Éster + agua'] ] },
   ],
   g11u4l1: [
     { game: 'catcher', title: 'Atrapa las proteínas', time: 45, lives: 3,
       rule: 'Atrapa solo las proteínas',
-      good: ['Colágeno', 'Hemoglobina', 'Insulina', 'Caseína', 'Albúmina', 'Pepsina', 'Anticuerpos', 'Miosina', 'Lactasa'],
-      bad: ['Almidón', 'Glucosa', 'Celulosa', 'Sacarosa', 'Colesterol', 'Aceite de oliva', 'ADN', 'ARN', 'Glucógeno', 'Triglicérido'] },
+      good: ['Queratina de las uñas', 'Proteína del músculo', 'Enzima de la saliva', 'Cadena de aminoácidos', 'Proteína del fríjol', 'Enzimas digestivas', 'Proteína del huevo', 'Queratina del cabello'],
+      bad: ['Almidón de la papa', 'Glucosa', 'Almidón del arroz', 'Aceite de palma', 'Grasa del aguacate', 'ADN', 'ARN', 'Triglicérido', 'Almidón de la yuca'] },
     { game: 'word', title: 'Palabras de la vida', lives: 6, words: [
       { w: 'CARBOHIDRATO', h: 'Biomolécula de energía rápida, como la glucosa y el almidón' },
       { w: 'LÍPIDO', h: 'Grasa o aceite: reserva de energía y parte de las membranas' },

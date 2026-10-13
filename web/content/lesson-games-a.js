@@ -22,12 +22,12 @@ export const LESSON_GAMES_A = {
       { q: 'Si partes un bloque de hierro por la mitad, su densidad…', o: ['Se reduce a la mitad', 'Se duplica', 'Sigue igual', 'Queda en cero'], a: 2, e: 'Masa y volumen bajan a la mitad juntos: el cociente no cambia.' },
       { q: '¿Cuál es una propiedad general de la materia?', o: ['Punto de ebullición', 'Olor', 'Densidad', 'Masa'], a: 3, e: 'Toda la materia tiene masa; no sirve para distinguir sustancias.' },
       { q: 'La densidad del agua es cercana a…', o: ['10 g/cm³', '1 g/cm³', '0,1 g/cm³', '100 g/cm³'], a: 1, e: 'Por eso se compara todo con 1 g/cm³ para saber si flota.' },
-      { q: '¿Qué masa tienen 10 cm³ de aluminio (2,7 g/cm³)?', o: ['2,7 g', '12,7 g', '27 g', '270 g'], a: 2, e: 'm = d × V = 2,7 × 10 = 27 g.' },
+      { q: 'Un bloque de 54 g ocupa 20 cm³. Su densidad es…', o: ['2,7 g/cm³', '74 g/cm³', '0,37 g/cm³', '34 g/cm³'], a: 0, e: 'd = m ÷ V = 54 ÷ 20 = 2,7 g/cm³: es aluminio.' },
       { q: 'Un material de 0,8 g/cm³ puesto en agua…', o: ['Flota', 'Se hunde', 'Se disuelve siempre', 'Queda a medio camino'], a: 0, e: '0,8 es menor que 1 g/cm³: flota.' },
       { q: '¿Qué propiedad sirve para identificar una sustancia?', o: ['Volumen', 'Punto de fusión', 'Peso', 'Masa'], a: 1, e: 'Es una propiedad específica: cada sustancia tiene la suya.' },
       { q: 'Un tronco enorme de balso y un clavo pequeño en el río. ¿Cuál flota?', o: ['El clavo', 'Los dos', 'El tronco', 'Ninguno'], a: 2, e: 'Importa el material, no el tamaño: el balso es menos denso que el agua.' },
       { q: 'Un cuerpo tiene 5 g y ocupa 5 cm³. Comparado con el agua…', o: ['Es menos denso', 'Tiene la misma densidad', 'Es 5 veces más denso', 'Es 25 veces más denso'], a: 1, e: '5 ÷ 5 = 1 g/cm³, igual que el agua.' },
-      { q: '¿Qué volumen ocupan 78,7 g de hierro (7,87 g/cm³)?', o: ['1 cm³', '7,87 cm³', '100 cm³', '10 cm³'], a: 3, e: 'V = m ÷ d = 78,7 ÷ 7,87 = 10 cm³.' } ] },
+      { q: 'Un objeto de 8 g ocupa 10 cm³. En agua…', o: ['Se hunde', 'Flota', 'Se disuelve', 'Explota'], a: 1, e: 'd = 8 ÷ 10 = 0,8 g/cm³, menos que el agua: flota.' } ] },
   ],
 
   // Estados de la materia
@@ -89,7 +89,7 @@ export const LESSON_GAMES_A = {
   g6u2l3: [
     { game: 'memory', title: 'Parejas de la separación', pairs: [
       ['Filtración', 'Tinto en el colador de tela'], ['Decantación', 'Agua y aceite en reposo'], ['Evaporación', 'Sal en las charcas al sol'],
-      ['Destilación', 'Separar alcohol y agua'], ['Imantación', 'Limaduras de hierro y arena'], ['Tamizado', 'Harina con grumos'] ] },
+      ['Destilación', 'Separar alcohol y agua'], ['Imantación', 'Limaduras de hierro y arena'], ['Embudo de decantación', 'El líquido denso sale primero'] ] },
     { game: 'order', title: 'Paso a paso: separa la mezcla', time: 90, rounds: [
       { prompt: 'Ordena los pasos para separar arena, sal y limaduras de hierro', items: ['Pasar un imán', 'Agregar agua y revolver', 'Filtrar para retener la arena', 'Evaporar el agua para obtener la sal'] },
       { prompt: 'Ordena los pasos de la destilación de alcohol y agua', items: ['Calentar la mezcla', 'Hierve primero el alcohol', 'El vapor pasa por el tubo frío', 'El vapor se condensa', 'Se recoge el alcohol en otro recipiente'] },
@@ -116,7 +116,7 @@ export const LESSON_GAMES_A = {
     { game: 'blitz', title: 'Contrarreloj en la cocina', time: 60, lives: 3, items: [
       { q: '¿Por qué la arepa se pone dorada en el budare?', o: ['Se ensucia con el budare', 'Reaccionan azúcares y proteínas (Maillard)', 'Se evapora el maíz', 'Se derrite la harina'], a: 1, e: 'La reacción de Maillard forma sustancias nuevas de color y sabor.' },
       { q: 'Derretir mantequilla en la sartén es un cambio…', o: ['Químico', 'Nuclear', 'Físico', 'Biológico'], a: 2, e: 'Solo cambia de estado: sigue siendo mantequilla.' },
-      { q: 'La levadura hace crecer la masa del pan porque produce…', o: ['Oxígeno', 'Dióxido de carbono (CO₂)', 'Hidrógeno', 'Sal'], a: 1, e: 'La levadura fermenta azúcares y libera CO₂, que infla la masa.' },
+      { q: 'El bicarbonato con vinagre hace crecer una torta porque libera…', o: ['Oxígeno', 'Dióxido de carbono (CO₂)', 'Hidrógeno', 'Sal'], a: 1, e: 'El CO₂ forma burbujas que inflan la masa.' },
       { q: 'Rallar queso es un cambio…', o: ['Físico: sigue siendo queso', 'Químico: se forma otra sustancia', 'Químico: cambia de forma', 'Nuclear'], a: 0, e: 'Solo cambia el tamaño de los pedazos.' },
       { q: 'Cuando la leche se corta…', o: ['Solo cambia de temperatura', 'Es un cambio físico', 'Se evapora', 'Se forman sustancias nuevas: cambio químico'], a: 3, e: 'Aparecen grumos y olor agrio: sustancias nuevas.' },
       { q: '¿Cuál de estos procesos del café es químico?', o: ['Moler el café', 'Tostar el café', 'Enfriar el tinto', 'Disolver azúcar en el tinto'], a: 1, e: 'Al tostarlo cambian el color, el olor y el sabor: se forman sustancias nuevas.' },
@@ -213,8 +213,8 @@ export const LESSON_GAMES_A = {
       { s: 'Los metales se pueden estirar en hilos.', a: true, e: 'Así se fabrican los alambres de cobre.' },
       { s: 'El oxígeno es un metal.', a: false, e: 'Es un no metal gaseoso.' },
       { s: 'Los metaloides están en la “escalera” de la tabla.', a: true, e: 'Separan a los metales de los no metales.' },
-      { s: 'Todos los metales son sólidos a temperatura ambiente.', a: false, e: 'El mercurio es un metal líquido.' },
-      { s: 'El hidrógeno es un metal alcalino porque está en el grupo 1.', a: false, e: 'Está arriba del grupo 1, pero es un no metal.' } ] },
+      { s: 'Los no metales conducen bien la electricidad.', a: false, e: 'Conducen mal; los buenos conductores son los metales.' },
+      { s: 'Los metales tienden a perder electrones.', a: true, e: 'Los no metales, en cambio, tienden a ganarlos.' } ] },
   ],
 
   // Propiedades periódicas
@@ -250,12 +250,13 @@ export const LESSON_GAMES_A = {
 
   // Fuerzas entre partículas
   g7u3l2: [
-    { game: 'catcher', title: 'Atrapa los gases', rule: 'Atrapa solo lo que es gas a 25 °C', time: 45, lives: 3,
-      good: ['O2', 'N2', 'CO2', 'He', 'CH4', 'Ne', 'Cl2', 'H2', 'NH3', 'Ar'],
-      bad: ['Agua (H₂O)', 'Fe', 'Cu', 'S', 'Sal (NaCl)', 'Azúcar', 'Alcohol', 'Br', 'Aceite'] },
+    { game: 'sorter', title: '¿Quién gana: la atracción o el movimiento?', time: 60, bins: ['Gana la atracción', 'Gana el movimiento'], items: [
+      ['Un cubo de hielo en el congelador', 0], ['Una piedra', 0], ['Un clavo de hierro', 0], ['Un bloque de panela', 0], ['Agua que se congela', 0],
+      ['El vapor de la olla', 1], ['El aire de un globo', 1], ['El gas de la estufa', 1], ['Agua que hierve', 1], ['Hielo que se derrite al sol', 1],
+      ['Vapor que se enfría y forma gotas', 0], ['Charco que se seca al sol', 1] ] },
     { game: 'order', title: 'Fuerzas contra movimiento', time: 90, rounds: [
       { prompt: 'Ordena de fuerzas de atracción más débiles a más fuertes (a 25 °C)', items: ['Oxígeno (gas)', 'Agua (líquido)', 'Hierro (sólido)'] },
-      { prompt: 'Ordena de menor a mayor punto de ebullición', items: ['Oxígeno', 'Alcohol', 'Agua'] },
+      { prompt: 'Ordena lo que pasa al calentar un cubo de hielo', items: ['Partículas fijas que solo vibran', 'Vibran cada vez más rápido', 'El movimiento vence a la atracción: se funde', 'Agua líquida'] },
       { prompt: 'Ordena de menor a mayor rapidez de las partículas', items: ['Agua a 5 °C', 'Agua a 40 °C', 'Agua a 90 °C'] },
       { prompt: 'Ordena lo que pasa al enfriar vapor de agua', items: ['Partículas rápidas y separadas', 'El movimiento se hace más lento', 'Las atracciones las juntan: líquido', 'Quedan fijas y vibrando: hielo'] } ] },
   ],
@@ -374,21 +375,20 @@ export const LESSON_GAMES_A = {
   g8u3l1: [
     { game: 'sorter', title: '¿Masa o peso?', bins: ['Masa', 'Peso'], time: 60, items: [
       ['Se mide en kilogramos', 0], ['Se mide en newtons', 1], ['Cambia en la Luna', 1], ['Es igual en la Luna', 0], ['Cantidad de materia', 0],
-      ['Fuerza de la gravedad', 1], ['Es una fuerza', 1], ['Depende del planeta', 1], ['Es mayor en Júpiter', 1], ['No cambia en el espacio', 0],
+      ['Fuerza de la gravedad', 1], ['Es una fuerza', 1], ['Depende del planeta', 1], ['Lo mide una balanza', 0], ['No cambia en el espacio', 0],
       ['Una persona de 70 kg', 0], ['686 N en la Tierra', 1] ] },
     { game: 'order', title: 'Ordena moles y masas', time: 90, rounds: [
       { prompt: 'Ordena de menor a mayor masa molar (H = 1, C = 12, O = 16)', items: ['H₂', 'CH₄', 'H₂O', 'O₂', 'CO₂'] },
       { prompt: 'Ordena de menor a mayor número de partículas', items: ['Una docena de huevos', 'Un millón de granos de arroz', 'Medio mol de agua', 'Un mol de agua'] },
       { prompt: 'Ordena los pasos para contar las moléculas de una muestra de agua', items: ['Pesar la muestra en gramos', 'Calcular la masa molar (18 g/mol)', 'Dividir la masa entre la masa molar', 'Multiplicar los moles por 6,02 × 10²³'] },
-      { prompt: 'Ordena de menor a mayor número de moles (H = 1, C = 12, O = 16)', items: ['9 g de H₂O', '16 g de CH₄', '88 g de CO₂', '54 g de H₂O'] },
-      { prompt: 'Ordena de menor a mayor el peso de una persona de 50 kg', items: ['En la Luna', 'En Marte', 'En la Tierra', 'En Júpiter'] } ] },
+      { prompt: 'Ordena de menor a mayor número de moles (H = 1, C = 12, O = 16)', items: ['9 g de H₂O', '16 g de CH₄', '88 g de CO₂', '54 g de H₂O'] } ] },
   ],
 
   // Densidad de materiales
   g8u3l2: [
     { game: 'catcher', title: 'Atrapa lo que se hunde', rule: 'Atrapa solo lo que se hunde en agua', time: 45, lives: 3,
-      good: ['Oro', 'Hierro', 'Plomo', 'Cobre', 'Piedra', 'Arena', 'Vidrio', 'Plata', 'Aluminio'],
-      bad: ['Corcho', 'Icopor', 'Hielo', 'Aceite', 'Madera de pino', 'Balso', 'Cera de vela', 'Gasolina', 'Burbuja de aire'] },
+      good: ['Oro', 'Hierro', 'Plomo', 'Cobre', 'Piedra', 'Arena', 'Vidrio', 'Clavo', 'Aluminio'],
+      bad: ['Corcho', 'Icopor', 'Hielo', 'Aceite', 'Madera de pino', 'Balso', 'Tabla de madera', 'Gasolina', 'Burbuja de aire'] },
     { game: 'order', title: 'La escalera de la densidad', time: 90, rounds: [
       { prompt: 'Ordena de menor a mayor densidad', items: ['Aire', 'Aceite', 'Agua', 'Aluminio', 'Hierro', 'Oro'] },
       { prompt: 'Ordena de arriba abajo lo que queda en un vaso con miel, agua, aceite y un corcho', items: ['Corcho', 'Aceite', 'Agua', 'Miel'] },

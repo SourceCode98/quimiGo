@@ -48,7 +48,7 @@ const grade: Grade =
    'Isomería de <b>cadena</b>: butano (lineal) e isobutano (ramificado), ambos C₄H₁₀. De <b>posición</b>: 1-propanol y 2-propanol. De <b>función</b>: etanol y dimetil éter, ambos C₂H₆O, pero uno es alcohol y el otro éter.'],
   key:'Misma fórmula, distinta estructura: isómeros.',
   co:'',
-  act:{type:'classify',prompt:'¿Son isómeros entre sí?',bins:['Sí son isómeros','No son isómeros'],items:[['Butano y metilpropano (C₄H₁₀)',0],['Etanol y dimetil éter (C₂H₆O)',0],['Metano y etano',1],['1-propanol y 2-propanol',0],['Eteno y etino',1],['Propanal y propanona (C₃H₆O)',0]]},
+  act:{type:'classify',prompt:'¿Son isómeros entre sí?',bins:['Sí son isómeros','No son isómeros'],items:[['Butano y metilpropano (C₄H₁₀)',0],['Etanol y dimetil éter (C₂H₆O)',0],['Metano y etano',1],['1-propanol y 2-propanol',0],['Eteno y etino',1],['1-butanol y dietil éter (C₄H₁₀O)',0]]},
   quiz:[{q:'Dos isómeros tienen igual…',o:['Estructura','Fórmula molecular','Punto de ebullición'],a:1,e:'Cambia el arreglo de los átomos.'},
    {q:'Etanol y dimetil éter son isómeros de…',o:['Cadena','Posición','Función'],a:2,e:'Cambia el grupo funcional.'},
    {q:'¿Tienen las mismas propiedades dos isómeros?',o:['Sí, siempre','No, su estructura distinta cambia sus propiedades'],a:1,e:'El etanol es líquido; el dimetil éter, gas.'}]}
