@@ -51,8 +51,8 @@ export const EXPLORE: Record<string, Explore> = {
     ][v.p] || {},
     read: (v) => (v.p < 0 ? 'Elige algo y mira qué aparece dentro de la caja.' : v.p === 2 || v.p === 3 ? 'La caja queda vacía: no hay partículas que pesar ni que ocupen lugar.' : 'Aparecen partículas: tiene masa y ocupa un lugar.'),
     tasks: [
-      { ask: 'Encuentra algo que <b>no</b> sea materia.', ok: (v) => v.p === 2 || v.p === 3, win: 'La luz y el sonido no tienen masa ni ocupan espacio: son energía, no materia.' },
-      { ask: '¿El aire es materia? Ponlo en la caja y compruébalo.', ok: (v) => v.p === 1, win: 'Sí. El aire tiene partículas, masa y ocupa espacio aunque no lo veas: por eso infla el globo.' },
+      { ask: 'Encuentra algo que <b>no</b> sea materia.', ok: (v) => v.p === 2 || v.p === 3, win: 'La luz y el sonido no pesan ni ocupan un lugar: son energía, no materia.' },
+      { ask: '¿El aire es materia? Ponlo en la caja y compruébalo.', ok: (v) => v.p === 1, win: 'Sí. El aire tiene partículas: pesa y ocupa un lugar aunque no lo veas. Por eso infla el globo.' },
     ],
   },
   g6u1l2: {
@@ -60,15 +60,16 @@ export const EXPLORE: Record<string, Explore> = {
     scene: (v) => ({ drop: true, objs: [{ n: 'Tu bloque', d: v.m / 10, c: '#E05A9B' }] }),
     read: (v) => {
       const d = v.m / 10;
-      return `Volumen fijo: 10 cm³ · <b>d = m ÷ V = ${fm(v.m)} ÷ 10 = ${fm(d)} g/cm³</b>`;
+      return `Volumen: 10 cm³ · <b>densidad = masa ÷ volumen = ${fm(v.m)} ÷ 10 = ${fm(d)} g/cm³</b>`;
     },
     tasks: [
       { ask: 'Haz que el bloque quede <b>debajo del aceite pero encima del agua</b>.', ok: (v) => v.m / 10 > 0.92 && v.m / 10 < 1, win: 'Su densidad quedó entre la del aceite (0,92) y la del agua (1,0): se hunde en el aceite y flota en el agua.', hint: 'Busca una densidad entre 0,92 y 1 g/cm³.' },
       { ask: 'Ahora haz que se quede <b>entre el agua y la miel</b>.', ok: (v) => v.m / 10 > 1 && v.m / 10 < 1.42, win: 'Es más denso que el agua (1,0) pero menos que la miel (1,42).' },
-      { ask: 'Por último, haz que llegue <b>hasta el fondo</b>.', ok: (v) => v.m / 10 > 1.42, win: 'Con más masa en el mismo volumen, la densidad supera la de la miel y se hunde en todo.' },
+      { ask: 'Por último, haz que llegue <b>hasta el fondo</b>.', ok: (v) => v.m / 10 > 1.42, win: 'Más masa en el mismo espacio: ahora es más denso que la miel y se hunde en todo.' },
     ],
   },
   g6u1l3: {
+    at: 3,
     ctl: [
       { id: 'c', label: 'Lugar', opts: ['Cartagena (nivel del mar)', 'Bogotá (2600 m)'], v: 0 },
       { id: 't', label: 'Temperatura', min: -20, max: 110, step: 1, v: -10, unit: '°C' },
@@ -83,9 +84,9 @@ export const EXPLORE: Record<string, Explore> = {
       return `Agua a <b>${v.t} °C</b>: ${v.t <= 0 ? 'hielo (sólido)' : v.t < boil ? 'líquida' : 'hierve y se vuelve vapor'}`;
     },
     tasks: [
-      { ask: 'Derrite el hielo: llévalo a <b>líquido</b>.', ok: (v) => v.t > 0 && v.t < 92, win: 'Al calentar, las partículas vibran más rápido hasta que se sueltan y se deslizan: el hielo se funde a 0 °C.' },
-      { ask: 'Ve a <b>Bogotá</b> y encuentra la temperatura <b>más baja</b> a la que hierve el agua.', ok: (v) => v.c === 1 && v.t === 92, win: 'En Bogotá hierve a 92 °C: arriba hay menos aire empujando (menos presión) y al agua le cuesta menos hervir.', hint: 'Sube la temperatura de grado en grado y mira cuándo aparece el vapor.' },
-      { ask: 'Vuelve a <b>Cartagena</b> y pon el agua a 95 °C. ¿Hierve?', ok: (v) => v.c === 0 && v.t === 95, win: 'No. A nivel del mar hay más presión y el agua necesita llegar a 100 °C.' },
+      { ask: 'Derrite el hielo: llévalo a <b>líquido</b>.', ok: (v) => v.t > 0 && v.t < 92, win: 'Al calentar, las partículas se mueven más rápido hasta que se sueltan y se deslizan: el hielo se derrite a 0 °C.' },
+      { ask: 'Ve a <b>Bogotá</b> y encuentra la temperatura <b>más baja</b> a la que hierve el agua.', ok: (v) => v.c === 1 && v.t === 92, win: 'En Bogotá hierve a 92 °C: en la montaña hay menos aire empujando (menos presión) y al agua le cuesta menos hervir.', hint: 'Sube la temperatura de grado en grado y mira cuándo aparece el vapor.' },
+      { ask: 'Vuelve a <b>Cartagena</b> y pon el agua a 95 °C. ¿Hierve?', ok: (v) => v.c === 0 && v.t === 95, win: 'No. En Cartagena hay más aire empujando (más presión) y el agua necesita llegar a 100 °C.' },
     ],
   },
   g6u2l1: {
@@ -114,7 +115,7 @@ export const EXPLORE: Record<string, Explore> = {
     read: (v) => ['Las partículas de sal se reparten por todo el líquido.', 'El aceite forma una capa aparte encima del agua.', 'El azúcar se reparte por todo el líquido.', 'La arena se queda en el fondo, sin mezclarse.'][v.p] || 'Elige una mezcla y observa dónde quedan sus partículas.',
     tasks: [
       { ask: 'Encuentra una mezcla <b>heterogénea</b> (se ven sus partes).', ok: (v) => v.p === 1 || v.p === 3, win: 'Se distinguen las partes: el aceite o la arena quedan separados del agua.' },
-      { ask: 'Ahora una mezcla <b>homogénea</b>.', ok: (v) => v.p === 0 || v.p === 2, win: 'El soluto se reparte igual por todo el líquido: no se distinguen las partes, pero cada sustancia sigue ahí.' },
+      { ask: 'Ahora una mezcla <b>homogénea</b>.', ok: (v) => v.p === 0 || v.p === 2, win: 'Lo que echaste se reparte por todo el líquido: todo se ve igual, pero cada sustancia sigue ahí.' },
     ],
   },
   g6u2l3: {
@@ -130,9 +131,9 @@ export const EXPLORE: Record<string, Explore> = {
       return good ? '✓ ' + why : '✗ Con ese método esta mezcla no se separa bien.';
     },
     tasks: [
-      { ask: 'Separa el <b>agua y el aceite</b>.', ok: (v) => v.m === 0 && v.k === 2, win: 'Decantación: el líquido más denso (agua) sale primero por la llave.' },
+      { ask: 'Separa el <b>agua y el aceite</b>.', ok: (v) => v.m === 0 && v.k === 2, win: 'Decantación: el agua queda abajo y sale primero por la llave; el aceite se queda arriba.' },
       { ask: 'Saca la <b>sal del agua de mar</b>.', ok: (v) => v.m === 2 && v.k === 3, win: 'Evaporación: el agua se va como vapor y la sal se queda.' },
-      { ask: 'Separa el <b>alcohol del agua</b>.', ok: (v) => v.m === 4 && v.k === 4, win: 'Destilación: aprovecha que el alcohol hierve a menor temperatura que el agua.' },
+      { ask: 'Separa el <b>alcohol del agua</b>.', ok: (v) => v.m === 4 && v.k === 4, win: 'Destilación: el alcohol hierve antes que el agua, se va como vapor y se recoge aparte.' },
     ],
   },
   g6u3l1: {
@@ -150,12 +151,12 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g6u3l2: {
-    ctl: [{ id: 'p', label: 'En la cocina', opts: ['Dorar una arepa', 'Bicarbonato con vinagre', 'Picar y derretir'], v: -1 }],
+    ctl: [{ id: 'p', label: 'En la cocina', opts: ['Dorar una arepa', 'Hervir agua', 'Bicarbonato con vinagre'], v: -1 }],
     scene: (v) => (v.p >= 0 ? { step: v.p } : {}),
-    read: (v) => ['El calor cambia el color, el olor y el sabor de la arepa.', 'Aparecen burbujas que antes no estaban.', 'Cambia la forma o el estado, pero no la sustancia.'][v.p] || 'Elige qué hacer en la cocina.',
+    read: (v) => ['El calor cambia el color, el olor y el sabor de la arepa.', 'Sale vapor, pero el vapor sigue siendo agua.', 'Aparecen burbujas que antes no estaban.'][v.p] || 'Elige qué hacer en la cocina.',
     tasks: [
-      { ask: 'Encuentra el cambio que produce <b>un gas nuevo</b>.', ok: (v) => v.p === 1, win: 'Las burbujas son CO₂: una sustancia nueva. Es un cambio químico.' },
-      { ask: 'Encuentra un cambio químico causado por el <b>calor</b>.', ok: (v) => v.p === 0, win: 'Al dorarse, los azúcares y el almidón forman sustancias nuevas de otro color y olor.' },
+      { ask: 'Encuentra el cambio que produce <b>un gas nuevo</b>.', ok: (v) => v.p === 2, win: 'Las burbujas son CO₂: una sustancia nueva. Es un cambio químico.' },
+      { ask: 'Encuentra un cambio químico causado por el <b>calor</b>.', ok: (v) => v.p === 0, win: 'Al dorarse, los azúcares y las proteínas forman sustancias nuevas de otro color y olor.' },
     ],
   },
 
@@ -163,7 +164,7 @@ export const EXPLORE: Record<string, Explore> = {
   g7u1l1: {
     ctl: [{ id: 'p', label: 'Modelo', opts: ['Dalton (1808)', 'Thomson (1897)', 'Rutherford (1911)', 'Bohr (1913)', 'Actual'], v: -1 }],
     scene: (v) => (v.p >= 0 ? { type: 'atom', model: ['dalton', 'thomson', 'rutherford', 'bohr', 'cloud'][v.p] } : {}),
-    read: (v) => ['Una esfera maciza que no se puede dividir.', 'Una esfera positiva con electrones incrustados, como uvas en un pastel.', 'Lanzó partículas contra una lámina de oro: casi todas pasaron y unas pocas rebotaron.', 'Electrones en órbitas fijas, como pisos de un edificio.', 'Una nube donde es probable encontrar al electrón.'][v.p] || 'Recorre los modelos y mira cómo cambió la idea del átomo.',
+    read: (v) => ['Una esfera maciza que no se puede dividir.', 'Una torta positiva con electrones incrustados, como uvas pasas.', 'Lanzó partículas contra una lámina de oro: casi todas pasaron y unas pocas rebotaron.', 'Electrones en órbitas fijas, como pisos de un edificio.', 'Una nube donde es probable encontrar al electrón.'][v.p] || 'Recorre los modelos y mira cómo cambió la idea del átomo.',
     tasks: [
       { ask: '¿Qué modelo descubrió que el átomo es <b>casi todo vacío</b> con un núcleo diminuto?', ok: (v) => v.p === 2, win: 'Rutherford: si casi todo pasa por la lámina, casi todo es vacío; lo que rebota choca con el núcleo.' },
       { ask: '¿En qué modelo el electrón <b>ya no tiene una órbita fija</b>?', ok: (v) => v.p === 4, win: 'En el modelo actual solo sabemos dónde es probable encontrarlo: el orbital.' },
@@ -178,7 +179,7 @@ export const EXPLORE: Record<string, Explore> = {
     scene: (v) => ({ type: 'atom', model: 'bohr', focus: null, Z: v.z, N: v.n, E: v.e }),
     read: (v) => {
       const el = PT[v.z - 1], q = v.z - v.e;
-      return `<b>${el[1]}</b> (${el[0]}) · número másico ${v.z + v.n} · carga ${q === 0 ? '0 (neutro)' : (q > 0 ? '+' : '−') + Math.abs(q)}`;
+      return `<b>${el[1]}</b> (${el[0]}) · número de masa ${v.z + v.n} · carga ${q === 0 ? '0 (neutro)' : (q > 0 ? '+' : '−') + Math.abs(q)}`;
     },
     tasks: [
       { ask: 'Construye un átomo de <b>carbono neutro</b>.', ok: (v) => v.z === 6 && v.e === 6, win: 'Con 6 protones es carbono; con 6 electrones las cargas se cancelan.', hint: 'Lo que define al elemento son los protones.' },
@@ -217,9 +218,9 @@ export const EXPLORE: Record<string, Explore> = {
     scene: (v) => { const e = at(v.p, MAIN[v.g - 1]); return { type: 'ptable', hl: v.k === 1 ? 'en' : 'radius', arrow: true, els: e ? [e[0]] : [] }; },
     read: (v) => { const e = at(v.p, MAIN[v.g - 1])!; return `<b>${e[1]} (${e[0]})</b> · radio ${e[4]} pm · electronegatividad ${fm(e[5] || 0)}`; },
     tasks: [
-      { ask: 'Encuentra el átomo <b>más grande del periodo 3</b>.', ok: (v) => v.p === 3 && v.g === 1, win: 'El sodio: a la izquierda los electrones de valencia están menos atraídos por el núcleo.' },
+      { ask: 'Encuentra el átomo <b>más grande del periodo 3</b>.', ok: (v) => v.p === 3 && v.g === 1, win: 'El sodio: a la izquierda el núcleo tiene menos protones y jala menos a los electrones.' },
       { ask: 'Encuentra el elemento <b>más electronegativo</b> de todos.', ok: (v) => v.p === 2 && v.g === 7, win: 'El flúor: arriba a la derecha, pequeño y con un núcleo que atrae fuerte.' },
-      { ask: 'En el grupo 1, ¿cuál es más grande? Muévete por los periodos y quédate en el mayor.', ok: (v) => v.p === 4 && v.g === 1, win: 'El potasio: al bajar por un grupo se agregan niveles y el átomo crece.' },
+      { ask: 'En el grupo 1, ¿cuál es más grande? Muévete por los periodos y quédate en el mayor.', ok: (v) => v.p === 4 && v.g === 1, win: 'El potasio: al bajar por un grupo se agregan pisos de electrones y el átomo crece.' },
     ],
   },
   g7u3l1: {
@@ -269,7 +270,7 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g8u1l3: {
-    at: 0,
+    at: 1,
     ctl: [
       { id: 'a', label: 'N₂', min: 1, max: 3, step: 1, v: 1 },
       { id: 'b', label: 'H₂', min: 1, max: 6, step: 1, v: 1 },
@@ -299,7 +300,7 @@ export const EXPLORE: Record<string, Explore> = {
     read: (v) => `V = ${fm(v.V)} L → <b>P = ${fm(1 / v.V, 2)} atm</b> · P × V = 1`,
     predict: { q: 'Si reduces el volumen a la mitad (con la misma temperatura), la presión…', o: ['Se duplica', 'Se reduce a la mitad', 'No cambia'], a: 0, e: 'Las mismas partículas en la mitad del espacio chocan el doble de veces.' },
     tasks: [
-      { ask: 'Haz que la presión sea <b>2 atm</b>.', ok: (v) => near(v.V, 0.5), win: 'La mitad del volumen, el doble de presión: P y V son inversamente proporcionales (Boyle).' },
+      { ask: 'Haz que la presión sea <b>2 atm</b>.', ok: (v) => near(v.V, 0.5), win: 'La mitad del volumen, el doble de presión: P y V van al contrario (ley de Boyle).' },
       { ask: 'Ahora llévala a <b>2,5 atm</b>.', ok: (v) => near(v.V, 0.4), win: 'P × V = 1 → V = 1 ÷ 2,5 = 0,4 L.' },
     ],
   },
@@ -313,7 +314,7 @@ export const EXPLORE: Record<string, Explore> = {
     read: (v) => `<b>P = ${fm((v.T / 300) * (0.5 / v.V), 2)} atm</b> (misma cantidad de gas)`,
     tasks: [
       { ask: 'Sube la temperatura a <b>600 K</b> sin cambiar el volumen.', ok: (v) => v.T === 600 && near(v.V, 0.5), win: 'La presión se duplica: con volumen fijo, P es proporcional a T.' },
-      { ask: 'Deja 600 K y devuelve la presión a <b>1 atm</b>.', ok: (v) => v.T === 600 && near(v.V, 1), win: 'Duplicando el volumen compensas el doble de temperatura: PV = nRT.' },
+      { ask: 'Deja 600 K y devuelve la presión a <b>1 atm</b>.', ok: (v) => v.T === 600 && near(v.V, 1), win: 'El doble de espacio compensa el doble de temperatura: la presión vuelve a 1 atm (PV = nRT).' },
     ],
   },
   g8u3l1: {
@@ -339,17 +340,17 @@ export const EXPLORE: Record<string, Explore> = {
 
   /* ---------------- 9° ---------------- */
   g9u1l1: {
-    at: 0,
-    ctl: [{ id: 'x', label: 'Sal en 100 g de agua', min: 0, max: 60, step: 2, v: 10, unit: 'g' }],
+    at: 4,
+    ctl: [{ id: 'x', label: 'Sal en 100 mL de agua', min: 0, max: 60, step: 2, v: 10, unit: 'g' }],
     scene: (v) => ({ type: 'particles', phase: 'liquid', layout: 'dissolve', dissolve: v.x ? Math.min(1, 36 / v.x) : 1, species: [{ f: 'Na', n: Math.max(1, Math.round(v.x / 3)), label: 'Sal' }, { f: 'H2O', n: 18, label: 'Agua' }] }),
     read: (v) => `Disuelta: <b>${Math.min(v.x, 36)} g</b> · En el fondo: <b>${Math.max(0, v.x - 36)} g</b>`,
     tasks: [
-      { ask: 'Prepara una solución <b>saturada sin que sobre sal</b> en el fondo.', ok: (v) => v.x === 36, win: 'A 20 °C caben 36 g de sal en 100 g de agua: esa es su solubilidad.', hint: 'Agrega sal hasta justo antes de que empiece a quedar en el fondo.' },
+      { ask: 'Prepara una solución <b>saturada sin que sobre sal</b> en el fondo.', ok: (v) => v.x === 36, win: 'Justo 36 g: el agua llenó su cupo. Ese límite es la solubilidad de la sal.', hint: 'Agrega sal hasta justo antes de que empiece a quedar en el fondo.' },
       { ask: 'Agrega sal hasta que <b>sobren 10 g</b>.', ok: (v) => v.x === 46, win: 'Ya no cabe más: lo que pase de 36 g se queda sin disolver.' },
     ],
   },
   g9u1l2: {
-    at: 0,
+    at: 2,
     ctl: [{ id: 'g', label: 'Soluto', min: 0, max: 40, step: 2, v: 4, unit: 'g' }],
     scene: (v) => ({ type: 'particles', phase: 'liquid', layout: 'dissolve', dissolve: 1, species: [{ f: 'Na', n: Math.max(1, Math.round(v.g / 2)), label: 'Soluto' }, { f: 'H2O', n: 20, label: 'Agua' }] }),
     read: (v) => `Solución total: 200 g · <b>% m/m = ${v.g} ÷ 200 × 100 = ${fm((v.g / 200) * 100, 1)} %</b>`,
@@ -359,7 +360,7 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g9u1l3: {
-    at: 0,
+    at: 1,
     ctl: [
       { id: 'n', label: 'NaCl', min: 0.1, max: 1, step: 0.1, v: 0.5, unit: 'mol', fmt: (x) => fm(x, 1) },
       { id: 'V', label: 'Volumen', min: 0.25, max: 2, step: 0.25, v: 2, unit: 'L', fmt: (x) => fm(x) },
@@ -367,17 +368,18 @@ export const EXPLORE: Record<string, Explore> = {
     scene: (v) => ({ type: 'particles', phase: 'liquid', layout: 'dissolve', dissolve: 1, vol: Math.min(1, 0.35 + v.V * 0.325), species: [{ f: 'Na', n: Math.max(1, Math.round(v.n * 16)), label: 'NaCl' }, { f: 'H2O', n: 18, label: 'Agua' }] }),
     read: (v) => `<b>M = ${fm(v.n, 1)} mol ÷ ${fm(v.V)} L = ${fm(v.n / v.V, 2)} mol/L</b>`,
     tasks: [
-      { ask: 'Prepara una solución <b>1 M</b> usando <b>0,5 mol</b>.', ok: (v) => near(v.n, 0.5) && near(v.V, 0.5), win: '0,5 mol ÷ 0,5 L = 1 mol/L.' },
-      { ask: 'Dilúyela a <b>0,5 M</b> sin cambiar los moles.', ok: (v) => near(v.n, 0.5) && near(v.V, 1), win: 'Diluir es agregar solvente: M₁V₁ = M₂V₂ → 1 × 0,5 = 0,5 × 1.' },
+      { ask: 'Prepara una solución <b>1 M</b> usando <b>0,5 mol</b>.', ok: (v) => near(v.n, 0.5) && near(v.V, 0.5), win: '0,5 mol ÷ 0,5 L = 1 M: un mol en cada litro.' },
+      { ask: 'Dilúyela a <b>0,5 M</b> sin cambiar los moles.', ok: (v) => near(v.n, 0.5) && near(v.V, 1), win: 'Agregaste agua y los moles no cambiaron: 1 × 0,5 = 0,5 × 1. El doble de litros, la mitad de molaridad.' },
     ],
   },
   g9u2l1: {
+    at: 5,
     ctl: [{ id: 'p', label: 'Sustancia', opts: ['HCl', 'NaOH', 'NH₃', 'H₂O'], v: -1 }],
     scene: (v) => (v.p >= 0 ? [{ type: 'mol', mol: 'HCl', pair: null, dipole: true, lp: false }, { type: 'mol', mol: 'NaOH', pair: null, dipole: false, lp: false }, { type: 'mol', mol: 'NH3', pair: null, lp: true, dipole: false }, { type: 'mol', mol: 'H2O', pair: null, lp: true, dipole: false }][v.p] : {}),
-    read: (v) => ['En agua suelta un <b>H⁺</b>.', 'En agua suelta un <b>OH⁻</b>.', 'No tiene OH⁻, pero su par libre puede <b>atrapar un H⁺</b>.', 'Puede ceder un H⁺ o aceptarlo.'][v.p] || 'Elige una sustancia y mira qué hace en el agua.',
+    read: (v) => ['En agua suelta un <b>H⁺</b>.', 'En agua suelta un <b>OH⁻</b>.', 'No tiene OH⁻, pero puede <b>recibir un H⁺</b>.', 'Puede pasar un H⁺ o recibirlo.'][v.p] || 'Elige una sustancia y mira qué hace en el agua.',
     tasks: [
-      { ask: 'Encuentra una base según <b>Arrhenius</b> (libera OH⁻).', ok: (v) => v.p === 1, win: 'El NaOH se separa en Na⁺ y OH⁻.' },
-      { ask: 'Encuentra una base que <b>no tenga OH⁻</b>.', ok: (v) => v.p === 2, win: 'El amoníaco acepta un H⁺ con su par libre: es base según Brønsted-Lowry.' },
+      { ask: 'Encuentra una base según <b>Arrhenius</b> (suelta OH⁻).', ok: (v) => v.p === 1, win: 'En agua, el NaOH se separa en Na⁺ y OH⁻.' },
+      { ask: 'Encuentra una base que <b>no tenga OH⁻</b>.', ok: (v) => v.p === 2, win: 'El amoníaco recibe el H⁺ que le pasan: es base según Brønsted-Lowry.' },
     ],
   },
   g9u2l2: {
@@ -386,20 +388,21 @@ export const EXPLORE: Record<string, Explore> = {
     scene: (v) => ({ type: 'graph', kind: 'phscale', mark: v.x }),
     read: (v) => (v.x === 7 ? 'Neutro, como el agua pura.' : `<b>${(10 ** Math.abs(7 - v.x)).toLocaleString('es-CO', { maximumFractionDigits: 1 })} veces</b> más ${v.x < 7 ? 'ácido' : 'básico'} que el agua pura.`),
     tasks: [
-      { ask: 'Encuentra un pH <b>100 veces más ácido que el café</b> (pH 5).', ok: (v) => v.x === 3, win: 'Cada unidad es ×10: de 5 a 3 son dos unidades, ×10 × 10 = ×100. Es la gaseosa.' },
-      { ask: 'Encuentra algo <b>1000 veces más básico</b> que el agua pura.', ok: (v) => v.x === 10, win: 'Tres unidades por encima de 7: pH 10, como el jabón.' },
+      { ask: 'Encuentra un pH <b>100 veces más ácido</b> que el agua pura.', ok: (v) => v.x === 5, win: 'Dos puntos por debajo de 7: 10 × 10 = 100. Es el pH del café.' },
+      { ask: 'Encuentra algo <b>1000 veces más básico</b> que el agua pura.', ok: (v) => v.x === 10, win: 'Tres puntos por encima de 7: 10 × 10 × 10 = 1.000. Es el pH del jabón.' },
     ],
   },
   g9u2l3: {
-    ctl: [{ id: 'x', label: 'NaOH 0,1 M agregado a 10 mL de HCl 0,1 M', min: 0, max: 20, step: 1, v: 0, unit: 'mL' }],
+    at: 5,
+    ctl: [{ id: 'x', label: 'Soda (NaOH 0,1 M) que agregas a 10 mL de HCl 0,1 M', min: 0, max: 20, step: 1, v: 0, unit: 'mL' }],
     scene: (v) => {
       const ph = v.x < 10 ? -Math.log10((0.1 * (10 - v.x)) / (10 + v.x)) : v.x === 10 ? 7 : 14 + Math.log10((0.1 * (v.x - 10)) / (10 + v.x));
       return { type: 'graph', kind: 'phscale', mark: +ph.toFixed(1) };
     },
     read: (v) => (v.x < 10 ? 'Todavía sobra ácido.' : v.x === 10 ? 'Todo el H⁺ reaccionó con el OH⁻: <b>neutro</b>.' : 'Ahora sobra base.'),
     tasks: [
-      { ask: 'Neutraliza el ácido: llega a <b>pH 7</b>.', ok: (v) => v.x === 10, win: 'Mismos moles de H⁺ y de OH⁻: H⁺ + OH⁻ → H₂O, y queda sal con agua.' },
-      { ask: 'Pásate un poco: agrega <b>2 mL más</b>.', ok: (v) => v.x === 12, win: 'Con solo 2 mL de más el pH salta por encima de 11: por eso se agrega gota a gota cerca del final.' },
+      { ask: 'Neutraliza el ácido: llega a <b>pH 7</b>.', ok: (v) => v.x === 10, win: 'Cada H⁺ encontró su OH⁻ y formaron agua. Solo quedan sal y agua.' },
+      { ask: 'Pásate un poco: agrega <b>2 mL más</b>.', ok: (v) => v.x === 12, win: 'Con solo 2 mL de más ya sobra base y el pH pasa de 11. Por eso, cerca del final, se agrega gota a gota.' },
     ],
   },
   g9u3l1: {
@@ -409,7 +412,7 @@ export const EXPLORE: Record<string, Explore> = {
     tasks: [
       { ask: 'Encuentra el que causa el <b>efecto invernadero</b>.', ok: (v) => v.p === 0, win: 'El CO₂ deja entrar la luz del sol pero retiene el calor.' },
       { ask: 'Encuentra el que produce <b>lluvia ácida</b>.', ok: (v) => v.p === 3, win: 'El SO₂ reacciona con el agua de las nubes y forma ácido sulfúrico.' },
-      { ask: 'Encuentra el que <b>llega hasta los pulmones</b>.', ok: (v) => v.p === 1, win: 'El PM2,5 es tan pequeño que pasa la nariz y llega a los alvéolos.' },
+      { ask: 'Encuentra el que <b>llega hasta los pulmones</b>.', ok: (v) => v.p === 1, win: 'El PM2,5 es tan fino que pasa la nariz y llega al fondo de los pulmones.' },
     ],
   },
   g9u3l2: {
@@ -441,17 +444,17 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g10u1l2: {
-    at: 1,
+    at: 4,
     ctl: [{ id: 'z', label: 'Número atómico (Z)', min: 5, max: 10, step: 1, v: 5 }],
     scene: (v) => ({ type: 'orbital', show: ['2p'], Z: v.z, hund: true }),
-    read: (v) => `<b>${PT[v.z - 1][1]}</b>: ${v.z - 4} electrones en los tres orbitales 2p`,
+    read: (v) => `<b>${PT[v.z - 1][1]}</b>: ${v.z - 4} electrones en los tres orbitales 2p · solos (desapareados): <b>${v.z - 4 <= 3 ? v.z - 4 : 10 - v.z}</b>`,
     tasks: [
       { ask: 'Encuentra el átomo con <b>más electrones desapareados</b> en 2p.', ok: (v) => v.z === 7, win: 'El nitrógeno: 3 electrones, uno en cada orbital (regla de Hund).' },
       { ask: 'Encuentra el primero en que un orbital 2p queda con <b>un par</b>.', ok: (v) => v.z === 8, win: 'El oxígeno: el cuarto electrón ya no tiene orbital vacío y se aparea.' },
     ],
   },
   g10u1l3: {
-    at: 1,
+    at: 4,
     ctl: [{ id: 'y', label: 'Tiempo', min: 0, max: 22920, step: 573, v: 0, unit: 'años', fmt: (x) => x.toLocaleString('es-CO') }],
     scene: (v) => ({ type: 'graph', kind: 'decay', mark: v.y }),
     read: (v) => `Queda <b>${fm(100 * 0.5 ** (v.y / 5730), 1)} %</b> del carbono-14`,
@@ -463,7 +466,7 @@ export const EXPLORE: Record<string, Explore> = {
   g10u2l1: {
     ctl: [{ id: 'p', label: 'Molécula', opts: ['H₂O', 'NH₃', 'CH₄', 'HCl'], v: -1 }],
     scene: (v) => (v.p >= 0 ? { type: 'mol', mol: ['H2O', 'NH3', 'CH4', 'HCl'][v.p], lp: true, pair: null } : {}),
-    read: (v) => (v.p >= 0 ? 'Las nubes son pares libres; los palitos, pares compartidos. Cuenta los del átomo central.' : 'Elige una molécula.'),
+    read: (v) => (v.p >= 0 ? 'Las nubes son pares libres; los palitos son enlaces (pares compartidos). Cuenta los del átomo central.' : 'Elige una molécula.'),
     tasks: [
       { ask: 'Encuentra la molécula cuyo átomo central tiene <b>2 pares libres</b>.', ok: (v) => v.p === 0, win: 'El O del agua: 2 pares compartidos + 2 libres = 8 electrones.' },
       { ask: 'Encuentra la que <b>no tiene ningún par libre</b>.', ok: (v) => v.p === 2, win: 'El C del metano usa sus 4 pares para enlazar 4 hidrógenos.' },
@@ -498,6 +501,7 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g10u2l3: {
+    at: 4,
     ctl: [
       { id: 'd', label: 'Pares alrededor del átomo central', min: 2, max: 4, step: 1, v: 4 },
       { id: 'l', label: 'De ellos, pares libres', min: 0, max: 2, step: 1, v: 0 },
@@ -512,6 +516,7 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g10u3l1: {
+    at: 3,
     ctl: [{ id: 'p', label: 'Elemento + oxígeno', opts: ['Calcio (Ca)', 'Sodio (Na)', 'Carbono (C)', 'Azufre (S)', 'Nitrógeno (N)'], v: -1 }],
     scene: (v) => (v.p === 1 ? { type: 'lattice', kind: 'ionic' } : v.p >= 0 ? { type: 'mol', mol: ['CaO', '', 'CO2', 'SO3', 'NO2'][v.p], pair: null } : {}),
     read: (v) => ['Se forma <b>CaO</b>, óxido de calcio (cal viva).', 'Se forma <b>Na₂O</b>, óxido de sodio.', 'Se forma <b>CO₂</b>, dióxido de carbono.', 'Se forma <b>SO₃</b>, trióxido de azufre.', 'Se forma <b>NO₂</b>, dióxido de nitrógeno.'][v.p] || 'Elige qué elemento se une con el oxígeno.',
@@ -521,7 +526,7 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g10u3l2: {
-    at: 0,
+    at: 1,
     ctl: [{ id: 'p', label: 'Óxido + agua', opts: ['CaO (óxido de calcio)', 'SO₃ (trióxido de azufre)'], v: -1 }],
     scene: (v) => (v.p === 0 ? rx([[1, 'CaO'], [1, 'H2O']], [[1, 'CaOH2']], { count: true }) : v.p === 1 ? rx([[1, 'SO3'], [1, 'H2O']], [[1, 'H2SO4']], { count: true }) : {}),
     read: (v) => ['CaO + H₂O → <b>Ca(OH)₂</b>, hidróxido de calcio', 'SO₃ + H₂O → <b>H₂SO₄</b>, ácido sulfúrico'][v.p] || 'Elige el óxido que vas a mezclar con agua.',
@@ -531,6 +536,7 @@ export const EXPLORE: Record<string, Explore> = {
     ],
   },
   g10u3l3: {
+    at: 0,
     ctl: [
       { id: 'a', label: 'Ácido', opts: ['HCl (clorhídrico)', 'H₂SO₄ (sulfúrico)'], v: -1 },
       { id: 'b', label: 'Base', opts: ['NaOH', 'Ca(OH)₂'], v: -1 },

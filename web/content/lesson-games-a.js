@@ -8,8 +8,8 @@ export const LESSON_GAMES_A = {
       good: ['Una piedra', 'El humo de la leña', 'Un grano de café', 'Tu cuerpo', 'Una gota de lluvia', 'El helio de un globo', 'Un lápiz', 'Un cubo de hielo', 'Un bloque de panela', 'La arena de la playa'],
       bad: ['Luz de una linterna', 'Sonido de un pito', 'Calor de una fogata', 'Rayo láser', 'Luz de la luna', 'Música del parlante', 'Calor de una plancha', 'Eco en una cueva', 'Luz de un bombillo'] },
     { game: 'memory', title: 'Parejas de masa y volumen', pairs: [
-      ['Materia', 'Tiene masa y volumen'], ['Energía', 'No tiene masa'], ['Balanza', 'Mide la masa'], ['Probeta', 'Mide el volumen'],
-      ['1 mL', '1 cm³'], ['1 kg', '1.000 g'], ['1 L', '1.000 mL'], ['Luz y sonido', 'Formas de energía'] ] },
+      ['Materia', 'Pesa y ocupa un lugar'], ['Energía', 'No pesa nada'], ['Balanza', 'Mide la masa'], ['Masa', 'Lo que pesa algo'],
+      ['Volumen', 'El lugar que ocupa'], ['1 mL', '1 cm³'], ['1 kg', '1.000 g'], ['Luz y sonido', 'Formas de energía'] ] },
   ],
 
   // Propiedades de la materia y densidad
@@ -18,16 +18,16 @@ export const LESSON_GAMES_A = {
       ['Corcho (0,24 g/cm³)', 0], ['Balso (0,15 g/cm³)', 0], ['Hielo (0,92 g/cm³)', 0], ['Aceite (0,92 g/cm³)', 0], ['Gasolina (0,74 g/cm³)', 0], ['Pino (0,5 g/cm³)', 0], ['Icopor (0,03 g/cm³)', 0],
       ['Aluminio (2,7 g/cm³)', 1], ['Hierro (7,87 g/cm³)', 1], ['Oro (19,3 g/cm³)', 1], ['Vidrio (2,5 g/cm³)', 1], ['Cobre (8,96 g/cm³)', 1], ['Miel (1,4 g/cm³)', 1], ['Plomo (11,3 g/cm³)', 1] ] },
     { game: 'blitz', title: 'Contrarreloj de la densidad', time: 60, lives: 3, items: [
-      { q: 'Una piedra de 30 g ocupa 10 cm³. Su densidad es…', o: ['3 g/cm³', '300 g/cm³', '0,3 g/cm³', '40 g/cm³'], a: 0, e: 'd = m ÷ V = 30 ÷ 10 = 3 g/cm³.' },
-      { q: 'Si partes un bloque de hierro por la mitad, su densidad…', o: ['Se reduce a la mitad', 'Se duplica', 'Sigue igual', 'Queda en cero'], a: 2, e: 'Masa y volumen bajan a la mitad juntos: el cociente no cambia.' },
-      { q: '¿Cuál es una propiedad general de la materia?', o: ['Punto de ebullición', 'Olor', 'Densidad', 'Masa'], a: 3, e: 'Toda la materia tiene masa; no sirve para distinguir sustancias.' },
+      { q: 'Una piedra de 30 g ocupa 10 cm³. Su densidad es…', o: ['3 g/cm³', '300 g/cm³', '0,3 g/cm³', '40 g/cm³'], a: 0, e: 'Densidad = masa ÷ volumen = 30 ÷ 10 = 3 g/cm³.' },
+      { q: 'Si partes un bloque de hierro por la mitad, su densidad…', o: ['Se reduce a la mitad', 'Se duplica', 'Sigue igual', 'Queda en cero'], a: 2, e: 'Sigue siendo hierro: la masa y el volumen bajan a la mitad juntos y la división da lo mismo.' },
+      { q: '¿Cuál es una propiedad general de la materia?', o: ['Temperatura a la que hierve', 'Olor', 'Densidad', 'Masa'], a: 3, e: 'Todo tiene masa; por eso no sirve para saber qué sustancia es algo.' },
       { q: 'La densidad del agua es cercana a…', o: ['10 g/cm³', '1 g/cm³', '0,1 g/cm³', '100 g/cm³'], a: 1, e: 'Por eso se compara todo con 1 g/cm³ para saber si flota.' },
-      { q: 'Un bloque de 54 g ocupa 20 cm³. Su densidad es…', o: ['2,7 g/cm³', '74 g/cm³', '0,37 g/cm³', '34 g/cm³'], a: 0, e: 'd = m ÷ V = 54 ÷ 20 = 2,7 g/cm³: es aluminio.' },
+      { q: 'Un bloque de 40 g ocupa 20 cm³. Su densidad es…', o: ['2 g/cm³', '60 g/cm³', '0,5 g/cm³', '20 g/cm³'], a: 0, e: 'Densidad = masa ÷ volumen = 40 ÷ 20 = 2 g/cm³. Es más denso que el agua: se hunde.' },
       { q: 'Un material de 0,8 g/cm³ puesto en agua…', o: ['Flota', 'Se hunde', 'Se disuelve siempre', 'Queda a medio camino'], a: 0, e: '0,8 es menor que 1 g/cm³: flota.' },
-      { q: '¿Qué propiedad sirve para identificar una sustancia?', o: ['Volumen', 'Punto de fusión', 'Peso', 'Masa'], a: 1, e: 'Es una propiedad específica: cada sustancia tiene la suya.' },
+      { q: '¿Qué propiedad sirve para saber qué sustancia es algo?', o: ['Volumen', 'Olor', 'Peso', 'Masa'], a: 1, e: 'El olor es una propiedad específica: cada sustancia tiene el suyo.' },
       { q: 'Un tronco enorme de balso y un clavo pequeño en el río. ¿Cuál flota?', o: ['El clavo', 'Los dos', 'El tronco', 'Ninguno'], a: 2, e: 'Importa el material, no el tamaño: el balso es menos denso que el agua.' },
       { q: 'Un cuerpo tiene 5 g y ocupa 5 cm³. Comparado con el agua…', o: ['Es menos denso', 'Tiene la misma densidad', 'Es 5 veces más denso', 'Es 25 veces más denso'], a: 1, e: '5 ÷ 5 = 1 g/cm³, igual que el agua.' },
-      { q: 'Un objeto de 8 g ocupa 10 cm³. En agua…', o: ['Se hunde', 'Flota', 'Se disuelve', 'Explota'], a: 1, e: 'd = 8 ÷ 10 = 0,8 g/cm³, menos que el agua: flota.' } ] },
+      { q: 'Un objeto de 8 g ocupa 10 cm³. En agua…', o: ['Se hunde', 'Flota', 'Se disuelve', 'Explota'], a: 1, e: 'Densidad = 8 ÷ 10 = 0,8 g/cm³, menos que el agua: flota.' } ] },
   ],
 
   // Estados de la materia
@@ -53,46 +53,46 @@ export const LESSON_GAMES_A = {
     { game: 'builder', title: 'Arma elementos y compuestos', targets: ['H2', 'N2', 'O3', 'Cl2', 'H2O', 'CO2', 'CO', 'H2O2'], palette: ['H', 'C', 'N', 'O', 'Cl'] },
     { game: 'truefalse', title: '¿Mito o verdad de las sustancias?', time: 60, lives: 3, items: [
       { s: 'El O₂ es un compuesto porque tiene dos átomos.', a: false, e: 'Tiene dos átomos, pero del mismo tipo: es un elemento.' },
-      { s: 'El agua (H₂O) es un compuesto.', a: true, e: 'Hidrógeno y oxígeno unidos químicamente en proporción fija.' },
+      { s: 'El agua (H₂O) es un compuesto.', a: true, e: 'Une dos elementos distintos: 2 de hidrógeno y 1 de oxígeno, siempre.' },
       { s: 'Un compuesto tiene las mismas propiedades que sus elementos.', a: false, e: 'El sodio y el cloro son peligrosos; juntos forman la sal de cocina.' },
       { s: 'Todos los elementos aparecen en la tabla periódica.', a: true, e: 'La tabla periódica es la lista de los elementos.' },
       { s: 'El oro que se extrae en Antioquia es un elemento.', a: true, e: 'Está formado por un solo tipo de átomo: Au.' },
       { s: 'La sal de cocina (NaCl) es un elemento.', a: false, e: 'Tiene sodio y cloro: es un compuesto.' },
-      { s: 'En un compuesto los elementos están en proporción fija.', a: true, e: 'El agua siempre tiene 2 átomos de H por cada átomo de O.' },
+      { s: 'En un compuesto los átomos se unen siempre en la misma cantidad.', a: true, e: 'El agua siempre tiene 2 átomos de H por cada átomo de O.' },
       { s: 'El CO₂ tiene tres elementos distintos.', a: false, e: 'Tiene tres átomos, pero solo dos elementos: carbono y oxígeno.' },
-      { s: 'Una sustancia pura tiene composición fija.', a: true, e: 'Por eso siempre tiene las mismas propiedades.' },
+      { s: 'Una sustancia pura siempre tiene la misma composición.', a: true, e: 'Por eso el agua pura es igual en Bogotá que en Leticia.' },
       { s: 'El hierro (Fe) es un compuesto porque es un metal.', a: false, e: 'Tiene un solo tipo de átomo: es un elemento.' },
       { s: 'El ozono (O₃) está formado por un solo elemento.', a: true, e: 'Tiene tres átomos, todos de oxígeno.' },
-      { s: 'H₂O y H₂O₂ son la misma sustancia.', a: false, e: 'Cambia la proporción: H₂O₂ es agua oxigenada, otra sustancia.' } ] },
+      { s: 'H₂O y H₂O₂ son la misma sustancia.', a: false, e: 'Cambia la cantidad de oxígeno: H₂O₂ es agua oxigenada, otra sustancia.' } ] },
   ],
 
   // Mezclas homogéneas y heterogéneas
   g6u2l2: [
-    { game: 'sorter', title: '¿Una fase o varias?', bins: ['Homogénea', 'Heterogénea'], time: 60, items: [
+    { game: 'sorter', title: '¿Una parte o varias?', bins: ['Homogénea', 'Heterogénea'], time: 60, items: [
       ['Agua con azúcar', 0], ['Suero oral', 0], ['Alcohol antiséptico', 0], ['Agua de mar filtrada', 0], ['Tinto colado', 0], ['Gasolina', 0], ['Refresco en polvo disuelto', 0],
-      ['Arroz con fríjoles', 1], ['Cereal con leche', 1], ['Bandeja paisa', 1], ['Granito', 1], ['Salpicón de frutas', 1], ['Tierra del jardín', 1], ['Aceite y vinagre', 1], ['Agua con arena', 1] ] },
+      ['Arroz con fríjoles', 1], ['Cereal con leche', 1], ['Bandeja paisa', 1], ['Sopa de verduras', 1], ['Salpicón de frutas', 1], ['Tierra del jardín', 1], ['Aceite y vinagre', 1], ['Agua con arena', 1] ] },
     { game: 'truefalse', title: '¿Mito o verdad de las mezclas?', time: 60, lives: 3, items: [
-      { s: 'En una mezcla, las sustancias cambian químicamente.', a: false, e: 'Cada sustancia conserva sus propiedades.' },
-      { s: 'El agua de panela bien disuelta es una mezcla homogénea.', a: true, e: 'No se distinguen sus componentes: una sola fase.' },
+      { s: 'En una mezcla, las sustancias se transforman en otras.', a: false, e: 'Cada sustancia sigue siendo la misma: la panela sigue siendo panela.' },
+      { s: 'El agua de panela bien disuelta es una mezcla homogénea.', a: true, e: 'No se ven sus partes: todo se ve igual.' },
       { s: 'Una mezcla homogénea también se llama solución.', a: true, e: 'Como el agua con sal disuelta.' },
-      { s: 'En una mezcla la proporción de los componentes siempre es la misma.', a: false, e: 'Puedes echar más o menos panela: la proporción varía.' },
+      { s: 'En una mezcla siempre se echa la misma cantidad de cada cosa.', a: false, e: 'Puedes echar más o menos panela: tú decides.' },
       { s: 'El sancocho es una mezcla homogénea.', a: false, e: 'Se ven la papa, la yuca y el caldo: es heterogénea.' },
-      { s: 'El aire limpio es una mezcla homogénea.', a: true, e: 'Nitrógeno, oxígeno y otros gases en una sola fase.' },
+      { s: 'El aire limpio es una mezcla homogénea.', a: true, e: 'Tiene varios gases, pero todo se ve igual: una sola parte.' },
       { s: 'Si un líquido es transparente, es una sustancia pura.', a: false, e: 'El agua con sal es transparente y es una mezcla.' },
-      { s: 'En el agua con aceite se distinguen dos fases.', a: true, e: 'El aceite queda encima del agua.' },
-      { s: 'Las mezclas se pueden separar por métodos físicos.', a: true, e: 'Porque sus componentes no cambiaron químicamente.' },
-      { s: 'Si a simple vista ves una sola fase, la mezcla es heterogénea.', a: false, e: 'Una sola fase visible indica mezcla homogénea.' },
-      { s: 'El agua con arena se vuelve homogénea si la revuelves muy rápido.', a: false, e: 'Al dejarla quieta la arena se asienta: se ven dos fases.' } ] },
+      { s: 'En el agua con aceite se ven dos capas.', a: true, e: 'El aceite queda encima del agua.' },
+      { s: 'Las partes de una mezcla se pueden volver a separar.', a: true, e: 'Porque ninguna de las sustancias se transformó.' },
+      { s: 'Si a simple vista ves una sola parte, la mezcla es heterogénea.', a: false, e: 'Si ves una sola parte, la mezcla es homogénea.' },
+      { s: 'El agua con arena se vuelve homogénea si la revuelves muy rápido.', a: false, e: 'Al dejarla quieta la arena se asienta: se ven dos partes.' } ] },
   ],
 
   // Métodos de separación de mezclas
   g6u2l3: [
     { game: 'memory', title: 'Parejas de la separación', pairs: [
       ['Filtración', 'Tinto en el colador de tela'], ['Decantación', 'Agua y aceite en reposo'], ['Evaporación', 'Sal en las charcas al sol'],
-      ['Destilación', 'Separar alcohol y agua'], ['Imantación', 'Limaduras de hierro y arena'], ['Embudo de decantación', 'El líquido denso sale primero'] ] },
+      ['Destilación', 'Separar alcohol y agua'], ['Imantación', 'Limaduras de hierro y arena'], ['Embudo con llave', 'El agua sale primero, el aceite se queda'] ] },
     { game: 'order', title: 'Paso a paso: separa la mezcla', time: 90, rounds: [
       { prompt: 'Ordena los pasos para separar arena, sal y limaduras de hierro', items: ['Pasar un imán', 'Agregar agua y revolver', 'Filtrar para retener la arena', 'Evaporar el agua para obtener la sal'] },
-      { prompt: 'Ordena los pasos de la destilación de alcohol y agua', items: ['Calentar la mezcla', 'Hierve primero el alcohol', 'El vapor pasa por el tubo frío', 'El vapor se condensa', 'Se recoge el alcohol en otro recipiente'] },
+      { prompt: 'Ordena los pasos de la destilación de alcohol y agua', items: ['Calentar la mezcla', 'Hierve primero el alcohol', 'El vapor pasa por el tubo frío', 'El vapor vuelve a ser líquido', 'Se recoge el alcohol en otro recipiente'] },
       { prompt: 'Ordena cómo se obtiene la sal en Manaure', items: ['Se llenan charcas con agua de mar', 'El sol calienta el agua', 'El agua se evapora', 'La sal queda en el fondo', 'Se recoge la sal'] },
       { prompt: 'Ordena la decantación de agua y aceite con un embudo', items: ['Echar la mezcla en el embudo', 'Esperar a que se formen dos capas', 'Abrir la llave y dejar salir el agua', 'Cerrar la llave cuando llegue el aceite'] } ] },
   ],
@@ -149,16 +149,16 @@ export const LESSON_GAMES_A = {
       { w: 'RUTHERFORD', h: 'Disparó partículas alfa contra una lámina de oro.' },
       { w: 'BOHR', h: 'En 1913 ubicó a los electrones en niveles de energía.' },
       { w: 'NÚCLEO', h: 'Parte pequeña y positiva del átomo, hallada con la lámina de oro.' },
-      { w: 'ORBITAL', h: 'Región de probabilidad donde es posible encontrar un electrón.' },
+      { w: 'ORBITAL', h: 'Zona donde es más probable encontrar un electrón.' },
       { w: 'ELECTRÓN', h: 'Partícula negativa descubierta en 1897.' } ] },
     { game: 'truefalse', title: '¿Mito o verdad del átomo?', time: 60, lives: 3, items: [
       { s: 'Dalton pensaba que el átomo se podía dividir en partes más pequeñas.', a: false, e: 'Para Dalton el átomo era una esfera maciza e indivisible.' },
       { s: 'Thomson descubrió el electrón.', a: true, e: 'Fue en 1897; por eso su modelo tiene electrones incrustados.' },
       { s: 'En el experimento de Rutherford casi todas las partículas alfa atravesaron la lámina de oro.', a: true, e: 'Por eso concluyó que el átomo es casi vacío.' },
       { s: 'Rutherford concluyó que el átomo es macizo y sin espacios vacíos.', a: false, e: 'Concluyó lo contrario: casi todo es vacío, con un núcleo pequeño.' },
-      { s: 'El núcleo del átomo tiene carga positiva.', a: true, e: 'Por eso repelía a las partículas alfa, que también son positivas.' },
-      { s: 'Bohr propuso que los electrones están en niveles de energía.', a: true, e: 'Así explicó los colores de luz del hidrógeno.' },
-      { s: 'El modelo actual dice que el electrón sigue una órbita exacta, como un planeta.', a: false, e: 'Habla de orbitales: regiones de probabilidad.' },
+      { s: 'El núcleo del átomo tiene carga positiva.', a: true, e: 'Por eso empujaba a las partículas alfa, que también son positivas.' },
+      { s: 'Bohr propuso que los electrones están en niveles de energía.', a: true, e: 'Como los pisos de un edificio: cada electrón vive en un piso.' },
+      { s: 'El modelo actual dice que el electrón sigue una órbita exacta, como un planeta.', a: false, e: 'Solo sabemos dónde es más probable encontrarlo: el orbital.' },
       { s: 'Un modelo se reemplaza cuando un experimento muestra algo que no puede explicar.', a: true, e: 'Así avanza la ciencia.' },
       { s: 'El modelo de Bohr es más antiguo que el de Thomson.', a: false, e: 'Thomson es de 1897 y Bohr de 1913.' },
       { s: 'Los modelos atómicos antiguos no sirvieron para nada.', a: false, e: 'Cada modelo fue la base para construir el siguiente.' },
@@ -182,7 +182,7 @@ export const LESSON_GAMES_A = {
     { game: 'sorter', title: '¿Protón, neutrón o electrón?', bins: ['Protón', 'Neutrón', 'Electrón'], time: 60, items: [
       ['Carga positiva', 0], ['Sin carga', 1], ['Carga negativa', 2], ['Define el elemento', 0], ['Cambia en los isótopos', 1],
       ['Se gana o se pierde en los iones', 2], ['Está fuera del núcleo', 2], ['Su número es Z', 0], ['El más liviano', 2],
-      ['Se calcula con A − Z', 1], ['Lo descubrió Thomson', 2], ['Hay 6 en todo átomo de carbono', 0], ['El carbono-14 tiene 8', 1] ] },
+      ['Se calcula con A − Z', 1], ['Hay 10 en el ion Na⁺', 2], ['Hay 6 en todo átomo de carbono', 0], ['El carbono-14 tiene 8', 1] ] },
   ],
 
   // Grupos y periodos
@@ -272,8 +272,8 @@ export const LESSON_GAMES_A = {
       { w: 'REACTIVOS', h: 'Sustancias que hay al comienzo de una reacción.' },
       { w: 'PRODUCTOS', h: 'Sustancias nuevas que se forman en una reacción.' },
       { w: 'PRECIPITADO', h: 'Sólido que aparece al mezclar dos líquidos y es evidencia de reacción.' },
-      { w: 'EFERVESCENCIA', h: 'Burbujeo de gas, como el de una pastilla en agua.' },
-      { w: 'OXIDACIÓN', h: 'Reacción del hierro o del cobre con el aire que cambia su color.' },
+      { w: 'BURBUJAS', h: 'Así se ve el gas que sale en una reacción, como en la pastilla efervescente.' },
+      { w: 'OXIDACIÓN', h: 'Lo que le pasa al clavo que se pone café rojizo con el aire y la humedad.' },
       { w: 'EVIDENCIA', h: 'Pista observable, como un cambio de color, que sugiere una reacción.' } ] },
   ],
 
@@ -325,7 +325,7 @@ export const LESSON_GAMES_A = {
   g8u2l1: [
     { game: 'word', title: 'Palabras del gas', lives: 6, words: [
       { w: 'PRESIÓN', h: 'Efecto de los choques de las partículas contra las paredes.' },
-      { w: 'TEMPERATURA', h: 'Mide la energía de movimiento de las partículas.' },
+      { w: 'TEMPERATURA', h: 'Dice qué tan rápido se mueven las partículas.' },
       { w: 'KELVIN', h: 'Escala de temperatura en la que 0 °C equivale a 273.' },
       { w: 'CHOQUES', h: 'Lo que hacen las partículas contra las paredes del recipiente.' },
       { w: 'PARTÍCULAS', h: 'Forman el gas: están muy separadas y se mueven en línea recta.' },
