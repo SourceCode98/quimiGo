@@ -93,3 +93,11 @@
 .ms-proposal.wrong{border-style:solid;border-color:var(--bad);background:var(--bad-soft)}
 .ms-proposal .mono{font-weight:500;font-size:.72rem;color:var(--muted)}
 .opt.ms-elim.gone{opacity:.45;text-decoration:line-through}
+
+/* Aprende · ¿Lo captaste? */
+.ms-check{border:2px solid var(--gold);background:var(--gold-soft)}
+.ms-check>.mono{color:var(--gold)}
+.ms-check .ms-binrow{justify-content:stretch}
+.ms-check .ms-binrow .opt{flex:1 1 140px;justify-content:center;text-align:center;min-height:46px;align-items:center;background:var(--surface)}
+.ms-check .ms-binrow .opt.right{background:var(--ok-soft)}
+.ms-check .ms-binrow .opt.wrong{background:var(--bad-soft)}
