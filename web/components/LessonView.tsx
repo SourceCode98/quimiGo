@@ -84,7 +84,7 @@ export function LessonView({ id }: { id: string }) {
   };
   const need = (s: Screen) => ({
     hook: 'Elige una respuesta para continuar',
-    learn: 'Revisa todos los pasos para continuar',
+    learn: 'Revisa todos los pasos y logra el reto Explora',
     act: 'Completa la actividad para continuar',
     game: `Consigue al menos ${gameMin} ${gameMin === 1 ? 'estrella' : 'estrellas'} para continuar`,
     quiz: 'Responde las preguntas para terminar',
@@ -162,7 +162,7 @@ export function LessonView({ id }: { id: string }) {
       case 'learn': return (
         <div id="aprende">
           <Learn key={id} l={l} extras={false} onSeenAll={onSeenAll} onNext={() => { if (learnDone || !student) goTo(cur + 1); }} />
-          {!learnDone && student && <p className="ms-need">Revisa todos los pasos (los puntos numerados) para seguir.</p>}
+          {!learnDone && student && <p className="ms-need">Revisa todos los pasos y logra el reto ★ Explora para seguir.</p>}
         </div>
       );
       case 'key': return (

@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { LessonRef } from '@/content';
 import { LESSON_SCENES } from '@/content/scenes';
 import { CHECKS } from '@/content/checks';
+import { EXPLORE } from '@/content/explore';
+import { Explore } from './Explore';
 
 const html = (s: string) => ({ __html: s });
 
@@ -18,7 +20,12 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
   const [picked, setPicked] = useState<number | null>(null);
   const [asking, setAsking] = useState(false);
   const box = useRef<HTMLDivElement>(null);
-  const scene = useRef<{ step(i: number): void; dispose(): void } | null>(null);
+  const scene = useRef<{ step(i: number, patch?: Record<string, unknown>): void; dispose(): void } | null>(null);
+  // "Explora": reto interactivo con la escena después del último paso. Hay que lograrlo para terminar Aprende.
+  const ex = EXPLORE[l.id];
+  const exAt = ex ? Math.min(ex.at ?? n - 1, n - 1) : 0;
+  const [exploring, setExploring] = useState(false);
+  const [exDone, setExDone] = useState(false);
   const done = useRef(onSeenAll);
   done.current = onSeenAll;
 
@@ -34,6 +41,7 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
     const k = Math.max(0, Math.min(n - 1, i));
     if (check && picked === null && k > check.at) { if (cur !== check.at) { setCur(check.at); scene.current?.step(check.at); } setAsking(true); return; }
     setAsking(false);
+    setExploring(false);
     setCur(k);
     scene.current?.step(k);
     // Vuelve a mostrar la animación: en celular queda arriba del texto y se pierde al leer.
@@ -44,7 +52,9 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
 
   // Avisa una sola vez cuando se vieron todos los pasos (también si la lección tiene un solo paso).
   const fired = useRef(false);
-  useEffect(() => { if (!fired.current && seen.size >= n) { fired.current = true; done.current(); } }, [seen, n]);
+  useEffect(() => { if (!fired.current && seen.size >= n && (!ex || exDone)) { fired.current = true; done.current(); } }, [seen, n, ex, exDone]);
+  const explore = () => { setAsking(false); setExploring(true); scene.current?.step(exAt); box.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
+  const finish = () => (onNext ? onNext() : document.getElementById('practica')?.scrollIntoView({ behavior: 'smooth' }));
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
@@ -52,6 +62,7 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
       if (/INPUT|TEXTAREA|SELECT/.test(a)) return;
       const r = document.getElementById('aprende')?.getBoundingClientRect();
       if (!r || r.bottom < 0 || r.top > innerHeight) return;
+      if (exploring) return;
       if (e.key === 'ArrowRight') { go(cur + 1); e.preventDefault(); }
       if (e.key === 'ArrowLeft') { go(cur - 1); e.preventDefault(); }
     };
@@ -68,12 +79,16 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
         <div className="step-count">
           <div className="dots">
             {Array.from({ length: n }, (_, i) => (
-              <button key={i} className={seen.has(i) ? 'seen' : ''} aria-current={i === cur ? 'step' : undefined} aria-label={`Paso ${i + 1}`} onClick={() => go(i)}>{i + 1}</button>
+              <button key={i} className={seen.has(i) ? 'seen' : ''} aria-current={i === cur && !exploring ? 'step' : undefined} aria-label={`Paso ${i + 1}`} onClick={() => go(i)}>{i + 1}</button>
             ))}
+            {ex && <button className={'ex-dot' + (exDone ? ' seen' : '')} aria-current={exploring ? 'step' : undefined} aria-label="Reto Explora" title="Explora"
+              disabled={seen.size < n && !exDone} onClick={explore}>★</button>}
           </div>
-          <span className="mono">Paso {cur + 1} de {n}</span>
+          <span className="mono">{exploring ? 'Explora' : `Paso ${cur + 1} de ${n}`}</span>
         </div>
-        {asking && check ? (
+        {exploring && ex ? (
+          <Explore key={l.id} ex={ex} onScene={(p) => scene.current?.step(exAt, p)} onDone={() => setExDone(true)} />
+        ) : asking && check ? (
           <div className="step-text enter ms-check" key="check" aria-live="polite">
             <span className="mono">¿Lo captaste?</span>
             <h3 dangerouslySetInnerHTML={html(check.q)} />
@@ -91,7 +106,12 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
           <p dangerouslySetInnerHTML={html(text)} />
         </div>
         )}
-        {asking ? (
+        {exploring ? (
+        <div className="step-nav">
+          <button className="btn ghost" onClick={() => go(cur)}>← Volver a la lección</button>
+          <button className="btn" disabled={!exDone} onClick={finish}>{exDone ? (onNext ? 'Continuar →' : 'Ir a practicar →') : 'Logra el reto para seguir'}</button>
+        </div>
+        ) : asking ? (
         <div className="step-nav">
           <button className="btn ghost" onClick={() => setAsking(false)}>← Volver al paso</button>
           <button className="btn" disabled={picked === null} onClick={() => go(cur + 1)}>Seguir →</button>
@@ -99,8 +119,8 @@ export function Learn({ l, onSeenAll, onNext, extras = true }: { l: LessonRef; o
         ) : (
         <div className="step-nav">
           <button className="btn ghost" disabled={cur === 0} onClick={() => go(cur - 1)}>← Anterior</button>
-          <button className="btn" onClick={() => (cur < n - 1 ? go(cur + 1) : onNext ? onNext() : document.getElementById('practica')?.scrollIntoView({ behavior: 'smooth' }))}>
-            {cur < n - 1 ? 'Siguiente →' : onNext ? 'Continuar →' : 'Ir a practicar →'}
+          <button className="btn" onClick={() => (cur < n - 1 ? go(cur + 1) : ex && !exDone ? explore() : finish())}>
+            {cur < n - 1 ? 'Siguiente →' : ex && !exDone ? 'Al reto Explora →' : onNext ? 'Continuar →' : 'Ir a practicar →'}
           </button>
         </div>
         )}

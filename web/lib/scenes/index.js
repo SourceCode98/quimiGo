@@ -26,8 +26,9 @@ export function stateAt(spec, i) {
 /** Un paso puede cambiar de tipo de escena (ej. de partículas a gráfica): se desmonta la anterior y se monta la nueva. */
 export function mountScene(el, spec) {
   let inst = null, type = null, prev = null, box = null;
-  const step = (i) => {
-    const s = stateAt(spec, i);
+  // patch: cambios en vivo sobre el estado del paso (los usa "Explora", donde el estudiante mueve controles).
+  const step = (i, patch) => {
+    const s = patch ? { ...stateAt(spec, i), ...patch } : stateAt(spec, i);
     if (s.type !== type) {
       if (inst) { try { inst.dispose(); } catch (e) { /* */ } }
       if (box) box.remove();
