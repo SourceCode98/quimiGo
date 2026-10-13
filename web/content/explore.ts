@@ -440,7 +440,7 @@ export const EXPLORE: Record<string, Explore> = {
     tasks: [
       { ask: 'Agrega electrones hasta llenar el <b>2s</b> sin poner nada en el 2p.', ok: (v) => v.z === 4, win: 'El berilio: 1s² 2s². Ya están llenos los dos apartamentos s de abajo.', hint: 'En 1s caben 2 y en 2s caben 2.' },
       { ask: 'Ahora llena el piso 2 <b>por completo</b>.', ok: (v) => v.z === 10, win: 'El neón: 2 + 2 + 6 = 10. Piso 2 lleno, por eso casi no reacciona.' },
-      { ask: 'Encuentra el átomo con <b>un solo electrón de valencia</b> en el piso 3.', ok: (v) => v.z === 11, win: 'El sodio: …2p⁶ 3s¹. Ese electrón solito es el que regala con facilidad.' },
+      { ask: 'Encuentra el átomo con <b>un solo electrón de valencia</b> en el piso 3.', ok: (v) => v.z === 11, win: 'El sodio: …2p⁶ 3s¹. Su último piso es el 3 y ahí solo hay 1: ese es su electrón de valencia, el que regala con facilidad.' },
     ],
   },
   g10u1l2: {

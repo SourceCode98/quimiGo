@@ -141,12 +141,19 @@ export const LESSON_GAMES_B = {
 
   /* ===================== GRADO 10° ===================== */
   g10u1l1: [
-    { game: 'hunter', title: 'Cazador de electrones de valencia', time: 90, clues: [
-      { c: 'Tengo un solo electrón: 1s¹', a: 'H' }, { c: 'Soy 1s²: el gas noble más pequeño', a: 'He' }, { c: 'Termino en 2s² y no tengo 2p', a: 'Be' },
-      { c: 'Termino en 2p¹', a: 'B' }, { c: 'Termino en 2p³', a: 'N' }, { c: 'Tengo 6 electrones de valencia en el piso 2', a: 'O' },
-      { c: 'Termino en 2p⁶: piso 2 lleno', a: 'Ne' }, { c: 'Termino en 3s¹', a: 'Na' }, { c: 'Termino en 3s²', a: 'Mg' },
-      { c: 'Termino en 3p¹', a: 'Al' }, { c: 'Tengo 5 electrones de valencia en el piso 3', a: 'P' }, { c: 'Termino en 3p⁴', a: 'S' },
-      { c: 'Tengo 7 electrones de valencia en el piso 3', a: 'Cl' }, { c: 'Termino en 3p⁶: piso 3 lleno hasta el p', a: 'Ar' }, { c: 'Termino en 4s¹', a: 'K' } ] },
+    { game: 'hunter', title: 'Cazador de configuraciones', time: 150, max: 20, clues: [
+      { c: '¿Quién soy? 1s²', a: 'He', h: 'Suma los numeritos: 2. Busca la casilla con el número 2.' },
+      { c: '¿Quién soy? 1s² 2s¹', a: 'Li', h: '2 + 1 = 3. Busca el número 3.' },
+      { c: '¿Quién soy? 1s² 2s² 2p²', a: 'C', h: '2 + 2 + 2 = 6. Busca el número 6.' },
+      { c: '¿Quién soy? 1s² 2s² 2p³', a: 'N', h: '2 + 2 + 3 = 7. Busca el número 7.' },
+      { c: '¿Quién soy? 1s² 2s² 2p⁴', a: 'O', h: '2 + 2 + 4 = 8. Busca el número 8.' },
+      { c: '¿Quién soy? 1s² 2s² 2p⁶', a: 'Ne', h: '2 + 2 + 6 = 10. Busca el número 10.' },
+      { c: '¿Quién soy? 1s² 2s² 2p⁶ 3s¹', a: 'Na', h: '2 + 2 + 6 + 1 = 11. Busca el número 11.' },
+      { c: '¿Quién soy? 1s² 2s² 2p⁶ 3s²', a: 'Mg', h: '2 + 2 + 6 + 2 = 12. Busca el número 12.' },
+      { c: '¿Quién soy? 1s² 2s² 2p⁶ 3s² 3p⁵', a: 'Cl', h: '2 + 2 + 6 + 2 + 5 = 17. Busca el número 17.' },
+      { c: 'Tengo 1 electrón de valencia y mi último piso es el 2', a: 'Li', h: 'Piso 2 = fila 2. Con 1 de valencia estoy en la primera columna.' },
+      { c: 'Tengo 2 electrones de valencia y mi último piso es el 3', a: 'Mg', h: 'Piso 3 = fila 3. Con 2 de valencia estoy en la segunda columna.' },
+      { c: 'Tengo 8 electrones de valencia en el piso 2: piso lleno', a: 'Ne', h: 'Piso 2 = fila 2. El piso lleno está en la última columna.' } ] },
     { game: 'order', title: 'De abajo hacia arriba', time: 90, rounds: [
       { prompt: 'Ordena los apartamentos según el orden de llenado', items: ['1s', '2s', '2p', '3s', '3p', '4s'] },
       { prompt: 'Ordena los pasos para escribir la configuración del sodio (Z = 11)', items: ['Cuenta: tiene 11 electrones', 'Pon 2 en el 1s', 'Pon 2 en el 2s', 'Pon 6 en el 2p', 'El que sobra va al 3s'] },

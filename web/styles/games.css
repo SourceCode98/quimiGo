@@ -260,6 +260,9 @@
 .gm-clue{position:relative;background:var(--surface2);border-radius:14px;padding:14px 18px 18px;border-left:6px solid var(--gold);overflow:hidden;min-height:92px;display:flex;flex-direction:column;justify-content:center;gap:4px}
 .gm-clue .gm-qt{font-size:clamp(1.2rem,3.4cqi,1.75rem)}
 .gm-was{color:var(--ok);white-space:nowrap}
+.gm-help{margin:4px 0 0;color:var(--gold);font-weight:600;font-size:.95rem}
+.gm-el{position:relative}
+.gm-el .gm-z{position:absolute;top:2px;left:4px;font:600 .6rem "IBM Plex Mono",monospace;color:var(--muted);line-height:1}
 .gm-speed{position:absolute;left:0;right:0;bottom:0;height:5px}
 .gm-speed i{display:block;height:100%;background:var(--gold);transform-origin:left}
 .gm-pt{display:grid;grid-template-columns:22px repeat(18,minmax(0,1fr));grid-auto-rows:auto;gap:4px}

@@ -39,7 +39,7 @@ function autoClues() {
 }
 
 export default function hunter(el, spec, finish) {
-  const given = (spec.clues || []).filter((c) => c && c.c && EL[c.a] && EL[c.a].z <= 36);
+  const given = (spec.clues || []).filter((c) => c && c.c && EL[c.a] && EL[c.a].z <= (spec.max || 36));
   const TIME = spec.time || 90;
   const target = given.length ? Math.min(given.length, 14) : 14;
   return makeGame(el, spec, finish, {
@@ -56,19 +56,21 @@ export default function hunter(el, spec, finish) {
       for (let p = 1; p <= 4; p++) cells += '<span class="gm-ptl dk" style="--c:1;--r:' + (p + 1) + '">' + p + '</span>';
       const MAINCOL = { 1: 1, 2: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8 };
       [1, 2, 13, 14, 15, 16, 17, 18].forEach((gc) => { cells += '<span class="gm-ptl mb" style="--mc:' + ((MAINCOL[gc] - 1) * 5 + 1) + ' / span 5;--mr:1">' + gc + '</span>'; });
-      cells += '<span class="gm-ptl mb gm-ptd" style="--mc:1 / span 40;--mr:6">Metales de transición (grupos 3 a 12, periodo 4)</span>';
-      ELZ.slice(1).forEach((e) => {
+      const MAX = spec.max || 36;
+      if (MAX > 20) cells += '<span class="gm-ptl mb gm-ptd" style="--mc:1 / span 40;--mr:6">Metales de transición (grupos 3 a 12, periodo 4)</span>';
+      ELZ.slice(1, MAX + 1).forEach((e) => {
         const [p, gc] = PT(e.z);
         let mc, mr;
         if (MAINCOL[gc]) { mc = (MAINCOL[gc] - 1) * 5 + 1; mr = p + 1; }
         else { const i = e.z - 21; mc = 8 + (i % 5) * 5; mr = 7 + Math.floor(i / 5); }
-        cells += '<button type="button" class="gm-el" data-s="' + e.sym + '" style="--c:' + (gc + 1) + ';--r:' + (p + 1) + ';--mc:' + mc + ' / span 5;--mr:' + mr + ';--cc:' + CAT[e.cat][1] + '" aria-label="' + e.name + '">' + e.sym + '</button>';
+        cells += '<button type="button" class="gm-el" data-s="' + e.sym + '" style="--c:' + (gc + 1) + ';--r:' + (p + 1) + ';--mc:' + mc + ' / span 5;--mr:' + mr + ';--cc:' + CAT[e.cat][1] + '" aria-label="' + e.name + '"><small class="gm-z">' + e.z + '</small>' + e.sym + '</button>';
       });
       const used = [...new Set(ELZ.slice(1).map((e) => e.cat))];
       g.stage.innerHTML =
-        '<div class="gm-clue"><p class="gm-qn"></p><h3 class="gm-qt"></h3><div class="gm-speed"><i></i></div></div>' +
+        '<div class="gm-clue"><p class="gm-qn"></p><h3 class="gm-qt"></h3><p class="gm-help" hidden></p><div class="gm-speed"><i></i></div></div>' +
         '<div class="gm-pt">' + cells + '</div>' +
         '<div class="gm-legend">' + used.map((c) => '<span><i style="background:' + CAT[c][1] + '"></i>' + CAT[c][0] + '</span>').join('') + '</div>';
+      const help = g.stage.querySelector('.gm-help');
       const qn = g.stage.querySelector('.gm-qn'), qt = g.stage.querySelector('.gm-qt'), clueBox = g.stage.querySelector('.gm-clue');
       const speed = g.stage.querySelector('.gm-speed i');
       const cellOf = (s) => g.stage.querySelector('.gm-el[data-s="' + s + '"]');
@@ -83,6 +85,7 @@ export default function hunter(el, spec, finish) {
         g.stage.querySelectorAll('.gm-el.no').forEach((b) => b.classList.remove('no'));
         qn.textContent = 'Pista ' + (ci + 1);
         qt.textContent = cur.c;
+        help.hidden = true; help.textContent = '';
         g.bump(clueBox, 'gm-in');
         t0 = performance.now();
         g.info('<span><b>' + found + '</b> ' + (found === 1 ? 'encontrado' : 'encontrados') + '</span>');
@@ -110,6 +113,7 @@ export default function hunter(el, spec, finish) {
           g.after(550, () => { b.classList.remove('yes'); next(); });
         } else {
           tries++;
+          if (cur.h) { help.textContent = 'Ayuda: ' + cur.h; help.hidden = false; }
           g.miss();
           b.classList.add('no');
           g.bad(b);
